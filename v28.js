@@ -84,34 +84,36 @@ var v28BaseShow=v5Show;v5Show=function(id,t){v28BaseShow(id,t);if(!String(id).st
  const first=box.querySelector('dt');if(first&&!box.querySelector('.v28-est')){first.insertAdjacentHTML('beforebegin',`<dt class="v28-est">예상 광고비</dt><dd class="v28-est">${v28Est(c.youtube_views)} <small>CPV ${V28_CPV}원 추산 · 아덱스 반영 대기</small></dd>`)}};
 var v28BaseCand=v20CandidateView;v20CandidateView=async function(c){const h=await v28BaseCand(c);
  return h.replace(/<div class="glass"><span>관측 광고비<\/span><strong>확인 전<\/strong><small>[^<]*<\/small><\/div>/,`<div class="glass"><span>예상 광고비</span><strong>${v28Est(c.youtube_views)}</strong><small>아덱스 디지털 광고비 반영 대기, 상기 데이터는 CPV ${V28_CPV}원으로 추산</small></div>`)};
-// 네이버 일별 추정 검색수(쿼리 추정기와 같은 방식): 서버가 만든 결과만 읽어 주별/일별로 표시. 추정 불가 키워드는 빈칸·사유 표시
-var v28QUnit='week',v28BaseTrend=v5TrendPanel;
+// 네이버 추정 검색수(쿼리 추정기와 같은 방식): 주별 쿼리수(추정치). 성별 토글은 성별 지수 추이(성별마다 따로 정규화 → 건수 아님)
+var v28QSeg='all',v28BaseTrend=v5TrendPanel;
+function v28Weekly(rows,val){const m=new Map();for(const p of rows){const t=new Date(p.day+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-(t.getUTCDay()+6)%7);const w=t.toISOString().slice(0,10);const e=m.get(w)||{n:0,v:{}};e.n++;for(const [k,f] of Object.entries(val))e.v[k]=(e.v[k]||0)+f(p);m.set(w,e)}
+ return [...m].sort((a,b)=>a[0].localeCompare(b[0])).filter(([w,e])=>e.n===7).map(([w,e])=>({day:w,...e.v,n:e.n}))}
 function v28QueryTrends(d){
  const q=d.query_estimates;if(!q)return null;const keys=Object.keys(q.series||{});if(!keys.length)return null;
- const daily=v28QUnit==='day',points=[];
- for(const k of keys){const s=q.series[k];
-  if(daily){for(const p of s)points.push({keyword:k,advertiser:d.campaign.advertiser,day:p.day,ratio:p.total,pc:p.pc,mo:p.mo})}
-  else{const m=new Map();for(const p of s){const t=new Date(p.day+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-(t.getUTCDay()+6)%7);const w=t.toISOString().slice(0,10);const e=m.get(w)||{sum:0,pc:0,mo:0,n:0};e.sum+=p.total;e.pc+=p.pc;e.mo+=p.mo;e.n++;m.set(w,e)}
-   const weeks=[...m].sort((a,b)=>a[0].localeCompare(b[0]));weeks.forEach(([w,e])=>{if(e.n===7)points.push({keyword:k,advertiser:d.campaign.advertiser,day:w,ratio:e.sum,pc:e.pc,mo:e.mo})})}}
- return {time_unit:daily?'date_est':'week',estimate:true,count_keywords:keys,points,definition:q.definition,source_url:'https://datalab.naver.com/',keyword_groups:{}};
+ const points=[],adv=d.campaign.advertiser;
+ if(v28QSeg==='all'){for(const k of keys)for(const w of v28Weekly(q.series[k],{ratio:p=>p.total,pc:p=>p.pc,mo:p=>p.mo}))points.push({keyword:k,advertiser:adv,day:w.day,ratio:w.ratio,pc:w.pc,mo:w.mo});
+  return {time_unit:'week',estimate:true,count_keywords:keys,points,definition:q.definition,source_url:'https://datalab.naver.com/',keyword_groups:{}}}
+ for(const k of keys){const s=(q.segments?.[k]||{})[v28QSeg]||[];for(const w of v28Weekly(s,{ratio:p=>p.ratio/7}))points.push({keyword:k,advertiser:adv,day:w.day,ratio:w.ratio})}
+ return {time_unit:'week',count_keywords:[],points,definition:`${v28QSeg==='m'?'남성':'여성'} 검색 지수(주 평균, ${v28QSeg==='m'?'남성':'여성'} 안에서 기간 최대=100). 성별마다 따로 정규화돼 남녀 크기 비교·건수 환산은 할 수 없고 추이만 참고합니다.`,source_url:'https://datalab.naver.com/',keyword_groups:{}};
 }
 v5TrendPanel=function(d){
  const g=v28QueryTrends(d);if(!g)return v28BaseTrend(d);
- v12TrendDaily=v28QUnit==='day';
- let h=v28BaseTrend({...d,trends:{...g,time_unit:'week'}});
+ v12TrendDaily=false;
+ const hasSeg=Object.values(d.query_estimates.segments||{}).some(x=>x.m||x.f);
+ let h=v28BaseTrend({...d,trends:g});
+ const tg=`<div class="v28-unit">${hasSeg?[['all','전체'],['m','남성'],['f','여성']].map(([k,l])=>`<button data-v28-seg="${k}" class="${v28QSeg===k?'on':''}">${l}</button>`).join(''):''}<span class="v28-est-badge">${v28QSeg==='all'?'추정치':'지수 · 건수 아님'}</span></div>`;
+ h=h.replace('<div class="v5-chips">',tg+'<div class="v5-chips">');
+ if(v28QSeg!=='all')return h;
  const skipped=(d.query_estimates.keywords||[]).filter(k=>k.status!=='ok');
- const unit=`<div class="v28-unit" title="주별은 7일이 모두 있는 주만 합산(진행 중인 주 제외)"><button data-v28-unit="week" class="${v28QUnit==='week'?'on':''}">주별</button><button data-v28-unit="day" class="${v28QUnit==='day'?'on':''}">일별</button><span class="v28-est-badge">추정치</span></div>`;
- h=h.replace('<div class="v5-chips">',unit+'<div class="v5-chips">');
- if(v12TrendDaily)h=h.replace('주차별 쿼리 추이','일별 쿼리 추이').replace('주차별 수치','일별 수치').replace('지난주 대비','전일 대비');
  const st=(d.query_estimates.keywords||[]).find(k=>k.keyword===v5TrendKey&&k.status==='ok');
  const ex=st&&st.sum_pc&&st.sum_mo?` · ${esc(st.keyword)}: PC 월 ${number(+st.monthly_pc)}건 ÷ 30일 지수 합 ${number(Math.round(st.sum_pc))} → 지수 1 = ${(st.monthly_pc/st.sum_pc).toFixed(1)}건, 모바일 월 ${number(+st.monthly_mo)}건 ÷ ${number(Math.round(st.sum_mo))} → 지수 1 = ${(st.monthly_mo/st.sum_mo).toFixed(1)}건 (기준 ${esc(st.anchor_start)}~${esc(st.anchor_end)})`:'';
- h=h.replace(/<p class="footnote">/,`<p class="footnote v28-formula">추정식 Q(d) = M<sub>pc</sub> × I<sub>pc</sub>(d) ÷ Σ최근30일 I<sub>pc</sub> + M<sub>mo</sub> × I<sub>mo</sub>(d) ÷ Σ최근30일 I<sub>mo</sub> — M: 검색광고 최근 30일 검색수(실제 건수), I: 데이터랩 일별 지수(같은 요청에서 받은 어제까지 30일 기준)${ex}</p><p class="footnote">`);
+ h=h.replace(/<p class="footnote">/,`<p class="footnote v28-formula">추정식 Q(d) = M<sub>pc</sub> × I<sub>pc</sub>(d) ÷ Σ최근30일 I<sub>pc</sub> + M<sub>mo</sub> × I<sub>mo</sub>(d) ÷ Σ최근30일 I<sub>mo</sub> — M: 검색광고 최근 30일 검색수(실제 건수), I: 데이터랩 일별 지수(같은 요청에서 받은 어제까지 30일 기준) · 주별 쿼리수는 7일이 모두 있는 주의 일별 추정 합${ex}</p><p class="footnote">`);
  if(skipped.length)h=h.replace('<p class="footnote">',`<p class="footnote v28-skip">추정하지 않음(빈칸): ${skipped.map(k=>esc(k.keyword)+' — '+esc(k.reason||'')).join(' · ')}</p><p class="footnote">`);
  return h;
 };
 document.addEventListener('click',e=>{
- const u=e.target.closest('[data-v28-unit]'),k=e.target.closest('.v12-trend-panel [data-trend-key]');if(!u&&!k)return;
- e.preventDefault();e.stopImmediatePropagation();if(u)v28QUnit=u.dataset.v28Unit;if(k)v5TrendKey=k.dataset.trendKey;
+ const u=e.target.closest('[data-v28-seg]'),k=e.target.closest('.v12-trend-panel [data-trend-key]');if(!u&&!k)return;
+ e.preventDefault();e.stopImmediatePropagation();if(u)v28QSeg=u.dataset.v28Seg;if(k)v5TrendKey=k.dataset.trendKey;
  const p=document.querySelector('.v12-trend-panel');if(p&&detailData)p.outerHTML=v5TrendPanel(detailData);
 },true);
 // YouTube 광고 소재 댓글 분석: 'YouTube 소재 확인하기' 아래 '댓글 분석' 버튼 → 자사(코웨이) 관련 댓글 + 인기 댓글 유형
@@ -141,3 +143,5 @@ async function v28OpenComments(id,title,force){
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-v28-cmt]');if(b){e.preventDefault();e.stopImmediatePropagation();const box=$('#story-hover');if(box)box.hidden=true;v28OpenComments(b.dataset.v28Cmt,b.dataset.v28Title||'');return}
  const f=e.target.closest('[data-v28-cmt-fetch]');if(f){e.preventDefault();const d=$('#detail');v28OpenComments(d.dataset.cmt,d.dataset.title||'',true)}},true);
+// 다른 캠페인: 이미지 없는 소재는 썸네일 칸을 비워 둠(글자 표시 안 함)
+var v28BaseOther=otherCampaignsPanel;otherCampaignsPanel=function(d){return v28BaseOther(d).replace(/<div class="v5-thumb-fill">[\s\S]*?<\/div>/g,'<div class="v5-thumb-fill v28-blank"></div>')};

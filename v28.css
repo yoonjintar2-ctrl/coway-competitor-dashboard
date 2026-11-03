@@ -6,3 +6,19 @@
 .v28-state.on{background:#e6f5ee;color:#1d7a4f}
 .v28-naver form button{align-self:end;background:#25a4dc;color:#fff;border:0;border-radius:8px;padding:10px 20px;font-weight:700;cursor:pointer}
 .v28-naver form button:hover{background:#1b8fc2}
+/* 중분류 경계: 왼쪽·위쪽만 흰 선 → 오른쪽 끝선이 대분류 머리띠와 일치 */
+.v28-bands .v4-group{border:0!important}
+.v28-bands .v4-group.v28-gl{border-left:3px solid #fff!important}
+.v28-bands .v4-group.v28-gt{border-top:3px solid #fff!important}
+.v28-bands .v4-leaf small{text-overflow:clip!important}
+.v28-bands .v27-mini small{text-overflow:clip!important}
+/* 비중이 작은 대분류(디지털 등): 트리맵 바로 아래 가로 띠 한 줄 */
+.v28-bands~.v8-small{gap:0!important;margin:0!important}
+.v28-bands~.v8-small .v8-small-item{background:var(--c);color:#fff!important;border:2px solid #fff;border-top-width:0;border-radius:0!important;padding:5px 9px!important;min-height:0!important;font-size:11px!important;gap:8px!important}
+.v28-bands~.v8-small .v8-small-item:last-child{border-radius:0 0 8px 8px!important}
+.v28-bands~.v8-small .v8-small-item i{display:none!important}
+.v28-bands~.v8-small .v8-small-item b{font-size:11px!important;color:#fff}
+.v28-bands~.v8-small .v8-small-item span{font-size:10.5px!important;font-weight:400!important;opacity:.9;color:#fff}
+.v4-treemap.v28-bands{border-radius:8px 8px 0 0!important}
+.v28-bands .v4-leaf>span>*{flex-shrink:0}
+.v28-bands .v4-group-label{text-overflow:clip}

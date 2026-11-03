@@ -17,13 +17,22 @@ function v28Cols(items,x,y,w,h){
  const sq2=small.map(i=>Math.sqrt(i.amount)),ss=sq2.reduce((s,v)=>s+v,0);let cy=y;for(const [k,r] of small.entries()){const rh=sq2[k]/ss*h;out.push({...r,x:cx,y:cy,w:sw,h:rh});cy+=rh}
  return out;
 }
-var v28BaseTree=treeMap;
+// v4 기본 트리맵(v8BaseTree)을 직접 사용: 모든 매체를 넘겨 비중이 캠페인 전체 대비가 되게 하고, 6% 미만 대분류는 띠 배치에서 빼고 아래 가로 띠로 표시
+var v28Small=new Set();
+function v28Route(items,x,y,w,h){return items.length&&items[0].groups?v28Bands(items.filter(i=>!v28Small.has(i.name)),x,y,w,h):items.length&&items[0].children?v28Cols(items,x,y,w,h):v8Squarify(items,x,y,w,h)}
 treeMap=function(rows){
- const _p=partition;
- partition=(items,x,y,w,h)=>items.length&&items[0].groups?v28Bands(items,x,y,w,h):items.length&&items[0].children?v28Cols(items,x,y,w,h):v8Squarify(items,x,y,w,h);
- // v8 래퍼가 partition을 squarify로 바꾸므로 그 안에서도 이 분기를 쓰도록 v8Squarify를 잠시 감쌈
- const sq=v8Squarify;v8Squarify=(items,x,y,w,h)=>items.length&&items[0].groups?v28Bands(items,x,y,w,h):items.length&&items[0].children?v28Cols(items,x,y,w,h):sq(items,x,y,w,h);
- try{return v28BaseTree(rows).replace('class="treemap v4-treemap"','class="treemap v4-treemap v28-bands"')}finally{partition=_p;v8Squarify=sq}
+ const valid=rows.filter(r=>r.amount>0),total=valid.reduce((a,r)=>a+r.amount,0);if(!total)return v8BaseTree(rows);
+ const byParent=new Map();for(const r of valid)byParent.set(r.parent,(byParent.get(r.parent)||0)+r.amount);
+ const big=[...byParent].filter(([p,v])=>v/total>=.06);v28Small=new Set(big.length?[...byParent].filter(([p,v])=>v/total<.06).map(([p])=>p):[]);
+ const _p=partition;partition=v28Route;let html;
+ try{html=v8BaseTree(rows)}finally{partition=_p}
+ html=html.replace('class="treemap v4-treemap"','class="treemap v4-treemap v28-bands"')
+  // 중분류 칸 경계선: 왼쪽·위쪽에만 흰 선(바깥 끝선이 대분류 머리띠와 정확히 맞도록)
+  .replace(/<div class="v4-group" style="left:([\d.e-]+)%;top:([\d.e-]+)%/g,(m,l,t)=>`<div class="v4-group${parseFloat(l)>0.01?' v28-gl':''}${parseFloat(t)>0.01?' v28-gt':''}" style="left:${l}%;top:${t}%`);
+ if(v28Small.size){const pal={'TV':'#219dd6','디지털':'#27b0aa','인쇄':'#9b8ac7','라디오':'#d5ab67'};
+  const strip=`<div class="v8-small">${[...v28Small].sort((a,b)=>byParent.get(b)-byParent.get(a)).map(p=>{const v=byParent.get(p),c=pal[p]||'#7f9aab';const kids=valid.filter(r=>r.parent===p).sort((a,b)=>b.amount-a.amount);return `<div class="v8-small-item" style="--c:${c}" tabindex="0" data-tree-tip="${esc(p+' 전체 · '+kids.map(k=>k.group+(k.sub?' '+k.sub:'')+' '+k.name).slice(0,4).join(', '))}|${number(v)}|${v4PctLabel(v4Pct(v,total))}"><i></i><b>${esc(p)}</b><span>${v4Money(v)}원 · ${v4PctLabel(v4Pct(v,total))}</span></div>`}).join('')}</div>`;
+  html=html.replace('<div class="legend">',strip+'<div class="legend">')}
+ return html;
 };
 // 경쟁사 광고비 비교: 브랜드 고유색이 비슷해(파랑·빨강 계열) 구분이 어려움 → 이 그래프에서만 서로 다른 색 계열로 표시
 var V28_ANNUAL_COLORS=['#1f8fd6','#f08a24','#2fa36b','#8b5cc9','#e0485f','#c9a227','#4b5d73'],v28AnnualMap={};
@@ -48,3 +57,15 @@ v7Draw=function(){
  (async()=>{const el=document.getElementById('v28-naver-state');try{const r=await api('/api/activity?'+new URLSearchParams({category:listing.categories[0]?.code||'',start:listing.period.end,end:listing.period.end}));el.textContent=r.settings?.naver_configured?'연결됨 · 매일 수집 때 전체 브랜드 검색 추이를 갱신합니다.':'연결 대기 · 키를 입력하면 다음 수집부터 전체 브랜드로 갱신합니다.';el.classList.toggle('on',!!r.settings?.naver_configured)}catch(e){el.textContent='연결 상태를 확인하지 못했습니다.'}})();
 };
 document.addEventListener('submit',async e=>{if(e.target.id!=='v28-naver-form')return;e.preventDefault();e.stopImmediatePropagation();const f=e.target;try{await api('/api/naver-credentials',Object.fromEntries(new FormData(f)));f.reset();toast('저장했습니다. 다음 수집부터 전체 브랜드 검색 추이를 갱신합니다.');const el=document.getElementById('v28-naver-state');if(el){el.textContent='연결됨 · 매일 수집 때 전체 브랜드 검색 추이를 갱신합니다.';el.classList.add('on')}}catch(err){toast(err.message)}},true);
+
+// 트리맵 글자: 칸 안에 다 들어가지 않으면 줄여 보고(비중+이름 → 이름만), 그래도 잘리면 표시하지 않음
+function v28Fits(span){if(span.scrollHeight>span.clientHeight+1||span.scrollWidth>span.clientWidth+1)return false;for(const n of span.children)if(n.scrollWidth>n.clientWidth+1)return false;return true}
+function v28FitLabels(){for(const el of document.querySelectorAll('.v28-bands .v4-leaf:not([data-v28])')){const span=el.querySelector('span');if(!span)continue;el.dataset.v28='1';
+ if(v28Fits(span))continue;const name=(el.dataset.treeTip||'').split('|')[0].split(' › ').pop(),share=(el.dataset.treeTip||'').split('|')[2]||'';
+ span.className='v27-mini';span.innerHTML=`<small>${esc(name)}</small><em>${esc(share)}</em>`;if(v28Fits(span))continue;
+ span.innerHTML=`<small>${esc(name)}</small>`;if(v28Fits(span))continue;span.remove()}
+ // 중분류 이름표: 칸이 낮거나 좁으면 이름만, 그래도 잘리면 숨김(마우스 오버 툴팁은 유지)
+ for(const g of document.querySelectorAll('.v28-bands .v4-group:not([data-v28])')){g.dataset.v28='1';const lab=g.querySelector('.v4-group-label');if(!lab)continue;
+  if(g.clientHeight<24){lab.style.display='none';g.querySelector('.v4-group-body').style.top='0';continue}
+  if(lab.scrollWidth<=lab.clientWidth+1)continue;lab.querySelector('em')?.remove();if(lab.scrollWidth<=lab.clientWidth+1)continue;lab.querySelector('b')?.remove();if(lab.scrollWidth<=lab.clientWidth+1)continue;lab.style.visibility='hidden'}}
+new MutationObserver(()=>{if(document.querySelector('.v28-bands .v4-leaf:not([data-v28]),.v28-bands .v4-group:not([data-v28])'))requestAnimationFrame(()=>requestAnimationFrame(v28FitLabels))}).observe(document.getElementById('content')||document.body,{childList:true,subtree:true});

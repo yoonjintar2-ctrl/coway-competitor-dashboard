@@ -105,3 +105,11 @@ html.nd #gantt-scroll .v6-bands i,html.nd #gantt-scroll .v6-bands i.odd,html.nd 
 html.nd .gantt-corner,html.nd .v6-corner{background:rgba(255,255,255,.12)!important}
 html.nd #gantt-scroll .v6-adv,html.nd #gantt-scroll .v6-adv.odd{background:rgba(255,255,255,.16)!important}
 html.nd .gantt-header>div.gantt-corner,html.nd .gantt-header>div:first-child{background:rgba(255,255,255,.12)!important}
+
+/* ── v30.3 (18:56): 1단계보다 조금 더 투명 + 연도 글자 얇게 ── */
+html.nd main .glass{background:linear-gradient(155deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.01) 48%,rgba(250,252,255,.02) 100%)!important;
+  -webkit-backdrop-filter:blur(6px) saturate(170%)!important;backdrop-filter:blur(6px) saturate(170%)!important}
+html.nd #gantt-scroll .v6-bands i,html.nd #gantt-scroll .v6-bands i.odd,html.nd #gantt-scroll .v6-adv,html.nd #gantt-scroll .v6-adv.odd{background:rgba(255,255,255,.04)!important}
+html.nd main .chip,html.nd #gantt-scroll .v5-bar.chip{background:rgba(255,255,255,.26)!important}
+html.nd .campaign-kpis>div,html.nd .v28-cmt-kpi>div.k2{background:rgba(255,255,255,.08)!important}
+html.nd .v17-year-track span{font-weight:500!important;letter-spacing:0!important}

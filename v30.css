@@ -113,3 +113,43 @@ html.nd #gantt-scroll .v6-bands i,html.nd #gantt-scroll .v6-bands i.odd,html.nd 
 html.nd main .chip,html.nd #gantt-scroll .v5-bar.chip{background:rgba(255,255,255,.26)!important}
 html.nd .campaign-kpis>div,html.nd .v28-cmt-kpi>div.k2{background:rgba(255,255,255,.08)!important}
 html.nd .v17-year-track span{font-weight:500!important;letter-spacing:0!important}
+
+/* ── v30.4 (19:05): 기본 디자인 전환 마무리 ── */
+/* 배경: 스크롤해도 물방울 배경 고정 */
+html.nd body{background-attachment:fixed!important}
+/* 타임라인 팝업: .glass 의 position:relative 가 fixed 를 덮어 화면 밖으로 밀리던 문제 → fixed 유지 + 흰 유리 */
+html.nd #campaign-hover,html.nd #story-hover{position:fixed!important;overflow:auto!important;border-radius:16px!important;
+  background:linear-gradient(155deg,rgba(255,255,255,.80) 0%,rgba(255,255,255,.56) 48%,rgba(250,252,255,.66) 100%)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(160%)!important;backdrop-filter:blur(22px) saturate(160%)!important;
+  border:1px solid rgba(255,255,255,.8)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(20,40,80,.05),0 18px 44px rgba(20,40,80,.14)!important}
+html.nd #campaign-hover[hidden],html.nd #story-hover[hidden]{display:none!important}
+/* 품목·광고주 머리글: 연도 표시처럼 크고 굵게 */
+html.nd .gantt-corner>span,html.nd .v6-corner>span{font-size:13px!important;font-weight:700!important;color:var(--ink)!important;letter-spacing:-.1px}
+/* 최근 시작한 캠페인 머리글 + '60일 기준' */
+.v17-recent-head .v31-basis{font-weight:600}
+/* YouTube 선공개 딱지: 유리 윗변 빛줄 위로, 불투명 */
+html.nd .v17-rc>em{z-index:3!important;opacity:1!important;background:#c5221f!important;color:#fff!important}
+/* 행 사이 띠 제거: 광고주 칸·띠 모두 배경 없음, 줄은 아래 한 줄만 */
+html.nd #gantt-scroll .v6-adv-col{background:transparent!important}
+html.nd #gantt-scroll .gantt-category{background:rgba(255,255,255,.14)!important;-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%)}
+html.nd #gantt-scroll .v6-adv,html.nd #gantt-scroll .v6-adv.odd,html.nd #gantt-scroll .v6-bands i,html.nd #gantt-scroll .v6-bands i.odd{background:transparent!important;border-top:0!important;border-bottom:1px solid rgba(20,40,80,.07)!important}
+/* 캡슐: 하늘색 유리 / YouTube 선공개는 붉은 유리 */
+html.nd #gantt-scroll .v5-bar.chip{
+  background:linear-gradient(155deg,rgba(150,214,242,.55) 0%,rgba(110,195,234,.34) 55%,rgba(170,222,246,.46) 100%)!important;
+  -webkit-backdrop-filter:blur(10px) saturate(170%);backdrop-filter:blur(10px) saturate(170%);
+  border:1px solid rgba(255,255,255,.85)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(37,164,220,.18),0 4px 14px rgba(26,140,194,.14)!important}
+html.nd #gantt-scroll .v15-cap:hover .v5-bar.chip{background:linear-gradient(155deg,rgba(150,214,242,.75),rgba(110,195,234,.52))!important}
+html.nd #gantt-scroll .is-evergreen .v5-bar.chip{background:linear-gradient(155deg,rgba(190,228,246,.42),rgba(160,214,240,.26))!important}
+html.nd #gantt-scroll .v17-hot .v5-bar.chip{border:1.5px solid rgba(26,140,194,.85)!important}
+html.nd #gantt-scroll .v16-yt .v5-bar.chip{
+  background:linear-gradient(155deg,rgba(246,160,168,.55) 0%,rgba(236,112,124,.34) 55%,rgba(248,178,186,.46) 100%)!important;
+  border:1.5px solid rgba(214,60,74,.7)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(214,60,74,.18),0 4px 14px rgba(214,60,74,.14)!important}
+html.nd #gantt-scroll .v16-yt.v15-cap:hover .v5-bar.chip,html.nd #gantt-scroll .v15-cap.v16-yt:hover .v5-bar.chip{background:linear-gradient(155deg,rgba(246,160,168,.75),rgba(236,112,124,.52))!important}
+/* 범례 표본도 같은 유리 색으로 */
+html.nd .v27-legend b{background:linear-gradient(155deg,rgba(150,214,242,.6),rgba(110,195,234,.38))!important;border-color:rgba(255,255,255,.9)!important}
+html.nd .v27-legend b.hot{border:1.5px solid rgba(26,140,194,.85)!important}
+html.nd .v27-legend b.yt{background:linear-gradient(155deg,rgba(246,160,168,.6),rgba(236,112,124,.38))!important;border:1.5px solid rgba(214,60,74,.7)!important}
+/* 캠페인 분석 '다른 캠페인' 선택칸도 유리 칩 */
+html.nd #campaign-switch.chip{padding:10px 34px 10px 16px!important;font-weight:600;border-radius:12px!important}

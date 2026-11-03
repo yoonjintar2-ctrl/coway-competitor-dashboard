@@ -129,7 +129,7 @@ html.nd .brand img{content:url("assets/coway-logo-nd.png")}
 html.nd .v6-chip.adv{border:1px solid var(--blue)!important;box-shadow:none!important}
 html.nd .v6-chip.cat{border:1px solid #c9ced6!important;background:#fff!important;color:var(--sub)!important}
 /* 필터: 타임라인에서만, 기간은 숨김, 이름표 크게 */
-html.nd:not([data-route="timeline"]) .toolbar .filter-label{display:none!important}
+html.nd:not([data-nd-route="timeline"]) .toolbar .filter-label{display:none!important}
 html.nd .toolbar .filter-label:has(#period-filter){display:none!important}
 html.nd .filter-label{font-size:12px!important;font-weight:600;color:var(--sub)!important;gap:6px!important;letter-spacing:0!important}
 html.nd .filter-label select{font-size:13.5px!important;padding:10px 30px 10px 12px!important}

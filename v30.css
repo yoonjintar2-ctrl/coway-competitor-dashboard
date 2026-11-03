@@ -91,3 +91,17 @@ html.nd .eyebrow{color:var(--blue-d)!important}
 /* 최근 캠페인 카드: 가로 스크롤 칸에 큰 그림자가 잘려 회색 판처럼 보이던 것 제거 */
 html.nd .v17-rc.glass{box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(20,40,80,.05),0 6px 16px rgba(20,40,80,.06)!important}
 html.nd .v17-recent-rail{padding-bottom:14px!important;margin-bottom:-10px!important}
+
+/* ── v30.2 (18:52): 오른쪽 본문 영역 유리를 훨씬 투명하게 ── */
+html.nd main .glass{background:linear-gradient(155deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.2) 48%,rgba(250,252,255,.3) 100%)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(170%)!important;backdrop-filter:blur(16px) saturate(170%)!important;border:1px solid rgba(255,255,255,.75)!important}
+html.nd main .glass::before{background:linear-gradient(118deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,.1) 26%,rgba(255,255,255,0) 42%,rgba(255,255,255,0) 72%,rgba(255,255,255,.18) 100%)}
+html.nd .v6-adv,html.nd .v6-adv.odd,html.nd .v6-bands>i,html.nd .v6-bands>i.odd{background:rgba(255,255,255,.16)!important}
+html.nd .gantt-shell .v6-cat,html.nd .gantt-shell [class*="cat"]{background:transparent!important}
+html.nd main .chip,html.nd #gantt-scroll .v5-bar.chip{background:rgba(255,255,255,.55)!important}
+html.nd #gantt-scroll .v15-cap:hover .v5-bar.chip{background:rgba(255,255,255,.8)!important}
+html.nd .campaign-kpis>div,html.nd .v28-cmt-kpi>div.k2{background:linear-gradient(155deg,rgba(255,255,255,.4),rgba(255,255,255,.2))!important}
+html.nd #gantt-scroll .v6-bands i,html.nd #gantt-scroll .v6-bands i.odd,html.nd .gantt-shell .v6-bands i{background:rgba(255,255,255,.16)!important}
+html.nd .gantt-corner,html.nd .v6-corner{background:rgba(255,255,255,.12)!important}
+html.nd #gantt-scroll .v6-adv,html.nd #gantt-scroll .v6-adv.odd{background:rgba(255,255,255,.16)!important}
+html.nd .gantt-header>div.gantt-corner,html.nd .gantt-header>div:first-child{background:rgba(255,255,255,.12)!important}

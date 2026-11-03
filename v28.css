@@ -76,3 +76,8 @@
 .v28-ytgroup .v28-cmt-btn span{flex:1}
 .v28-ytgroup .v28-cmt-btn svg{width:15px;height:15px;color:#ff0033}
 .v28-ytgroup .v28-cmt-btn:hover,.v28-ytgroup>.v5-link.yt:hover{background:#ffeef1!important}
+/* 댓글 분석: 테두리와 같은 진한 색으로 채우고 흰 글자 */
+.v28-ytgroup{border-color:#d9354f!important}
+.v28-ytgroup .v28-cmt-btn{background:#d9354f!important;color:#fff!important;border-top-color:#d9354f!important}
+.v28-ytgroup .v28-cmt-btn svg{color:#fff!important}
+.v28-ytgroup .v28-cmt-btn:hover{background:#c22a43!important}

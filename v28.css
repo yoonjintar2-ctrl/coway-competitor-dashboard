@@ -1,0 +1,3 @@
+/* 트리맵 띠 배치: 가로로 긴 칸에 글자가 덜 잘리도록 */
+.v28-bands .v4-leaf span small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.v4-treemap.v28-bands{height:600px!important}

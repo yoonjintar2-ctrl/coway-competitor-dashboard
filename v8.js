@@ -36,7 +36,7 @@ document.addEventListener('pointerout',e=>{
 },true);
 // 트리맵: squarified 배치(행이 가지런히) + 작은 대분류(전체의 6% 미만)는 아래 줄에 작은 네모로
 function v8Squarify(items,x,y,w,h){
- const out=[];let rest=items.filter(i=>i.amount>0).slice().sort((a,b)=>b.amount-a.amount);const total=rest.reduce((s,i)=>s+i.amount,0);if(!total)return out;
+ const out=[];let rest=items.filter(i=>i.amount>0).slice().sort((a,b)=>(a.name==='지상파'?-1:b.name==='지상파'?1:0)||b.amount-a.amount);const total=rest.reduce((s,i)=>s+i.amount,0);if(!total)return out;
  const scale=(w*h)/total;let X=x,Y=y,W=w,H=h;
  const worst=(row,side)=>{const s=row.reduce((a,r)=>a+r.amount*scale,0);let m=0;for(const r of row){const a=r.amount*scale;m=Math.max(m,Math.max(side*side*a/(s*s),(s*s)/(side*side*a)))}return m};
  while(rest.length){const side=Math.min(W,H);let row=[rest[0]],i=1;while(i<rest.length&&worst([...row,rest[i]],side)<=worst(row,side)){row.push(rest[i]);i++}rest=rest.slice(i);const s=row.reduce((a,r)=>a+r.amount*scale,0);

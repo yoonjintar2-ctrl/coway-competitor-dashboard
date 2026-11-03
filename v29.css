@@ -175,3 +175,25 @@ html.nd body::after{background:
   radial-gradient(36% 44% at 30% 82%,rgba(37,164,220,.2),rgba(37,164,220,0) 72%),
   radial-gradient(30% 36% at 55% 45%,rgba(255,255,255,.55),rgba(255,255,255,0) 70%),
   linear-gradient(160deg,rgba(244,250,253,.5),rgba(226,242,250,.34) 55%,rgba(246,251,254,.52))!important}
+/* ── v29.4 (18:33): 레퍼런스처럼 훨씬 밝게 — 거의 흰 바탕 위에 하늘색 물방울이 희미하게, 창은 밝은 반투명 + 가장자리 빛 ── */
+html.nd body::before{filter:grayscale(1) sepia(1) hue-rotate(160deg) saturate(1.25) brightness(1.42) contrast(.62) blur(2.4px)!important;opacity:.9}
+html.nd body::after{background:
+  radial-gradient(46% 52% at 8% 10%,rgba(255,255,255,.9),rgba(255,255,255,0) 70%),
+  radial-gradient(40% 46% at 70% 8%,rgba(214,238,250,.55),rgba(214,238,250,0) 72%),
+  radial-gradient(48% 54% at 92% 62%,rgba(255,255,255,.88),rgba(255,255,255,0) 70%),
+  radial-gradient(42% 50% at 26% 78%,rgba(206,234,249,.5),rgba(206,234,249,0) 72%),
+  radial-gradient(36% 40% at 55% 40%,rgba(255,255,255,.7),rgba(255,255,255,0) 70%),
+  linear-gradient(160deg,rgba(250,252,254,.74),rgba(240,247,252,.64) 55%,rgba(251,253,255,.76))!important}
+html.nd{--glass-bg:linear-gradient(155deg,rgba(255,255,255,.86),rgba(255,255,255,.66));--glass-blur:blur(26px) saturate(180%);
+  --glass-edge:inset 0 1px 0 #fff,inset 1px 0 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(255,255,255,.45),inset -1px 0 0 rgba(255,255,255,.35);
+  --glass-shadow:0 1px 2px rgba(30,60,90,.05),0 14px 34px rgba(30,70,110,.08)}
+html.nd .glass{border:1px solid rgba(255,255,255,.92)!important}
+html.nd .sidebar{background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(255,255,255,.6))!important;border-right:1px solid rgba(255,255,255,.95)!important;
+  box-shadow:inset -1px 0 0 rgba(255,255,255,.7),2px 0 18px rgba(30,70,110,.05)!important}
+html.nd .gantt-header{background:rgba(255,255,255,.62)!important}
+html.nd #gantt-scroll .gantt-track,html.nd #gantt-scroll .gantt-row{background:rgba(255,255,255,.5)!important}
+html.nd .gantt-row:nth-child(odd){background:rgba(255,255,255,.4)!important}
+html.nd .v6-adv,html.nd .v6-adv.odd{background:rgba(255,255,255,.7)!important}
+html.nd .v6-bands>i,html.nd .v6-bands>i.odd{background:rgba(255,255,255,.68)!important}
+html.nd .v17-rc{background:linear-gradient(155deg,rgba(255,255,255,.9),rgba(255,255,255,.72))!important;border:1px solid rgba(255,255,255,.95)!important}
+html.nd .campaign-kpis>div{background:linear-gradient(155deg,rgba(255,255,255,.86),rgba(255,255,255,.66))!important}

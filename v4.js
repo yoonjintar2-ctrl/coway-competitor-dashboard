@@ -1,6 +1,6 @@
 /* v4 — 2026-11-03 Claude 인계 수정. v3.js 다음에 로드되어 일부 화면 함수만 덮어씁니다.
    게시일 표시, 원본 카피, 소재별 집행 매체·공식 YouTube 업로드, 트리맵 비중, 월별 표 전치, 이미지 미확보 사유. */
-const v4Money=n=>n==null?'—':Number(n)===0?'0':Math.abs(n)>=1e9?Math.round(n/1e8).toLocaleString('ko-KR')+'억':Math.abs(n)>=1e8?(n/1e8).toLocaleString('ko-KR',{maximumFractionDigits:1})+'억':(n/1e4).toLocaleString('ko-KR',{maximumFractionDigits:1})+'만';
+const v4Money=n=>n==null?'—':Number(n)===0?'0':Math.abs(n)>=1e9?Math.round(n/1e8).toLocaleString('ko-KR')+'억':Math.abs(n)>=1e8?(n/1e8).toLocaleString('ko-KR',{maximumFractionDigits:1})+'억':Math.round(n/1e4).toLocaleString('ko-KR')+'만';
 const v4Icons={
  tv:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="13" rx="2.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M9 2.5l3 2.5 3-2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
  youtube:'<svg viewBox="0 0 28 20" aria-hidden="true"><rect x="0.5" y="0.5" width="27" height="19" rx="5" fill="#ff0033"/><path d="M11.2 5.6v8.8l7.4-4.4z" fill="#fff"/></svg>',

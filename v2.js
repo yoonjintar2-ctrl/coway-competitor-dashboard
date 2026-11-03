@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const number=n=>n==null?'—':Number(n).toLocaleString('ko-KR',{maximumFractionDigits:0}),money=n=>n==null?'—':n===0?'0':Math.abs(n)>=1e8?(n/1e8).toLocaleString('ko-KR',{maximumFractionDigits:1})+'억':(n/1e4).toLocaleString('ko-KR',{maximumFractionDigits:1})+'만';
+const number=n=>n==null?'—':Number(n).toLocaleString('ko-KR',{maximumFractionDigits:0}),money=n=>n==null?'—':n===0?'0':Math.abs(n)>=1e8?(n/1e8).toLocaleString('ko-KR',{maximumFractionDigits:1})+'억':Math.round(n/1e4).toLocaleString('ko-KR')+'만';
 const names={broadcast:'방송',print:'인쇄',digital_video:'디지털 영상',digital_banner:'디지털 배너',youtube:'YouTube',searchad:'검색광고',news:'뉴스',datalab:'데이터랩',basis:'소재 매칭',excel:'엑셀',annual:'연간 자료',trends:'검색 트렌드',instagram:'Instagram',history:'캠페인 이력'};
 const statusNames={success:'정상',partial:'일부 확인 중',not_configured:'연결 대기',auth_required:'로그인 갱신 필요',failed:'수집 오류',running:'진행 중'};
 const buckets={terrestrial:'지상파',general:'종편',cable:'케이블',radio:'라디오',print:'신문·잡지',digital_video:'디지털 영상',digital_banner:'디지털 배너'};

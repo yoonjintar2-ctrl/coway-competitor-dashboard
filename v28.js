@@ -25,3 +25,15 @@ treeMap=function(rows){
  const sq=v8Squarify;v8Squarify=(items,x,y,w,h)=>items.length&&items[0].groups?v28Bands(items,x,y,w,h):items.length&&items[0].children?v28Cols(items,x,y,w,h):sq(items,x,y,w,h);
  try{return v28BaseTree(rows).replace('class="treemap v4-treemap"','class="treemap v4-treemap v28-bands"')}finally{partition=_p;v8Squarify=sq}
 };
+// 경쟁사 광고비 비교: 브랜드 고유색이 비슷해(파랑·빨강 계열) 구분이 어려움 → 이 그래프에서만 서로 다른 색 계열로 표시
+var V28_ANNUAL_COLORS=['#1f8fd6','#f08a24','#2fa36b','#8b5cc9','#e0485f','#c9a227','#4b5d73'],v28AnnualMap={};
+function v28WithAnnualColors(fn){const saved={};for(const [n,c] of Object.entries(v28AnnualMap)){saved[n]=v3BrandPalette[n];v3BrandPalette[n]=c}
+ try{return fn()}finally{for(const [n,c] of Object.entries(saved)){if(c===undefined)delete v3BrandPalette[n];else v3BrandPalette[n]=c}}}
+var v28BaseAnnual=annualPanel;
+annualPanel=function(d){
+ const tot=new Map();for(const r of d.annual||[])tot.set(r.advertiser,(tot.get(r.advertiser)||0)+r.amount);
+ const sel=d.campaign.advertiser,names=[sel,...[...tot.keys()].filter(a=>a!==sel).sort((p,q)=>tot.get(q)-tot.get(p))];
+ v28AnnualMap={};let k=1;names.forEach(n=>{v28AnnualMap[n]=n==='코웨이'?V28_ANNUAL_COLORS[0]:V28_ANNUAL_COLORS[1+((k++-1)%(V28_ANNUAL_COLORS.length-1))]});  // 코웨이는 항상 파랑
+ return v28WithAnnualColors(()=>v28BaseAnnual(d));
+};
+var v28BaseAnnualCard=v12AnnualCard;v12AnnualCard=function(i,ev){return v28WithAnnualColors(()=>v28BaseAnnualCard(i,ev))};

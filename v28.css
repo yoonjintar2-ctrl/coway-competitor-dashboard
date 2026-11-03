@@ -24,3 +24,12 @@
 .v28-bands .v4-group-label{text-overflow:clip}
 /* 쿼리 추이: 카드 테두리(1px) 안쪽에 정확히 붙도록 */
 .v12-trend-wrap{margin:0 -23px!important;width:calc(100% + 46px)!important}
+.v28-unit{display:flex;align-items:center;gap:4px;margin:2px 0 8px}
+.v28-unit button{border:1px solid #cfe3ef;background:#fff;color:#4f6d80;border-radius:12px;padding:3px 11px;font-size:11.5px;cursor:pointer}
+.v28-unit button.on{background:#25a4dc;border-color:#25a4dc;color:#fff;font-weight:700}
+.v28-est-badge{margin-left:6px;font-size:10.5px;font-weight:700;color:#a35a12;background:#fff4e8;border-radius:10px;padding:2px 8px}
+.v28-skip{color:#a35a12!important}
+.v28-qgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:6px 0 10px}
+.v28-qgrid>div{background:#f4f9fc;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.v28-qgrid span{font-size:11px;color:#6d8797}.v28-qgrid b{font-size:18px;color:#102b45}.v28-qgrid b.on{color:#1d7a4f}.v28-qgrid b.off{color:#a35a12}
+.v28-qgrid small{font-size:10.5px;color:#6d8797;line-height:1.5}

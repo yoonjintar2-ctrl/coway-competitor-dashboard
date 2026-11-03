@@ -48,15 +48,16 @@ annualPanel=function(d){
 var v28BaseAnnualCard=v12AnnualCard;v12AnnualCard=function(i,ev){return v28WithAnnualColors(()=>v28BaseAnnualCard(i,ev))};
 // 설정 > '외부 연결' 탭: 네이버 데이터랩 API 키(주차별 쿼리 추이 전체 브랜드·데일리 갱신용). 키 값은 화면·응답에 다시 표시하지 않음
 v7Tabs.push(['api','외부 연결']);
-function v28ApiCard(){return `<section class="glass section v28-naver">${header('네이버 데이터랩 API','주차별 쿼리 추이를 품목 내 전체 브랜드로 수집하고 매일 갱신합니다. 네이버 개발자센터 애플리케이션(데이터랩 검색어 트렌드 사용)의 Client ID/Secret을 입력하세요.')}<p class="v28-state" id="v28-naver-state">연결 상태 확인 중…</p><form id="v28-naver-form" class="category-form" autocomplete="off"><label>Client ID<input name="client_id" required autocomplete="off"></label><label>Client Secret<input name="client_secret" type="password" required autocomplete="new-password"></label><button type="submit">저장</button></form><p class="footnote">저장한 값은 이 PC에만 암호화되어 보관되며 화면에 다시 표시하지 않습니다. 키가 없으면 기존 브라우저 검증본(품목별 5개 브랜드)을 그대로 보여줍니다. 수집 키워드: 품목별 아덱스 관측 광고주 전체(72개), 묶음마다 같은 기준 키워드를 넣어 품목 안에서 서로 비교할 수 있게 보정합니다.</p></section>`}
+function v28ApiCard(){return `<section class="glass section v28-naver">${header('네이버 쿼리 추정','keyword.jintar.co.kr 쿼리 추정기와 같은 방식·같은 키로 일별 추정 검색수를 매일 1회 증분 수집합니다. 키는 PC 서버 환경변수에서만 읽고 화면·코드·GitHub에는 넣지 않습니다.')}<div id="v28-q-state" class="v28-qgrid">상태 확인 중…</div><p class="footnote">환경변수: NAVER_HUB_CLIENT_ID · NAVER_HUB_CLIENT_SECRET · NAVER_SEARCHAD_LICENSE · NAVER_SEARCHAD_SECRET · NAVER_SEARCHAD_CUSTOMER. 호출은 순차(0.3초 간격), 429·5xx는 1→2→4→8초 재시도. 데이터랩 사용량은 기존 추정기와 월 한도를 함께 씁니다.</p></section>`}
 var v28BaseDraw=v7Draw;
 v7Draw=function(){
  if(v7Tab!=='api')return v28BaseDraw();
  $('#content').innerHTML=`<div class="v7-layout">${v7Menu()}${v28ApiCard()}</div>`;
- if(listing?.static){document.getElementById('v28-naver-state').textContent='읽기 전용 사이트 · 키 입력은 PC의 로컬 대시보드에서만 할 수 있습니다.';document.getElementById('v28-naver-form').remove();return}
- (async()=>{const el=document.getElementById('v28-naver-state');try{const r=await api('/api/activity?'+new URLSearchParams({category:listing.categories[0]?.code||'',start:listing.period.end,end:listing.period.end}));el.textContent=r.settings?.naver_configured?'연결됨 · 매일 수집 때 전체 브랜드 검색 추이를 갱신합니다.':'연결 대기 · 키를 입력하면 다음 수집부터 전체 브랜드로 갱신합니다.';el.classList.toggle('on',!!r.settings?.naver_configured)}catch(e){el.textContent='연결 상태를 확인하지 못했습니다.'}})();
+ const el=document.getElementById('v28-q-state');
+ if(listing?.static){el.textContent='읽기 전용 사이트 · 수집 상태는 PC의 로컬 대시보드에서 확인합니다.';return}
+ (async()=>{try{const r=await api('/api/query-usage');const ok=Object.values(r.keys).every(Boolean);const t=r.calls.today,m=r.calls.month;
+  el.innerHTML=`<div><span>키 연결</span><b class="${ok?'on':'off'}">${ok?'5개 모두 연결됨':'연결 대기'}</b><small>${Object.entries(r.keys).map(([k,v])=>(v?'✓ ':'✕ ')+esc(k)).join('<br>')}</small></div><div><span>오늘 호출 (${esc(r.calls.day)})</span><b>${number(t.datalab_hub||0)}회</b><small>데이터랩 · 검색광고 ${number(t.searchad||0)}회</small></div><div><span>이번 달 호출</span><b>${number(m.datalab_hub||0)}회</b><small>데이터랩 · 검색광고 ${number(m.searchad||0)}회</small></div>`}catch(e){el.textContent='상태를 확인하지 못했습니다(서버 재시작 필요할 수 있음).'}})();
 };
-document.addEventListener('submit',async e=>{if(e.target.id!=='v28-naver-form')return;e.preventDefault();e.stopImmediatePropagation();const f=e.target;try{await api('/api/naver-credentials',Object.fromEntries(new FormData(f)));f.reset();toast('저장했습니다. 다음 수집부터 전체 브랜드 검색 추이를 갱신합니다.');const el=document.getElementById('v28-naver-state');if(el){el.textContent='연결됨 · 매일 수집 때 전체 브랜드 검색 추이를 갱신합니다.';el.classList.add('on')}}catch(err){toast(err.message)}},true);
 
 // 트리맵 글자: 칸 안에 다 들어가지 않으면 줄여 보고(비중+이름 → 이름만), 그래도 잘리면 표시하지 않음
 function v28Fits(span){if(span.scrollHeight>span.clientHeight+1||span.scrollWidth>span.clientWidth+1)return false;for(const n of span.children)if(n.scrollWidth>n.clientWidth+1)return false;return true}
@@ -83,3 +84,30 @@ var v28BaseShow=v5Show;v5Show=function(id,t){v28BaseShow(id,t);if(!String(id).st
  const first=box.querySelector('dt');if(first&&!box.querySelector('.v28-est')){first.insertAdjacentHTML('beforebegin',`<dt class="v28-est">예상 광고비</dt><dd class="v28-est">${v28Est(c.youtube_views)} <small>CPV ${V28_CPV}원 추산 · 아덱스 반영 대기</small></dd>`)}};
 var v28BaseCand=v20CandidateView;v20CandidateView=async function(c){const h=await v28BaseCand(c);
  return h.replace(/<div class="glass"><span>관측 광고비<\/span><strong>확인 전<\/strong><small>[^<]*<\/small><\/div>/,`<div class="glass"><span>예상 광고비</span><strong>${v28Est(c.youtube_views)}</strong><small>아덱스 디지털 광고비 반영 대기, 상기 데이터는 CPV ${V28_CPV}원으로 추산</small></div>`)};
+// 네이버 일별 추정 검색수(쿼리 추정기와 같은 방식): 서버가 만든 결과만 읽어 주별/일별로 표시. 추정 불가 키워드는 빈칸·사유 표시
+var v28QUnit='week',v28BaseTrend=v5TrendPanel;
+function v28QueryTrends(d){
+ const q=d.query_estimates;if(!q)return null;const keys=Object.keys(q.series||{});if(!keys.length)return null;
+ const daily=v28QUnit==='day',points=[];
+ for(const k of keys){const s=q.series[k];
+  if(daily){for(const p of s)points.push({keyword:k,advertiser:d.campaign.advertiser,day:p.day,ratio:p.total})}
+  else{const m=new Map();for(const p of s){const t=new Date(p.day+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-(t.getUTCDay()+6)%7);const w=t.toISOString().slice(0,10);const e=m.get(w)||{sum:0,n:0};e.sum+=p.total;e.n++;m.set(w,e)}
+   const weeks=[...m].sort((a,b)=>a[0].localeCompare(b[0]));weeks.forEach(([w,e])=>{if(e.n===7)points.push({keyword:k,advertiser:d.campaign.advertiser,day:w,ratio:e.sum})})}}
+ return {time_unit:daily?'date_est':'week',estimate:true,count_keywords:keys,points,definition:q.definition,source_url:'https://datalab.naver.com/',keyword_groups:{}};
+}
+v5TrendPanel=function(d){
+ const g=v28QueryTrends(d);if(!g)return v28BaseTrend(d);
+ v12TrendDaily=v28QUnit==='day';
+ let h=v28BaseTrend({...d,trends:{...g,time_unit:'week'}});
+ const skipped=(d.query_estimates.keywords||[]).filter(k=>k.status!=='ok');
+ const unit=`<div class="v28-unit" title="주별은 7일이 모두 있는 주만 합산(진행 중인 주 제외)"><button data-v28-unit="week" class="${v28QUnit==='week'?'on':''}">주별</button><button data-v28-unit="day" class="${v28QUnit==='day'?'on':''}">일별</button><span class="v28-est-badge">추정치</span></div>`;
+ h=h.replace('<div class="v5-chips">',unit+'<div class="v5-chips">');
+ if(v12TrendDaily)h=h.replace('주차별 쿼리 추이','일별 쿼리 추이').replace('주차별 수치','일별 수치').replace('지난주 대비','전일 대비');
+ if(skipped.length)h=h.replace('<p class="footnote">',`<p class="footnote v28-skip">추정하지 않음(빈칸): ${skipped.map(k=>esc(k.keyword)+' — '+esc(k.reason||'')).join(' · ')}</p><p class="footnote">`);
+ return h;
+};
+document.addEventListener('click',e=>{
+ const u=e.target.closest('[data-v28-unit]'),k=e.target.closest('.v12-trend-panel [data-trend-key]');if(!u&&!k)return;
+ e.preventDefault();e.stopImmediatePropagation();if(u)v28QUnit=u.dataset.v28Unit;if(k)v5TrendKey=k.dataset.trendKey;
+ const p=document.querySelector('.v12-trend-panel');if(p&&detailData)p.outerHTML=v5TrendPanel(detailData);
+},true);

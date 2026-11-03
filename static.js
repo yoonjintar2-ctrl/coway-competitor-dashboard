@@ -18,6 +18,7 @@
     if(cat!=='all')L.campaigns=L.campaigns.filter(c=>c.category===cat);
     return ok(L)}
    if(p.startsWith('/api/campaign/'))return ok(await json('campaign/'+decodeURIComponent(p.split('/').pop())+'.json'));
+   if(p.startsWith('/api/comments/'))return ok(await json('comments/'+decodeURIComponent(p.split('/').pop())+'.json'));
    if(p==='/api/adjustments')return ok(await json('adjustments.json'));
    if(p==='/api/indexes')return ok(await json('indexes.json'));
    if(p==='/api/media-classes')return ok(await json('media-classes.json'));

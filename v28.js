@@ -114,3 +114,30 @@ document.addEventListener('click',e=>{
  e.preventDefault();e.stopImmediatePropagation();if(u)v28QUnit=u.dataset.v28Unit;if(k)v5TrendKey=k.dataset.trendKey;
  const p=document.querySelector('.v12-trend-panel');if(p&&detailData)p.outerHTML=v5TrendPanel(detailData);
 },true);
+// YouTube 광고 소재 댓글 분석: 'YouTube 소재 확인하기' 아래 '댓글 분석' 버튼 → 자사(코웨이) 관련 댓글 + 인기 댓글 유형
+var v28BaseYtRow=v4YoutubeRow;
+v4YoutubeRow=function(r){let h=v28BaseYtRow(r);if(r.youtube_status!=='matched')return h;
+ return h.replace(/<\/div>$/,`<button class="v28-cmt-btn" data-v28-cmt="${esc(r.creative_id)}" data-v28-title="${esc(r.copyline||r.product||'')}">💬 댓글 분석</button></div>`)};
+function v28CmtCard(c,extra){return `<div class="v28-cmt-card"><p>${esc(c.text)}</p><div><span>👍 ${number(c.likes)}</span>${c.replies?`<span>답글 ${number(c.replies)}</span>`:''}<span>${esc(c.date)}</span>${(extra||c.types||[]).map(t=>`<em>${esc(t)}</em>`).join('')}</div></div>`}
+function v28CmtBars(list,total){const mx=Math.max(1,...list.map(x=>x.count));return `<div class="v28-cmt-bars">${list.map(x=>`<div><span>${esc(x.type)}</span><i style="width:${x.count/mx*100}%"></i><b>${number(x.count)}건</b><small>좋아요 ${number(x.likes)}</small></div>`).join('')}</div>`}
+function v28CmtView(a,title){
+ const st={ok:'수집',disabled:'댓글 사용 중지',not_found:'영상 없음'};
+ const vids=`<div class="v28-cmt-vids">${a.videos.map(v=>`<a href="${esc(safeUrl(v.url))}" target="_blank" rel="noopener">${v5Icon.yt}<span>${esc((v.title||'').slice(0,46))}</span><small>${v.status?(st[v.status]||'수집 실패')+(v.status==='ok'?` ${number(v.comment_count||0)}개${v.total!=null?' / 전체 '+number(v.total)+'개':''}`:''):'미수집'}</small></a>`).join('')}</div>`;
+ if(!a.comments)return `<h2>댓글 분석<small>${esc(title)}</small></h2>${vids}<p class="v28-cmt-empty">${a.videos.some(v=>v.status==='disabled')&&a.videos.every(v=>v.status&&v.status!=='ok')?'광고 영상의 댓글이 막혀 있어 분석할 댓글이 없습니다.':a.videos.some(v=>!v.status)?'아직 댓글을 받지 않았습니다.':'분석할 댓글이 없습니다.'}</p>${listing?.static?'':'<button class="v28-cmt-refresh" data-v28-cmt-fetch="1">댓글 받기</button>'}`;
+ const cw=a.coway;
+ return `<h2>댓글 분석<small>${esc(title)}</small></h2>${vids}
+ <div class="v28-cmt-kpi"><div><span>분석 댓글</span><b>${number(a.opinion)}개</b><small>이벤트 참여 ${number(a.events)}개 제외</small></div><div class="cw"><span>코웨이 언급</span><b>${number(cw.count)}개</b><small>${cw.share!=null?'분석 댓글의 '+cw.share+'%':''}</small></div><div><span>가장 많은 유형</span><b>${esc(a.popular.types[0]?.type||'—')}</b><small>${a.popular.types[0]?number(a.popular.types[0].count)+'건 · 좋아요 '+number(a.popular.types[0].likes):''}</small></div></div>
+ <section class="v28-cmt-sec cw"><h3>A. 코웨이(자사) 관련 댓글</h3>${cw.count?v28CmtBars(cw.types)+`<div class="v28-cmt-list">${cw.top.map(c=>v28CmtCard(c,c.coway_types)).join('')}</div>`:'<p class="v28-cmt-empty">코웨이·코웨이 제품을 언급한 댓글이 없습니다.</p>'}</section>
+ <section class="v28-cmt-sec"><h3>B. 인기 댓글 · 많이 나온 유형</h3>${v28CmtBars(a.popular.types.slice(0,8))}<div class="v28-cmt-list">${a.popular.top.map(c=>v28CmtCard(c)).join('')}</div>${a.words.length?`<div class="v28-cmt-words"><span>자주 나온 단어</span>${a.words.map(w=>`<em>${esc(w.word)} <b>${w.count}</b></em>`).join('')}</div>`:''}</section>
+ <p class="footnote">${esc(a.method)}${a.videos[0]?.fetched_at?' · 수집 '+esc(a.videos.map(v=>v.fetched_at).filter(Boolean).sort().pop().slice(0,16).replace('T',' ')):''}</p>${listing?.static?'':'<button class="v28-cmt-refresh" data-v28-cmt-fetch="1">댓글 새로 받기</button>'}`;
+}
+async function v28OpenComments(id,title,force){
+ const dialog=$('#detail');dialog.className='post-dialog v28-cmt-dialog';dialog.dataset.cmt=id;dialog.dataset.title=title;
+ $('#detail-body').innerHTML=`<h2>댓글 분석<small>${esc(title)}</small></h2><p class="v28-cmt-empty">댓글을 불러오는 중…</p>`;if(!dialog.open)dialog.showModal();
+ try{let a=await api('/api/comments/'+encodeURIComponent(id));
+  if(!listing?.static&&(force||a.videos.some(v=>!v.status))){$('#detail-body').innerHTML=`<h2>댓글 분석<small>${esc(title)}</small></h2><p class="v28-cmt-empty">YouTube에서 댓글을 받는 중…</p>`;a=await api('/api/comments/'+encodeURIComponent(id),{force:!!force})}
+  if(dialog.dataset.cmt===id)$('#detail-body').innerHTML=v28CmtView(a,title)}
+ catch(e){$('#detail-body').innerHTML=`<h2>댓글 분석<small>${esc(title)}</small></h2><p class="v28-cmt-empty">${esc(e.message)}</p>`}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-v28-cmt]');if(b){e.preventDefault();e.stopImmediatePropagation();const box=$('#story-hover');if(box)box.hidden=true;v28OpenComments(b.dataset.v28Cmt,b.dataset.v28Title||'');return}
+ const f=e.target.closest('[data-v28-cmt-fetch]');if(f){e.preventDefault();const d=$('#detail');v28OpenComments(d.dataset.cmt,d.dataset.title||'',true)}},true);

@@ -74,3 +74,20 @@ html.nd #gantt-scroll .v17-hot .v5-bar.chip{border:1.5px solid #2a7fb0!important
 html.nd #gantt-scroll .v16-yt .v5-bar.chip{border:1.5px solid #f3a2ae!important;background:rgba(255,245,246,.78)!important}
 html.nd #gantt-scroll .v17-open .v5-bar.chip{border-right:0!important;border-top-right-radius:0!important;border-bottom-right-radius:0!important}
 html.nd #gantt-scroll .is-evergreen .v5-bar.chip{background:rgba(255,255,255,.5)!important}
+
+/* ── v30.1 (18:49): 타이틀 뒤 물방울 배경(사용자 제공 사진) + 코웨이 로고색 시그니처 + 카드 그림자 잘림 제거 ── */
+html.nd{--blue:#25a4dc;--blue-d:#1a8cc2;--blue-l:#e6f5fc;--blue-m:#c9e9f8}
+html.nd body{
+  background:
+    radial-gradient(1100px 700px at 12% -8%,rgba(255,255,255,.95),transparent 62%),
+    radial-gradient(900px 620px at 100% 4%,rgba(207,223,250,.55),transparent 60%),
+    radial-gradient(900px 650px at 55% 112%,rgba(222,231,246,.7),transparent 60%),
+    url("assets/nd-drops.jpg") center top/100% auto no-repeat,
+    var(--page)!important;
+  background-attachment:fixed,fixed,fixed,scroll,fixed!important;
+}
+html.nd .nav.active{background:rgba(230,245,252,.8)!important;color:var(--blue-d)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 0 0 1px rgba(37,164,220,.18)!important}
+html.nd .eyebrow{color:var(--blue-d)!important}
+/* 최근 캠페인 카드: 가로 스크롤 칸에 큰 그림자가 잘려 회색 판처럼 보이던 것 제거 */
+html.nd .v17-rc.glass{box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(20,40,80,.05),0 6px 16px rgba(20,40,80,.06)!important}
+html.nd .v17-recent-rail{padding-bottom:14px!important;margin-bottom:-10px!important}

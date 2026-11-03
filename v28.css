@@ -81,3 +81,21 @@
 .v28-ytgroup .v28-cmt-btn{background:#d9354f!important;color:#fff!important;border-top-color:#d9354f!important}
 .v28-ytgroup .v28-cmt-btn svg{color:#fff!important}
 .v28-ytgroup .v28-cmt-btn:hover{background:#c22a43!important}
+/* 인쇄 원본: 이중 스크롤 제거(창 하나만 스크롤) */
+.v10-print-dialog{max-height:90vh;overflow:auto}
+.v10-print-grid{max-height:none!important;overflow:visible!important}
+/* 댓글 분석 v2 */
+.v28-cmt-kpi{grid-template-columns:minmax(200px,1fr) 2.4fr!important}
+.v28-cmt-kpi>div.k1{background:linear-gradient(135deg,#25a4dc,#1d86c0)!important;color:#fff}
+.v28-cmt-kpi>div.k2{background:#e8f5fc!important}
+.v28-cmt-kpi>div.k1 span,.v28-cmt-kpi>div.k1 small{color:#e3f4fc!important}.v28-cmt-kpi>div.k1 b{color:#fff!important;font-size:24px}
+.v28-cmt-kpi ol{margin:2px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;counter-reset:r}
+.v28-cmt-kpi li{counter-increment:r;display:grid;grid-template-columns:20px auto 1fr;column-gap:8px;align-items:baseline}
+.v28-cmt-kpi li::before{content:counter(r);grid-row:span 2;width:18px;height:18px;border-radius:50%;background:#1f6f99;color:#fff;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.v28-cmt-kpi li b{font-size:14.5px!important;color:#102b45}.v28-cmt-kpi li em{font-style:normal;font-size:11.5px;color:#1f6f99;font-weight:600}
+.v28-cmt-kpi li small{grid-column:2 / span 2;font-size:11px;color:#5d7a8c}
+.v28-cmt-list.one{grid-template-columns:1fr!important}
+.v28-cmt-card{position:relative;padding-left:44px!important}
+.v28-rank{position:absolute;left:12px;top:11px;width:22px;height:22px;border-radius:6px;background:#25a4dc;color:#fff;font-style:normal;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+.v28-cmt-vids{flex-direction:column;align-items:stretch;border-top:1px solid #e3edf2;padding-top:10px;margin-top:4px!important}
+.v28-cmt-vids>span{font-size:11px;color:#6d8797;font-weight:700}

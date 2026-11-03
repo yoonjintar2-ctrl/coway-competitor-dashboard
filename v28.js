@@ -124,16 +124,22 @@ v4YoutubeRow=function(r){let h=v28BaseYtRow(r);if(r.youtube_status!=='matched')r
  return h.replace(m[0],`<div class="v28-ytgroup">${m[0]}${btn}</div>`)};
 function v28CmtCard(c,extra){return `<div class="v28-cmt-card"><p>${esc(c.text)}</p><div><span>👍 ${number(c.likes)}</span>${c.replies?`<span>답글 ${number(c.replies)}</span>`:''}<span>${esc(c.date)}</span>${(extra||c.types||[]).map(t=>`<em>${esc(t)}</em>`).join('')}</div></div>`}
 function v28CmtBars(list,total){const mx=Math.max(1,...list.map(x=>x.count));return `<div class="v28-cmt-bars">${list.map(x=>`<div><span>${esc(x.type)}</span><i style="width:${x.count/mx*100}%"></i><b>${number(x.count)}건</b><small>좋아요 ${number(x.likes)}</small></div>`).join('')}</div>`}
+var V28_TYPE_DESC={'가격·렌탈료':'가격·월 렌탈료·가성비를 이야기한 댓글','약정·위약금':'약정 기간·해지·위약금을 이야기한 댓글','관리 서비스':'방문 관리·AS·상담 서비스를 이야기한 댓글','위생·필터':'필터·세척·물맛 등 위생을 이야기한 댓글','소음·성능':'얼음·냉온수·소음·고장 등 제품 성능을 이야기한 댓글','디자인':'디자인·색상·크기·인테리어를 이야기한 댓글','광고·모델 반응':'광고 연출과 모델에 반응한 댓글','실사용 경험담':'직접 써 본 사용 후기 댓글','질문':'가격·기능 등을 묻는 질문 댓글','비꼼·불만':'광고·제품에 대한 불만·비꼼 댓글'};
 function v28CmtView(a,title){
  const st={ok:'수집',disabled:'댓글 사용 중지',not_found:'영상 없음'};
- const vids=`<div class="v28-cmt-vids">${a.videos.map(v=>`<a href="${esc(safeUrl(v.url))}" target="_blank" rel="noopener">${v5Icon.yt}<span>${esc((v.title||'').slice(0,46))}</span><small>${v.status?(st[v.status]||'수집 실패')+(v.status==='ok'?` ${number(v.comment_count||0)}개${v.total!=null?' / 전체 '+number(v.total)+'개':''}`:''):'미수집'}</small></a>`).join('')}</div>`;
- if(!a.comments)return `<h2>댓글 분석<small>${esc(title)}</small></h2>${vids}<p class="v28-cmt-empty">${a.videos.some(v=>v.status==='disabled')&&a.videos.every(v=>v.status&&v.status!=='ok')?'광고 영상의 댓글이 막혀 있어 분석할 댓글이 없습니다.':a.videos.some(v=>!v.status)?'아직 댓글을 받지 않았습니다.':'분석할 댓글이 없습니다.'}</p>${listing?.static?'':'<button class="v28-cmt-refresh" data-v28-cmt-fetch="1">댓글 받기</button>'}`;
- const cw=a.coway,ord=l=>[...l.filter(x=>x.type!=='기타'),...l.filter(x=>x.type==='기타').map(x=>({...x,type:'기타(유형 없음)'}))],pt=ord(a.popular.types),top1=pt[0]&&pt[0].type!=='기타(유형 없음)'?pt[0]:null;
- return `<h2>댓글 분석<small>${esc(title)}</small></h2>${vids}
- <div class="v28-cmt-kpi"><div><span>분석 댓글</span><b>${number(a.opinion)}개</b><small>이벤트 참여 ${number(a.events)}개 제외</small></div><div class="cw"><span>코웨이 언급</span><b>${number(cw.count)}개</b><small>${cw.share!=null?'분석 댓글의 '+cw.share+'%':''}</small></div><div><span>가장 많은 유형</span><b>${esc(top1?.type||'—')}</b><small>${top1?number(top1.count)+'건 · 좋아요 '+number(top1.likes):''}</small></div></div>
- <section class="v28-cmt-sec cw"><h3>A. 코웨이(자사) 관련 댓글</h3>${cw.count?v28CmtBars(ord(cw.types))+`<div class="v28-cmt-list">${cw.top.map(c=>v28CmtCard(c,c.coway_types)).join('')}</div>`:'<p class="v28-cmt-empty">코웨이·코웨이 제품을 언급한 댓글이 없습니다.</p>'}</section>
- <section class="v28-cmt-sec"><h3>B. 인기 댓글 · 많이 나온 유형</h3>${v28CmtBars(pt.slice(0,9))}<div class="v28-cmt-list">${a.popular.top.map(c=>v28CmtCard(c)).join('')}</div>${a.words.length?`<div class="v28-cmt-words"><span>자주 나온 단어</span>${a.words.map(w=>`<em>${esc(w.word)} <b>${w.count}</b></em>`).join('')}</div>`:''}</section>
- <p class="footnote">${a.models?.length?'광고 모델(소재 카피 기준): '+esc(a.models.join(', '))+' — 모델 언급은 광고·모델 반응으로 분류 · ':''}${esc(a.method)}${a.videos[0]?.fetched_at?' · 수집 '+esc(a.videos.map(v=>v.fetched_at).filter(Boolean).sort().pop().slice(0,16).replace('T',' ')):''}</p>${listing?.static?'':'<button class="v28-cmt-refresh" data-v28-cmt-fetch="1">댓글 새로 받기</button>'}`;
+ const vids=`<div class="v28-cmt-vids"><span>영상별 댓글 수</span>${a.videos.map(v=>`<a href="${esc(safeUrl(v.url))}" target="_blank" rel="noopener">${v5Icon.yt}<span>${esc((v.title||'').slice(0,46))}</span><small>${v.status?(st[v.status]||'수집 실패')+(v.status==='ok'?` ${number(v.comment_count||0)}개${v.total!=null?' / 전체 '+number(v.total)+'개':''}`:''):'미수집'}</small></a>`).join('')}</div>`;
+ const again=listing?.static?'':'<button class="v28-cmt-refresh" data-v28-cmt-fetch="1">댓글 새로 받기</button>';
+ if(!a.comments)return `<h2>댓글 분석<small>${esc(title)}</small></h2><p class="v28-cmt-empty">${a.videos.length&&a.videos.every(v=>v.status&&v.status!=='ok')?'광고 영상의 댓글이 막혀 있어 분석할 댓글이 없습니다.':a.videos.some(v=>!v.status)?'아직 댓글을 받지 않았습니다.':'분석할 댓글이 없습니다.'}</p>${vids}${again}`;
+ const pt=[...a.popular.types.filter(x=>x.type!=='기타'),...a.popular.types.filter(x=>x.type==='기타').map(x=>({...x,type:'기타(유형 없음)'}))];
+ const top3=pt.filter(x=>x.type!=='기타(유형 없음)').slice(0,3),model=a.models?.length?a.models.join(', '):'';
+ const desc=t=>(V28_TYPE_DESC[t]||'')+(t==='광고·모델 반응'&&model?`(모델 ${model})`:'');
+ return `<h2>댓글 분석<small>${esc(title)}</small></h2>
+ <div class="v28-cmt-kpi"><div class="k1"><span>분석 댓글</span><b>${number(a.opinion)}개</b><small>인기순 수집 ${number(a.comments)}개 중 이벤트 참여 ${number(a.events)}개 제외</small></div>
+ <div class="k2"><span>가장 많은 유형</span>${top3.length?`<ol>${top3.map(x=>`<li><b>${esc(x.type)}</b><em>${number(x.count)}건 · 분석 댓글의 ${a.opinion?Math.round(x.count/a.opinion*100):0}% · 좋아요 ${number(x.likes)}</em><small>${esc(desc(x.type))}</small></li>`).join('')}</ol>`:'<b>—</b>'}</div></div>
+ <section class="v28-cmt-sec"><h3>유형별 댓글 수</h3>${v28CmtBars(pt.slice(0,9))}</section>
+ <section class="v28-cmt-sec"><h3>인기 댓글 TOP 5</h3><div class="v28-cmt-list one">${a.popular.top.slice(0,5).map((c,i)=>v28CmtCard(c).replace('<div class="v28-cmt-card">',`<div class="v28-cmt-card"><i class="v28-rank">${i+1}</i>`)).join('')}</div>${a.words.length?`<div class="v28-cmt-words"><span>자주 나온 단어</span>${a.words.map(w=>`<em>${esc(w.word)} <b>${w.count}</b></em>`).join('')}</div>`:''}</section>
+ ${vids}
+ <p class="footnote">${model?'광고 모델(소재 카피 기준): '+esc(model)+' — 모델 언급은 광고·모델 반응으로 분류 · ':''}${esc(a.method.replace(' · 이벤트 참여 댓글은 여론 집계에서 제외',' · 이벤트 참여 댓글 제외'))}${a.videos[0]?.fetched_at?' · 수집 '+esc(a.videos.map(v=>v.fetched_at).filter(Boolean).sort().pop().slice(0,16).replace('T',' ')):''}</p>${again}`;
 }
 async function v28OpenComments(id,title,force){
  const dialog=$('#detail');dialog.className='post-dialog v28-cmt-dialog';dialog.dataset.cmt=id;dialog.dataset.title=title;

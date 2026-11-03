@@ -113,9 +113,9 @@ html.nd .nd-toggle{color:var(--mute)}html.nd .nd-toggle:hover{color:var(--blue)}
 html.nd body{background:#eef2f6!important}
 html.nd body::before{content:"";position:fixed;inset:-24px;z-index:-2;pointer-events:none;
   background:url("https://images.unsplash.com/photo-1789220937662-e1c0e9460f1d?w=2200&q=72&auto=format&fit=crop") center/cover no-repeat;
-  filter:saturate(.45) brightness(1.22) contrast(.82) blur(1.2px)}
+  filter:saturate(.42) brightness(1.2) contrast(.8) blur(2.2px)}
 html.nd body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:linear-gradient(160deg,rgba(243,246,250,.74),rgba(236,241,247,.62) 55%,rgba(243,246,250,.78))}
+  background:linear-gradient(160deg,rgba(243,246,250,.82),rgba(236,241,247,.7) 55%,rgba(243,246,250,.84))}
 /* 유리 카드 */
 html.nd .glass{background:linear-gradient(160deg,rgba(255,255,255,.86),rgba(250,252,254,.78))!important;backdrop-filter:blur(18px) saturate(150%)!important;-webkit-backdrop-filter:blur(18px) saturate(150%)!important;
   border:.5px solid rgba(0,0,0,.08)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 8px 26px rgba(20,40,70,.07),0 2px 6px rgba(0,0,0,.04)!important}

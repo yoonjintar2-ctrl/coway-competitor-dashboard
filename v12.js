@@ -76,7 +76,7 @@ document.addEventListener('pointermove',e=>{
  const g=svg.querySelector('.v12-guide');g.setAttribute('x1',V27_L+i*(vb.width-V27_L-V27_INSET)/Math.max(1,n-1));g.setAttribute('x2',V27_L+i*(vb.width-V27_L-V27_INSET)/Math.max(1,n-1));g.setAttribute('visibility','visible');
  const dot=wrap.querySelector('.v12-dot'),tip=wrap.querySelector('.v12-tip');dot.hidden=false;dot.style.left=px+'px';dot.style.top=yv+'px';
  const wk=new Date(row.day+'T00:00:00Z'),we=new Date(wk);we.setUTCDate(we.getUTCDate()+(v12TrendDaily?0:6));
- tip.hidden=false;tip.innerHTML=`<small>${v12TrendDaily?dateLabel(row.day):dateLabel(row.day)+' ~ '+dateLabel(we.toISOString().slice(0,10))}</small><b>${v12TrendCount?number(Math.round(row.ratio))+'회':row.ratio.toFixed(1)}</b><span>${esc(v5TrendKey)} ${v12TrendCount?(v12TrendDaily?'일별 추정 검색수':'주간 추정 검색수'):'검색 상대지수'}</span>`;
+ tip.hidden=false;tip.innerHTML=`<small>${v12TrendDaily?dateLabel(row.day):dateLabel(row.day)+' ~ '+dateLabel(we.toISOString().slice(0,10))}</small><b>${v12TrendCount?number(Math.round(row.ratio))+'회':row.ratio.toFixed(1)}</b><span>${esc(v5TrendKey)} ${v12TrendCount?(v12TrendDaily?'일별 추정 검색수':'주간 추정 검색수'):'검색 상대지수'}</span>${row.pc!=null&&row.mo!=null?`<span class="v28-pm">PC ${number(Math.round(row.pc))}회 · MO ${number(Math.round(row.mo))}회</span>`:''}`;
  const tw=tip.offsetWidth;tip.style.left=Math.max(0,Math.min(r.width-tw,px-tw/2))+'px';tip.style.top=Math.max(0,yv-tip.offsetHeight-14)+'px';
 });
 document.addEventListener('pointerout',e=>{const wrap=e.target.closest('.v12-trend-wrap');if(!wrap||wrap.contains(e.relatedTarget))return;wrap.querySelector('.v12-tip').hidden=true;wrap.querySelector('.v12-dot').hidden=true;wrap.querySelector('.v12-guide')?.setAttribute('visibility','hidden')});

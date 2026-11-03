@@ -90,9 +90,9 @@ function v28QueryTrends(d){
  const q=d.query_estimates;if(!q)return null;const keys=Object.keys(q.series||{});if(!keys.length)return null;
  const daily=v28QUnit==='day',points=[];
  for(const k of keys){const s=q.series[k];
-  if(daily){for(const p of s)points.push({keyword:k,advertiser:d.campaign.advertiser,day:p.day,ratio:p.total})}
-  else{const m=new Map();for(const p of s){const t=new Date(p.day+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-(t.getUTCDay()+6)%7);const w=t.toISOString().slice(0,10);const e=m.get(w)||{sum:0,n:0};e.sum+=p.total;e.n++;m.set(w,e)}
-   const weeks=[...m].sort((a,b)=>a[0].localeCompare(b[0]));weeks.forEach(([w,e])=>{if(e.n===7)points.push({keyword:k,advertiser:d.campaign.advertiser,day:w,ratio:e.sum})})}}
+  if(daily){for(const p of s)points.push({keyword:k,advertiser:d.campaign.advertiser,day:p.day,ratio:p.total,pc:p.pc,mo:p.mo})}
+  else{const m=new Map();for(const p of s){const t=new Date(p.day+'T00:00:00Z');t.setUTCDate(t.getUTCDate()-(t.getUTCDay()+6)%7);const w=t.toISOString().slice(0,10);const e=m.get(w)||{sum:0,pc:0,mo:0,n:0};e.sum+=p.total;e.pc+=p.pc;e.mo+=p.mo;e.n++;m.set(w,e)}
+   const weeks=[...m].sort((a,b)=>a[0].localeCompare(b[0]));weeks.forEach(([w,e])=>{if(e.n===7)points.push({keyword:k,advertiser:d.campaign.advertiser,day:w,ratio:e.sum,pc:e.pc,mo:e.mo})})}}
  return {time_unit:daily?'date_est':'week',estimate:true,count_keywords:keys,points,definition:q.definition,source_url:'https://datalab.naver.com/',keyword_groups:{}};
 }
 v5TrendPanel=function(d){
@@ -103,6 +103,9 @@ v5TrendPanel=function(d){
  const unit=`<div class="v28-unit" title="주별은 7일이 모두 있는 주만 합산(진행 중인 주 제외)"><button data-v28-unit="week" class="${v28QUnit==='week'?'on':''}">주별</button><button data-v28-unit="day" class="${v28QUnit==='day'?'on':''}">일별</button><span class="v28-est-badge">추정치</span></div>`;
  h=h.replace('<div class="v5-chips">',unit+'<div class="v5-chips">');
  if(v12TrendDaily)h=h.replace('주차별 쿼리 추이','일별 쿼리 추이').replace('주차별 수치','일별 수치').replace('지난주 대비','전일 대비');
+ const st=(d.query_estimates.keywords||[]).find(k=>k.keyword===v5TrendKey&&k.status==='ok');
+ const ex=st&&st.sum_pc&&st.sum_mo?` · ${esc(st.keyword)}: PC 월 ${number(+st.monthly_pc)}건 ÷ 30일 지수 합 ${number(Math.round(st.sum_pc))} → 지수 1 = ${(st.monthly_pc/st.sum_pc).toFixed(1)}건, 모바일 월 ${number(+st.monthly_mo)}건 ÷ ${number(Math.round(st.sum_mo))} → 지수 1 = ${(st.monthly_mo/st.sum_mo).toFixed(1)}건 (기준 ${esc(st.anchor_start)}~${esc(st.anchor_end)})`:'';
+ h=h.replace(/<p class="footnote">/,`<p class="footnote v28-formula">추정식 Q(d) = M<sub>pc</sub> × I<sub>pc</sub>(d) ÷ Σ최근30일 I<sub>pc</sub> + M<sub>mo</sub> × I<sub>mo</sub>(d) ÷ Σ최근30일 I<sub>mo</sub> — M: 검색광고 최근 30일 검색수(실제 건수), I: 데이터랩 일별 지수(같은 요청에서 받은 어제까지 30일 기준)${ex}</p><p class="footnote">`);
  if(skipped.length)h=h.replace('<p class="footnote">',`<p class="footnote v28-skip">추정하지 않음(빈칸): ${skipped.map(k=>esc(k.keyword)+' — '+esc(k.reason||'')).join(' · ')}</p><p class="footnote">`);
  return h;
 };

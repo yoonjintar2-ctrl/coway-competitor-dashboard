@@ -33,3 +33,6 @@
 .v28-qgrid>div{background:#f4f9fc;border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
 .v28-qgrid span{font-size:11px;color:#6d8797}.v28-qgrid b{font-size:18px;color:#102b45}.v28-qgrid b.on{color:#1d7a4f}.v28-qgrid b.off{color:#a35a12}
 .v28-qgrid small{font-size:10.5px;color:#6d8797;line-height:1.5}
+.v28-formula{font-size:10.5px!important;color:#5d7a8c!important;background:#f4f9fc;border-radius:8px;padding:7px 10px;margin-top:6px!important}
+.v28-formula sub{font-size:8px}
+.v12-tip .v28-pm{display:block;margin-top:4px;font-size:11px;color:#a9c6da;white-space:nowrap}

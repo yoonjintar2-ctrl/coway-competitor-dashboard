@@ -153,3 +153,16 @@ html.nd .v27-legend b.hot{border:1.5px solid rgba(26,140,194,.85)!important}
 html.nd .v27-legend b.yt{background:linear-gradient(155deg,rgba(246,160,168,.6),rgba(236,112,124,.38))!important;border:1.5px solid rgba(214,60,74,.7)!important}
 /* 캠페인 분석 '다른 캠페인' 선택칸도 유리 칩 */
 html.nd #campaign-switch.chip{padding:10px 34px 10px 16px!important;font-weight:600;border-radius:12px!important}
+
+/* ── v30.5 (23:10): 물방울 배경을 화면 전체에 고르게 + 스크롤해도 고정 ──
+   기존 nd-drops.jpg 는 화면 위쪽 띠에만 물방울이 있고 아래로 갈수록 사라져서, 스크롤하면 유리판 뒤로 거의 안 보였음.
+   원본 사진에서 큰 명암만 펴고 물방울 디테일을 남긴 nd-drops2.jpg 를 화면 크기에 맞춰(cover) 고정 */
+html.nd body{
+  background:
+    radial-gradient(1100px 700px at 12% -8%,rgba(255,255,255,.85),transparent 62%),
+    radial-gradient(900px 620px at 100% 4%,rgba(207,223,250,.45),transparent 60%),
+    radial-gradient(900px 650px at 55% 112%,rgba(222,231,246,.55),transparent 60%),
+    url("assets/nd-drops2.jpg") center center/cover no-repeat,
+    var(--page)!important;
+  background-attachment:fixed,fixed,fixed,fixed,fixed!important;
+}

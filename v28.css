@@ -99,3 +99,18 @@
 .v28-rank{position:absolute;left:12px;top:11px;width:22px;height:22px;border-radius:6px;background:#25a4dc;color:#fff;font-style:normal;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
 .v28-cmt-vids{flex-direction:column;align-items:stretch;border-top:1px solid #e3edf2;padding-top:10px;margin-top:4px!important}
 .v28-cmt-vids>span{font-size:11px;color:#6d8797;font-weight:700}
+/* 소재 버튼 v2: YouTube = 붉은 배경·흰 글씨(높게), 댓글 분석 = 연한 배경·붉은 글씨, TV 스토리보드 = 진한 파랑·흰 글씨 */
+.v5-links .v5-link,.v28-ytgroup .v28-cmt-btn{font-size:12.5px!important;font-weight:700!important}
+.v5-links .v5-link span,.v28-ytgroup .v28-cmt-btn span{font-size:12.5px!important}
+.v28-ytgroup{border-color:#d9354f!important;background:#fff7f8!important}
+.v28-ytgroup>.v5-link.yt{background:#d9354f!important;color:#fff!important;padding:12px 12px!important}
+.v28-ytgroup>.v5-link.yt svg{color:#fff!important}
+.v28-ytgroup>.v5-link.yt:hover{background:#c22a43!important}
+.v28-ytgroup>.v5-link.yt .v17-two small{color:#ffe3e8!important;opacity:1!important}
+.v28-ytgroup .v28-cmt-btn{background:#fff7f8!important;color:#b4142d!important;border-top:1px solid #d9354f!important;padding:8px 12px!important}
+.v28-ytgroup .v28-cmt-btn svg{color:#d9354f!important}
+.v28-ytgroup .v28-cmt-btn:hover{background:#ffeef1!important}
+.v5-link.tv{background:#2386c0!important;border:1px solid #17699a!important;color:#fff!important;padding:12px 12px!important}
+.v5-link.tv svg{color:#fff!important}
+.v5-link.tv:hover{background:#1b76ab!important}
+.v28-ytgroup>.v5-link.yt svg path{fill:#d9354f!important}

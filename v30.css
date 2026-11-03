@@ -1,0 +1,76 @@
+/* v30 — 신규 디자인 '재질' 교체: glass-sample.html 맨 위 'jinny 스타일 흰 유리' 블록 값을 그대로 사용(html.nd 일 때만).
+   레이아웃은 그대로, 배경 그림 제거, 판은 .glass / 작은 요소는 .chip / 큰 판은 .sheen / 등장은 .rise */
+html.nd{
+  --ink:#1f2328; --sub:#5f6368; --mute:#8a8f97;
+  --blue:#0b57d0; --blue-l:#e8f0fe;
+  --page:#eef2f7;
+  --glass-bg:linear-gradient(155deg,rgba(255,255,255,.80) 0%,rgba(255,255,255,.56) 48%,rgba(250,252,255,.66) 100%);
+  --glass-blur:blur(22px) saturate(160%);
+  --glass-line:1px solid rgba(255,255,255,.8);
+  --glass-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(20,40,80,.05),0 18px 44px rgba(20,40,80,.10);
+}
+/* 1. 배경: 그림 제거 → --page 단색 + 옅은 빛 번짐 3개, fixed */
+html.nd body::before,html.nd body::after{content:none!important;display:none!important;background:none!important}
+html.nd body{
+  color:var(--ink);
+  font-family:"Pretendard Variable","Pretendard","Malgun Gothic",sans-serif!important;letter-spacing:-.1px;-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(1100px 700px at 12% -8%,rgba(255,255,255,.95),transparent 62%),
+    radial-gradient(900px 620px at 100% 4%,rgba(207,223,250,.55),transparent 60%),
+    radial-gradient(900px 650px at 55% 112%,rgba(222,231,246,.7),transparent 60%),
+    var(--page)!important;
+  background-attachment:fixed!important;
+}
+/* 2. 유리 판 */
+html.nd .glass{
+  position:relative;isolation:isolate;overflow:hidden;border-radius:20px!important;
+  background:var(--glass-bg)!important;-webkit-backdrop-filter:var(--glass-blur)!important;backdrop-filter:var(--glass-blur)!important;
+  border:var(--glass-line)!important;box-shadow:var(--glass-shadow)!important;
+}
+/* 3. 빛 비침 1: 왼쪽 위 대각선 반사광 */
+html.nd .glass::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+  background:linear-gradient(118deg,rgba(255,255,255,.65) 0%,rgba(255,255,255,.12) 26%,rgba(255,255,255,0) 42%,rgba(255,255,255,0) 72%,rgba(255,255,255,.22) 100%);
+}
+/* 빛 비침 2: 윗변 가는 반짝임 선 */
+html.nd .glass::after{
+  content:"";position:absolute;left:8%;right:8%;top:0;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,1) 50%,transparent);
+}
+/* 빛 비침 3: 큰 판에 화면이 뜰 때 한 번 지나가는 빛줄기 */
+html.nd .sheen{position:absolute;inset:0;border-radius:inherit;pointer-events:none;overflow:hidden;z-index:2}
+html.nd .sheen i{position:absolute;top:-20%;bottom:-20%;width:38%;left:-60%;transform:skewX(-18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:sheen 1.6s cubic-bezier(.45,0,.3,1) .35s both}
+@keyframes sheen{to{left:130%}}
+/* 5. 등장 */
+html.nd .rise{animation:unfoldIn .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes unfoldIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){html.nd .rise,html.nd .sheen i{animation:none}}
+/* 4. 유리 위의 작은 요소(캡슐·드롭다운) */
+html.nd .chip{background:rgba(255,255,255,.72)!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:inset 0 1px 0 #fff,0 4px 14px rgba(20,40,80,.08)!important;border-radius:999px!important}
+
+/* ── 기존 대시보드에 붙이기 위한 최소 보정(배치는 그대로) ── */
+html.nd #content>*{animation:none}                         /* v29 등장 효과 대신 .rise 사용 */
+html.nd .sidebar.glass{position:fixed!important;border-radius:0 20px 20px 0!important;border-left:0!important}
+html.nd header.glass{padding:18px 22px!important;margin-bottom:18px}
+html.nd .v17-rc.glass{overflow:visible}                     /* 카드 위 'NEW' 딱지가 잘리지 않게 */
+html.nd .v17-rc.glass::before{overflow:hidden}
+html.nd select.chip{padding:10px 34px 10px 16px!important;font-weight:600}
+/* 판 안쪽의 불투명 흰 배경 제거(유리가 비치도록) */
+html.nd .gantt-header,html.nd .gantt-corner,html.nd .v6-corner{background:transparent!important;backdrop-filter:none!important}
+html.nd #gantt-scroll .gantt-track,html.nd #gantt-scroll .gantt-row,html.nd .gantt-row:nth-child(odd){background:transparent!important}
+html.nd .v6-adv,html.nd .v6-adv.odd,html.nd .v6-bands>i,html.nd .v6-bands>i.odd{background:rgba(255,255,255,.34)!important;backdrop-filter:none!important}
+html.nd .gantt-row{border-bottom-color:rgba(20,40,80,.06)!important}
+html.nd .gantt-header *{border-color:rgba(20,40,80,.08)!important}
+/* 캡슐(.v5-bar.chip): 상태 표시는 유지 — 진한 테두리(최근 30일), 열린 캡슐(진행 중), 빨간 테두리(YouTube 선공개) */
+html.nd .v17-hot .v5-bar.chip{border:1.5px solid #2a7fb0!important}
+html.nd .v16-yt .v5-bar.chip{border:1.5px solid #f3a2ae!important;background:rgba(255,245,246,.78)!important}
+html.nd .v17-open .v5-bar.chip{border-right:0!important;border-top-right-radius:0!important;border-bottom-right-radius:0!important}
+html.nd .is-evergreen .v5-bar.chip{background:rgba(255,255,255,.5)!important}
+/* 타임라인 캡슐: 기존 #gantt-scroll 규칙보다 우선하도록 같은 범위로 다시 지정(.chip 값 그대로) */
+html.nd #gantt-scroll .v5-bar.chip{background:rgba(255,255,255,.72)!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:inset 0 1px 0 #fff,0 4px 14px rgba(20,40,80,.08)!important;border-radius:999px!important}
+html.nd #gantt-scroll .v15-cap:hover .v5-bar.chip{background:rgba(255,255,255,.92)!important}
+html.nd #gantt-scroll .v17-hot .v5-bar.chip{border:1.5px solid #2a7fb0!important}
+html.nd #gantt-scroll .v16-yt .v5-bar.chip{border:1.5px solid #f3a2ae!important;background:rgba(255,245,246,.78)!important}
+html.nd #gantt-scroll .v17-open .v5-bar.chip{border-right:0!important;border-top-right-radius:0!important;border-bottom-right-radius:0!important}
+html.nd #gantt-scroll .is-evergreen .v5-bar.chip{background:rgba(255,255,255,.5)!important}

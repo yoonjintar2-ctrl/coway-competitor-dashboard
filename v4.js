@@ -34,7 +34,7 @@ showBrandPost=function(id){
 /* 2·5. 주요 소재: 이미지 사유, 집행 매체 아이콘, 공식 YouTube 업로드, 원본 카피 */
 function v4ImagePlaceholder(r){
  const kind=r.image_status||'not_checked';
- const title={radio:'라디오 소재',no_visual:'원천 이미지 없음',unmatched:'정확한 매칭 미확정',source_failed:'원천 접근 실패',not_checked:'원본 이미지 미확보',pending:'원본 이미지 미확보'}[kind]||'원본 이미지 미확보';
+ const title={banner_unnamed:'배너 소재 · 소재명 없음',radio:'라디오 소재',no_visual:'원천 이미지 없음',unmatched:'정확한 매칭 미확정',source_failed:'원천 접근 실패',not_checked:'원본 이미지 미확보',pending:'원본 이미지 미확보'}[kind]||'원본 이미지 미확보';
  return `<span class="image-pending v4-pending ${esc(kind)}">${kind==='radio'?v4Icons.radio:''}<b>${title}</b><small>${esc(r.image_note||'')}</small></span>`;
 }
 function v4MediaBadges(r){

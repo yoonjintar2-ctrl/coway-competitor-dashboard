@@ -159,3 +159,7 @@ html.nd .campaign-kpis>div,html.nd .v28-cmt-kpi>div.k2{background:linear-gradien
 html.nd select,html.nd input[type=date]{background:rgba(255,255,255,.7)!important;backdrop-filter:blur(10px);border-color:rgba(0,0,0,.12)!important}
 html.nd .secondary,html.nd .v5-chips button,html.nd .v28-unit button,html.nd .v6-chip.cat{background:rgba(255,255,255,.6)!important}
 html.nd .v6-heading,html.nd .analysis-heading>.glass,html.nd .v6-title{background:transparent}
+/* 타임라인 안쪽 광고주 띠·이름 칸도 반투명 유리 */
+html.nd .v6-adv,html.nd .v6-adv.odd{background:rgba(255,255,255,.5)!important;backdrop-filter:blur(10px)}
+html.nd .v6-bands>i,html.nd .v6-bands>i.odd{background:rgba(255,255,255,.46)!important}
+html.nd .gantt-shell{background:linear-gradient(160deg,rgba(255,255,255,.4),rgba(255,255,255,.22))!important}

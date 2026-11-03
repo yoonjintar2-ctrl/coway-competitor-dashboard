@@ -11,5 +11,9 @@
  function mount(){const box=document.querySelector('.sidebar-bottom')||document.querySelector('.sidebar');if(!box||box.querySelector('.nd-toggle'))return;
   const b=document.createElement('button');b.type='button';b.className='nd-toggle';box.appendChild(b);apply(get());
   b.addEventListener('click',()=>{const on=!get();set(on);apply(on);toast(on?'신규 디자인으로 보고 있어요. 이 브라우저에서만 바뀌어요.':'기존 디자인으로 돌아왔어요.')})}
+ // 화면(route) 표시: 필터를 타임라인에서만 보이게
+ function mark(){try{document.documentElement.dataset.route=(typeof route!=='undefined'&&route)||'timeline'}catch(e){}}
+ function hook(){if(typeof render!=='function'||render.__nd)return;const base=render;render=async function(...a){mark();const r=await base.apply(this,a);mark();return r};render.__nd=true;mark()}
+ document.addEventListener('DOMContentLoaded',()=>setTimeout(hook,0));document.addEventListener('click',()=>setTimeout(mark,0),true);
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
 })();

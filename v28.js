@@ -119,7 +119,9 @@ document.addEventListener('click',e=>{
 // YouTube 광고 소재 댓글 분석: 'YouTube 소재 확인하기' 아래 '댓글 분석' 버튼 → 자사(코웨이) 관련 댓글 + 인기 댓글 유형
 var v28BaseYtRow=v4YoutubeRow;
 v4YoutubeRow=function(r){let h=v28BaseYtRow(r);if(r.youtube_status!=='matched')return h;
- return h.replace(/<\/div>$/,`<button class="v28-cmt-btn" data-v28-cmt="${esc(r.creative_id)}" data-v28-title="${esc(r.copyline||r.product||'')}">💬 댓글 분석</button></div>`)};
+ const btn=`<button class="v28-cmt-btn" data-v28-cmt="${esc(r.creative_id)}" data-v28-title="${esc(r.copyline||r.product||'')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>댓글 분석</span>›</button>`;
+ const m=h.match(/<(a|button) class="v5-link yt"[\s\S]*?<\/\1>/);if(!m)return h.replace(/<\/div>$/,btn+'</div>');
+ return h.replace(m[0],`<div class="v28-ytgroup">${m[0]}${btn}</div>`)};
 function v28CmtCard(c,extra){return `<div class="v28-cmt-card"><p>${esc(c.text)}</p><div><span>👍 ${number(c.likes)}</span>${c.replies?`<span>답글 ${number(c.replies)}</span>`:''}<span>${esc(c.date)}</span>${(extra||c.types||[]).map(t=>`<em>${esc(t)}</em>`).join('')}</div></div>`}
 function v28CmtBars(list,total){const mx=Math.max(1,...list.map(x=>x.count));return `<div class="v28-cmt-bars">${list.map(x=>`<div><span>${esc(x.type)}</span><i style="width:${x.count/mx*100}%"></i><b>${number(x.count)}건</b><small>좋아요 ${number(x.likes)}</small></div>`).join('')}</div>`}
 function v28CmtView(a,title){

@@ -69,3 +69,10 @@
 .v12-tip .v28-pm i{font-style:normal;display:inline-block;width:22px;color:#7fb2d3;font-size:10px}
 .v5-thumb-fill.v28-blank{background:#eef4f8!important}
 .v5-thumb-fill.v28-blank *{display:none}
+/* YouTube 소재 확인하기 + 댓글 분석: 한 덩어리 버튼 */
+.v28-ytgroup{display:flex;flex-direction:column;width:100%;border:1px solid #f1cdd3;border-radius:9px;overflow:hidden;background:#fff7f8}
+.v28-ytgroup>.v5-link.yt{border:0!important;border-radius:0!important;margin:0!important;background:transparent!important}
+.v28-ytgroup .v28-cmt-btn{display:flex;align-items:center;gap:7px;width:100%;margin:0;border:0;border-top:1px solid #f1cdd3;border-radius:0;background:transparent;color:#b4142d;padding:8px 12px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;text-align:left}
+.v28-ytgroup .v28-cmt-btn span{flex:1}
+.v28-ytgroup .v28-cmt-btn svg{width:15px;height:15px;color:#ff0033}
+.v28-ytgroup .v28-cmt-btn:hover,.v28-ytgroup>.v5-link.yt:hover{background:#ffeef1!important}

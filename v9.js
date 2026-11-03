@@ -1,0 +1,15 @@
+/* v9 — 2026-11-03 Claude: 설정은 왼쪽 하단 작은 단추, 브랜드 채널 메뉴 제거, 설정 화면 상단 필터 숨김,
+   타임라인 광고주 열에 올해 누적 광고비, 설정 > 광고비 보정. */
+(function(){document.querySelectorAll('.sidebar nav [data-route="channels"],.sidebar nav [data-route="settings"]').forEach(b=>b.remove());const bottom=document.querySelector('.sidebar-bottom');if(bottom&&!bottom.querySelector('[data-route="settings"]'))bottom.insertAdjacentHTML('afterbegin','<button class="v9-settings" data-route="settings" title="관리자 설정">⚙ 설정</button><br>')})();
+function v9Toolbar(){const on=route==='settings';document.querySelector('header .toolbar')?.toggleAttribute('hidden',on);const cp=$('#custom-period');if(cp&&on)cp.hidden=true}
+var v9BaseRender=render;render=async function(){v9Toolbar();return v9BaseRender()};
+// 광고주 열: 올해 누적 광고비
+var v9BaseLayout=layoutVisibleFlights;
+layoutVisibleFlights=function(){v9BaseLayout();const ytd=listing?.advertiser_ytd||{},year=(listing?.ytd_start||'').slice(0,4);for(const row of document.querySelectorAll('.gantt-row')){const cat=listing.campaigns.find(c=>c.id===row.querySelector('[data-gantt]')?.dataset.gantt)?.category;if(!cat)continue;for(const el of row.querySelectorAll('.v6-adv')){const name=el.querySelector('span')?.textContent;if(!name||el.querySelector('small'))continue;const v=ytd[cat+'|'+name];el.querySelector('span').insertAdjacentHTML('beforeend',`<small>${year}년 누적 ${v!=null?v4Money(v)+'원':'—'}</small>`)}}};
+// 설정 > 광고비 보정
+v7Tabs.splice(1,0,['adjust','광고비 보정']);
+var v9BaseDraw=v7Draw;
+v7Draw=function(){if(v7Tab!=='adjust')return v9BaseDraw();const a=listing.adjustments,keys=[['terrestrial','지상파'],['general','종편'],['cable','케이블'],['digital_video','디지털 영상'],['digital_banner','디지털 배너']];
+ $('#content').innerHTML=`<div class="v7-layout">${v7Menu()}<section class="glass section">${header('광고비 보정','모니터링(아덱스) 광고비에 곱할 실집행 비율입니다. 보너스가 많은 매체는 낮은 비율을 적용합니다.',`<button class="primary" id="v9-adj-save">저장</button>`)}<div class="v9-adj">${keys.map(([k,l])=>`<label><span>${l}</span><input type="number" min="0" max="100" step="0.1" data-adj="${k}" value="${a[k]?.mode==='ratio'?a[k].value:100}"><em>% 반영</em></label>`).join('')}</div><p class="footnote">모든 화면의 광고비·트리맵·월별 표·타임라인 금액에 적용되며, 원본 금액은 '원본'으로 함께 표시합니다. 라디오·인쇄는 보정하지 않습니다.</p></section></div>`};
+document.addEventListener('click',async e=>{if(e.target.id!=='v9-adj-save')return;const body={...listing.adjustments};for(const i of document.querySelectorAll('[data-adj]'))body[i.dataset.adj]={mode:'ratio',value:Number(i.value)};try{const r=await api('/api/adjustments',body);listing.adjustments=r.adjustments;toast('보정 비율을 저장했습니다. 타임라인·분석에 반영됩니다.');await load();route='settings';v7Tab='adjust';await render()}catch(err){toast(err.message)}});
+var v9BaseSettingsRender=render;render=async function(){if(route==='settings'&&v7Tab==='adjust'){v9Toolbar();document.querySelectorAll('[data-route]').forEach(n=>n.classList.toggle('active',n.dataset.route===route));$('#page-title').textContent='설정 · 인덱스';v7Draw();return}return v9BaseSettingsRender()};

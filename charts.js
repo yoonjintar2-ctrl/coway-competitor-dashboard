@@ -1,0 +1,18 @@
+function renderSpendPanel(d,resolution='day'){
+ const total=d.totals.amount||0,top=d.brands.slice(0,4),others=d.brands.slice(4).reduce((a,b)=>a+b.amount,0),series=[...top,...(others?[{advertiser:'기타',amount:others}]:[])];
+ const units=[];
+ if(resolution==='day'){for(let value=Date.parse(d.period.start+'T00:00:00Z');value<=Date.parse(d.period.end+'T00:00:00Z');value+=86400000)units.push(new Date(value).toISOString().slice(0,10))}
+ else units.push(...new Set(d.media.map(m=>m.month)));
+ const rows=resolution==='day'?d.daily:d.media,lookup=new Map(rows.map(r=>[r.kind+'|'+(r.day||r.month),r.amount]));
+ const maximum={};for(const r of rows)maximum[r.kind]=Math.max(maximum[r.kind]||0,r.amount);
+ const heat=Object.entries(names).slice(0,4).map(([kind,name])=>`<div class="daily-row"><span class="daily-label">${esc(name)}</span>${units.map(unit=>{
+ const value=lookup.get(kind+'|'+unit),present=value!=null,opacity=present?.10+.82*Math.sqrt(value/(maximum[kind]||1)):0;
+ const title=`${unit} · ${name} · ${present?number(value)+'원':'관측 행 없음'}`;
+ return `<button class="daily-cell ${present?'has-data':'no-data'}" ${resolution==='day'?`data-day="${unit}" data-kind="${kind}"`:''} title="${esc(title)}" aria-label="${esc(title)}" style="background:${present?`rgba(37,164,220,${opacity})`:'repeating-linear-gradient(135deg,#e7eef2,#e7eef2 3px,#f7fafb 3px,#f7fafb 5px)'}">${resolution==='month'?money(value):''}</button>`}).join('')}</div>`).join('');
+ return `<section class="glass section">${header('매체별 광고비와 집행 강도','아덱스 원본 광고비(보정 전)의 비중과 날짜별 집행 변화를 봅니다. 상단 품목·광고주 조건을 적용합니다.',`<div class="segments"><button data-resolution="day" class="${resolution==='day'?'active':''}">일별</button><button data-resolution="month" class="${resolution==='month'?'active':''}">월별</button></div>`)}<div class="chart-total">수집 매체 합계 ${money(total)} 원</div><div class="share-bar">${series.map((b,i)=>`<span style="width:${total?b.amount/total*100:0}%;background:${colors[i]}" title="${esc(b.advertiser)} ${number(b.amount)}원">${total&&b.amount/total>.075?Math.round(b.amount/total*100)+'%':''}</span>`).join('')}</div><div class="legend">${series.map((b,i)=>`<span><i class="dot" style="background:${colors[i]}"></i>${esc(b.advertiser)} ${total?(b.amount/total*100).toFixed(1):0}%</span>`).join('')}</div><div class="daily-scroll"><div class="daily-heat ${resolution}" style="--days:${units.length};--grid-width:${resolution==='day'?Math.max(600,units.length*13+88):600}px"><div class="daily-row daily-dates"><span class="daily-label">${resolution==='day'?'날짜':'월'}</span>${units.map((unit,i)=>`<span title="${unit}">${resolution==='month'?parseInt(unit.slice(5))+'월':(i===0||unit.endsWith('-01')||i%7===0?unit.slice(5).replace('-','/'):'' )}</span>`).join('')}</div>${heat}</div></div><p class="footnote">색 농도는 각 매체의 기간 내 최고 일액 대비입니다. 마우스를 올리면 실제 원 단위 광고비, 일자를 클릭하면 광고주별 내역을 봅니다. 사선 칸은 관측 행 없음이며 확정된 0원과 구분합니다.</p></section>`;
+}
+function showDay(day,kind){
+ const rows=(data.daily_brands||[]).filter(r=>r.day===day&&r.kind===kind),total=rows.reduce((a,r)=>a+r.amount,0);
+ $('#detail-body').innerHTML=`<span class="eyebrow">${esc(data.category.label)} · ${esc(names[kind])}</span><h2>${day} 광고비</h2><p>행 표시액 합계 <strong>${number(total)}원</strong> · 잠정 자료 포함</p>${rows.length?`<table class="data-table"><thead><tr><th>광고주</th><th class="num">광고비(원)</th></tr></thead><tbody>${rows.sort((a,b)=>b.amount-a.amount).map(r=>`<tr><td>${esc(r.advertiser)}</td><td class="num">${number(r.amount)}</td></tr>`).join('')}</tbody></table>`:empty('이 일자에 관측된 행이 없습니다.','자료 지연 또는 미집행 여부는 다음 수집에서 재확인합니다.')}`;
+ $('#detail').showModal();
+}

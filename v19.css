@@ -1,0 +1,9 @@
+.loading .v19-loader{width:230px;height:98px;display:block;margin:4px auto 12px;overflow:visible}
+.v19-loader path,.v19-loader circle{fill:none;stroke:#2a7fb0;stroke-linecap:round;stroke-linejoin:round}
+.v19-axis{stroke-width:1.5;opacity:.35}
+.v19-line{stroke-width:3;stroke-dasharray:300;stroke-dashoffset:300;animation:v19draw 1.8s cubic-bezier(.55,.1,.3,1) infinite}
+.v19-area{stroke-width:1.2;opacity:0;stroke-dasharray:4 5;animation:v19area 1.8s ease-in-out infinite}
+.v19-dot{stroke-width:2.5;fill:#fff!important;opacity:0;animation:v19dot 1.8s ease-in-out infinite}
+@keyframes v19draw{0%{stroke-dashoffset:300}65%{stroke-dashoffset:0}100%{stroke-dashoffset:0;opacity:.15}}
+@keyframes v19area{0%,40%{opacity:0}70%{opacity:.45}100%{opacity:0}}
+@keyframes v19dot{0%,60%{opacity:0;r:2}70%{opacity:1;r:5}100%{opacity:0}}

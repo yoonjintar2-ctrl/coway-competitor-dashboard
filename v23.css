@@ -1,0 +1,12 @@
+.loading.v23-loading{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px 0!important}
+.v23-drop{width:64px;height:78px;overflow:visible;filter:drop-shadow(0 6px 14px rgba(20,121,180,.18))}
+.v23-shell{fill:rgba(255,255,255,.55);stroke:#25a4dc;stroke-width:2.2}
+.v23-fill{animation:v23rise 2.6s cubic-bezier(.45,.1,.35,1) infinite}
+@keyframes v23rise{0%{transform:translateY(98px)}75%{transform:translateY(10px)}88%{transform:translateY(10px);opacity:1}100%{transform:translateY(10px);opacity:0}}
+.v23-wave{animation:v23wave 1.2s linear infinite}
+.v23-wave2{fill:rgba(255,255,255,.28);animation:v23wave 1.8s linear infinite reverse}
+@keyframes v23wave{from{transform:translateX(0)}to{transform:translateX(80px)}}
+.v23-shine{fill:none;stroke:rgba(255,255,255,.85);stroke-width:3;stroke-linecap:round}
+.v23-text{width:100%;text-align:center!important;margin:0!important;font-size:13.5px!important;font-weight:600;color:#45667a!important;letter-spacing:.2px;text-align:center}
+.v23-text span{display:inline-block;opacity:0;transform:translateY(6px);animation:v23in .5s ease-out forwards}
+@keyframes v23in{to{opacity:1;transform:none}}

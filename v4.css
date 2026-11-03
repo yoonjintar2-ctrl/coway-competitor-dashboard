@@ -1,0 +1,85 @@
+/* v4 — 2026-11-03 Claude 인계 수정 */
+/* 브랜드 포스팅 게시일 */
+.v4-post .v4-post-media{position:relative;display:block}
+.v4-post .v4-post-media>img,.v4-post .post-placeholder{width:100%;height:106px;object-fit:cover;display:block}
+.v4-post-date{position:absolute;left:8px;top:8px;padding:4px 8px;border-radius:5px;background:#0f2c42e0;color:#fff;font-size:11px;font-weight:700;letter-spacing:.3px;font-variant-numeric:tabular-nums;line-height:1.2}
+.v4-post-date.static{position:static;display:inline-block;font-size:13px}
+.v4-post-head{display:flex;align-items:center;gap:10px}
+.v4-post-platform{display:flex;align-items:center;gap:5px}
+.v4-post-platform svg{width:14px;height:10px;flex:none}
+/* 주요 소재 */
+.v4-material{display:flex;flex-direction:column}
+.v4-spend-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px 0}
+.v4-spend-row>strong{font-size:13px;color:#16384f;font-variant-numeric:tabular-nums}
+.v4-media{display:flex;gap:5px;align-items:center}
+.v4-media-icon{display:inline-grid;place-items:center;width:24px;height:20px;border-radius:5px;background:#eaf3f8;color:#2a6f93;font-style:normal}
+.v4-media-icon svg{width:15px;height:15px}
+.v4-media-icon.youtube{background:#fff;border:1px solid #f3d3d8}
+.v4-media-icon.youtube svg{width:17px;height:12px}
+.v4-media-icon:focus-visible{outline:2px solid #2a93c4;outline-offset:1px}
+.v4-yt{margin:8px 13px 0;font-size:10px;line-height:1.5}
+.v4-yt.matched>a{display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #f1cdd3;border-radius:7px;background:#fff7f8;color:#b4142d;font-weight:600;text-decoration:none}
+.v4-yt.matched>a svg{width:18px;height:13px;flex:none}
+.v4-yt.matched>a span{flex:1}
+.v4-yt.matched>a:hover{background:#ffeef1}
+.v4-yt small{display:block;margin-top:4px;color:#7a92a2;font-size:9px}
+.v4-yt details{margin-top:4px;font-size:9px;color:#6d8a9b}
+.v4-yt details summary{cursor:pointer}
+.v4-yt details a{display:block;margin-top:4px;color:#3e7fa0;overflow-wrap:anywhere}
+.v4-yt.muted{color:#8aa0ad;font-size:9px;padding:6px 9px;border:1px dashed #d6e4ec;border-radius:7px}
+.v4-material .material-caption{padding-top:10px}
+.v4-material .material-caption dl{grid-template-columns:70px 1fr}
+.v4-pending{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:100%;padding:12px;text-align:center;color:#55798d}
+.v4-pending b{font-size:11px}
+.v4-pending small{font-size:9px;line-height:1.5;color:#7b97a7}
+.v4-pending svg{width:26px;height:26px}
+.v4-pending.radio{background:linear-gradient(145deg,#f6eddc,#fbf7ef);color:#9a7333}
+.v4-pending.unmatched,.v4-pending.source_failed{background:repeating-linear-gradient(135deg,#eef4f8 0 8px,#e6eef3 8px 16px)}
+/* 스토리보드·카피 */
+#story-hover.v4-hover{max-height:none;pointer-events:none}
+#story-hover.v4-hover img{max-height:220px}
+.v4-copy{font-size:12px;line-height:1.75;color:#24475d}
+.v4-copy h3{font-size:13px;margin:0 0 10px}
+.v4-copy p{margin:0 0 7px;display:grid;grid-template-columns:auto 1fr;gap:10px;white-space:pre-line}
+.v4-copy p b{color:#2a86b2;font-size:11px;min-width:42px}
+.v4-copy p:not(:has(b)){grid-template-columns:1fr}
+.v4-copy .footnote{display:block;margin-top:12px}
+.v4-copy-version+.v4-copy-version{margin-top:14px;padding-top:12px;border-top:1px solid #dce9f1}
+.v4-copy-tag{display:inline-block;margin-bottom:8px;padding:2px 7px;border-radius:4px;background:#e7f3fa;color:#2d7ea6;font-size:10px}
+.v4-copy.compact{padding:9px 10px 6px;font-size:11px;border-top:1px solid #e3eef4}
+.v4-copy.compact p{margin-bottom:4px}
+.v4-copy.compact .more{color:#7c97a8;font-size:10px}
+.v4-copy.empty-copy{color:#7b94a3;font-size:11px;padding:14px;border:1px dashed #d5e4ec;border-radius:8px}
+.v4-story h2{display:flex;flex-direction:column;gap:4px;font-size:17px;padding-right:24px}
+.v4-story h2 small{font-size:11px;color:#7790a0;font-weight:400}
+.v4-story-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:22px;align-items:start}
+.v4-story-grid.copy-only{grid-template-columns:minmax(0,640px)}
+.v4-story-grid .v4-copy{max-height:70vh;overflow:auto;padding:16px 18px;background:#ffffffc7;border:1px solid #dcebf3;border-radius:10px}
+@media(max-width:900px){.v4-story-grid{grid-template-columns:1fr}}
+/* 트리맵 */
+.v4-treemap{height:340px}
+.v4-parent>strong{display:flex;align-items:baseline;gap:6px;font-size:11px}
+.v4-parent>strong b,.v4-group-label b{font-size:13px}
+.v4-parent>strong em,.v4-group-label em{font-style:normal;font-weight:400;opacity:.85;font-size:10px}
+.v4-groups{position:absolute}
+.v4-group{position:absolute;box-sizing:border-box;border:3px solid #fff;border-top-width:0}
+.v4-group:first-child{border-left-width:0}
+.v4-group-label{position:absolute;left:0;right:0;top:0;height:22px;padding:4px 7px;font-size:10px;white-space:nowrap;overflow:hidden;background:#0d3a5726;display:flex;gap:6px;align-items:baseline}
+.v4-group-body{position:absolute;left:0;right:0;top:22px;bottom:0}
+.v4-leaf{background-image:linear-gradient(rgba(255,255,255,var(--shade)),rgba(255,255,255,var(--shade)));cursor:default}
+.v4-leaf:hover,.v4-leaf:focus-visible{outline:2px solid #fff;outline-offset:-3px;filter:brightness(1.08)}
+.v4-leaf>span{position:absolute;inset:6px;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.v4-leaf b{font-size:15px;line-height:1.1}
+.v4-leaf em{font-style:normal;font-size:10px}
+.v4-leaf small{font-size:9px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tree-tip{position:fixed;z-index:90;display:grid;gap:3px;padding:9px 11px;border-radius:8px;background:#0f2c42f2;color:#fff;font-size:10px;box-shadow:0 6px 22px #0b273b40;pointer-events:none;max-width:320px}
+#tree-tip[hidden]{display:none}
+#tree-tip small{color:#bcd6e6;font-size:9px}
+#tree-tip strong{font-size:13px;font-variant-numeric:tabular-nums}
+/* 월별 표 전치 */
+.v4-monthly th[scope=row]{text-align:left;white-space:nowrap;color:#3f6176;font-weight:600}
+.v4-monthly thead th{text-align:right}
+.v4-monthly thead th:first-child{text-align:left}
+.v4-monthly .v4-total-col{background:#eef6fa;font-weight:600}
+.v4-monthly tfoot td,.v4-monthly tfoot th{font-weight:700;border-top:1px solid #bfd5e1}
+.v4-monthly th:first-child{position:sticky;left:0;background:#f5fafc;z-index:1}

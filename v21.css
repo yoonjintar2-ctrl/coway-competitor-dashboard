@@ -1,0 +1,6 @@
+.v21-empty{margin-bottom:10px}
+.v17-recent{position:relative}
+.v21-nav{position:absolute;top:58%;transform:translateY(-50%);z-index:3;width:36px;height:36px;border-radius:50%;border:1px solid #d5e3ea;background:#fff;color:#102b45;font-size:22px;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(16,43,69,.16);opacity:0;pointer-events:none;transition:opacity .18s}
+.v21-nav.prev{left:-10px}.v21-nav.next{right:-10px}
+.v17-recent:hover .v21-nav{opacity:1;pointer-events:auto}
+.v21-nav[hidden]{display:none}

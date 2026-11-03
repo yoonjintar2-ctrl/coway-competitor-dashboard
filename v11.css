@@ -1,0 +1,5 @@
+/* 타임라인: 광고주 색 통일(영역으로 구분), 막대 높이 통일, 상시는 투명도만 */
+#gantt-scroll .v5-flight,#gantt-scroll .v6-adv{--brand:#2a7fb0 !important}
+#gantt-scroll .v5-flight{--thick:10px !important}
+#gantt-scroll .v5-flight.is-evergreen .v5-bar{background:var(--brand) !important;opacity:.38}
+#gantt-scroll .v5-flight.is-evergreen:hover .v5-bar{opacity:.6}

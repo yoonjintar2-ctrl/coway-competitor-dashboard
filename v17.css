@@ -1,0 +1,63 @@
+/* ---------- 타임라인 ---------- */
+#gantt-scroll .v15-gauge{display:none!important}
+#gantt-scroll .v5-onair,#gantt-scroll .onair-edge,.onair-key{display:none!important}
+/* 2단 머리글 */
+.v5-shell .gantt-header{height:62px}
+.v17-year-track{position:absolute;left:var(--label);right:0;top:0;height:26px;border-bottom:1px solid #3a5f7a}
+.v17-year-track span{position:absolute;top:0;height:26px;line-height:26px;padding-left:10px;border-left:1px solid #3a5f7a;color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.3px;box-sizing:border-box;white-space:nowrap}
+.v17-year-track span:first-child{border-left:0}
+.v5-shell .gantt-month-track{top:26px!important;height:36px!important}
+.v5-shell .gantt-month-track span{padding-top:10px!important;padding-bottom:0!important;font-size:11px}
+.v5-shell .gantt-corner{height:62px!important;display:flex;align-items:center}
+/* 광고주 카드: 배경·테두리 일치, 캡슐 좌측이 카드 밖으로 나가지 않게 */
+#gantt-scroll .v6-bands i{left:0!important;right:0!important;border:1px solid #e3ecf1!important;border-radius:12px!important;background:#fff!important;box-shadow:none!important;background-clip:border-box!important;box-sizing:border-box}
+#gantt-scroll .v6-adv{left:6px!important;right:6px!important;border:1px solid #e3ecf1!important;border-radius:12px!important;background:#fff!important;box-shadow:none!important;background-clip:border-box!important;box-sizing:border-box;padding:12px 12px}
+#gantt-scroll .gantt-track{overflow:hidden}
+#gantt-scroll .v15-cap{margin-left:0}
+/* 캡슐 글자·상시 배지 잘림 */
+#gantt-scroll .v15-text strong{line-height:16px!important;padding:1px 0!important;display:flex!important;align-items:center;gap:5px}
+#gantt-scroll .v15-text strong>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#gantt-scroll .v15-text strong em{flex:none;line-height:12px!important;padding:1px 5px!important;margin:0!important;display:inline-block}
+#gantt-scroll .v15-tiny .v15-text{display:none!important}
+/* 진행 중: 오른쪽 끝까지 열린 캡슐 */
+#gantt-scroll .v17-open .v5-bar{border-top-right-radius:0!important;border-bottom-right-radius:0!important;border-right:0!important}
+/* 최근 30일 온에어 강조 */
+#gantt-scroll .v17-hot .v5-bar{background:#d7eaf8!important;border:1.5px solid #2a7fb0!important;box-shadow:0 0 0 3px rgba(42,127,176,.13)}
+#gantt-scroll .v17-hot.v17-open .v5-bar{border-right:0!important}
+.v17-newb{font-style:normal;font-size:9px!important;font-weight:800;color:#fff!important;background:#2a7fb0;border:0!important;border-radius:8px!important;padding:1px 6px!important}
+/* 최근 캠페인 띠 */
+.v17-recent{margin:0 0 14px}
+.v17-recent-head{display:flex;align-items:baseline;gap:10px;margin:0 2px 8px}.v17-recent-head b{font-size:14px;color:#102b45}.v17-recent-head small{font-size:11px;color:#7d93a1}
+.v17-recent-rail{display:flex;gap:12px;overflow-x:auto;padding:8px 2px 6px;scrollbar-width:none}
+.v17-rc{flex:0 0 268px;position:relative;display:flex;gap:10px;align-items:center;text-align:left;background:#fff;border:1px solid #e3ecf1;border-radius:14px;padding:10px;cursor:pointer;box-shadow:0 4px 14px rgba(16,43,69,.06);font:inherit;color:inherit}
+.v17-rc:hover{border-color:#8cc3e4;box-shadow:0 6px 18px rgba(42,127,176,.16)}
+.v17-rc>em{position:absolute;top:-8px;left:10px;font-style:normal;font-size:9.5px;font-weight:800;color:#fff;background:#2a7fb0;border-radius:8px;padding:1px 8px}
+.v17-rc.yt>em{background:#e5203a}.v17-rc.yt{border-color:#f6c3cb}
+.v17-rc>img,.v17-rc>i{width:64px;height:64px;border-radius:10px;object-fit:cover;flex:none;background:#9fc4dc;display:grid;place-items:center;color:#fff;font-style:normal;font-size:20px;font-weight:800}
+.v17-rc>span{min-width:0;display:flex;flex-direction:column;gap:2px}
+.v17-rc>span b{font-size:12.5px;color:#102b45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v17-rc>span small{font-size:10.5px;color:#6d8797;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ---------- 로딩 ---------- */
+.loading .v17-loader{width:220px;height:84px;display:block;margin:6px auto 10px}
+.v17-loader rect{fill:#2a7fb0;opacity:.85;transform-box:fill-box;transform-origin:bottom;animation:v17grow 1.4s ease-in-out infinite}
+.v17-loader polyline{fill:none;stroke:#102b45;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:260;stroke-dashoffset:260;animation:v17draw 1.4s ease-in-out infinite}
+@keyframes v17grow{0%{transform:scaleY(.08)}50%{transform:scaleY(1)}100%{transform:scaleY(.08)}}
+@keyframes v17draw{0%{stroke-dashoffset:260}60%{stroke-dashoffset:0}100%{stroke-dashoffset:0;opacity:.2}}
+.loading p{text-align:center;margin:0;color:#6d8797;font-size:12px}
+/* ---------- 캠페인 분석 ---------- */
+.v17-two{display:flex;flex-direction:column;line-height:1.25}.v17-two small{font-size:10px;font-weight:500;opacity:.8}
+.v17-tree{position:relative}
+.v17-tree .legend{position:absolute;top:22px;right:24px;margin:0!important;max-width:60%;justify-content:flex-end}
+.v8-small{gap:10px!important;margin-top:10px!important}
+.v8-small-item{min-height:58px!important;padding:12px 18px!important;font-size:13px!important;flex:1 1 220px!important;border-radius:10px!important}
+.v8-small-item b{font-size:14px!important}.v8-small-item span{font-size:12.5px!important}.v8-small-item i{width:14px!important;height:14px!important}
+.v17-bleed{margin:0 -24px}
+.v17-bleed svg{display:block;width:100%}
+.v17-kpi{gap:8px!important;align-items:center!important}.v17-kpi span{font-size:12px;color:#6d8797}.v17-kpi em{font-size:13px!important;padding:3px 10px!important}
+.v17-ig-note p{font-size:12.5px;color:#45667a;margin:10px 0 0}
+/* 다른 캠페인 카드: 무채색, 글자 잘 보이게 */
+.other-campaign-card{--brand:#cfdbe3!important;border-top-color:#cfdbe3!important}
+.other-campaign-card .v5-thumb-fill,.other-campaign-card .other-campaign-placeholder{background:#eef3f6!important;color:#24465c!important}
+.other-campaign-card .v5-thumb-fill b,.other-campaign-card .v5-thumb-fill span,.other-campaign-card .v5-thumb-fill small{color:#24465c!important;text-shadow:none!important}
+.other-campaign-card .v5-thumb-fill small{color:#6d8797!important}
+.brand span{font-size:11px!important;letter-spacing:.2px!important;color:#5d7a8b!important;font-weight:600}

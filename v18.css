@@ -1,0 +1,9 @@
+.v5-shell .gantt-scroll,#gantt-scroll{max-height:none!important;overflow-y:hidden!important;overflow-x:auto;overscroll-behavior:auto!important;cursor:grab}
+#gantt-scroll.v18-drag{cursor:grabbing;user-select:none}
+#gantt-scroll.v18-drag *{pointer-events:none}
+/* 열린 캡슐: 오른쪽 끝까지 평평한 직선 */
+#gantt-scroll .v17-open .v5-bar{border-top-right-radius:0!important;border-bottom-right-radius:0!important;border-right:0!important}
+/* 상단 카드 너비 통일 + 말줄임 */
+.v17-rc{flex:0 0 280px!important;width:280px;min-width:0;max-width:280px;box-sizing:border-box;overflow:visible}
+.v17-rc>span{flex:1;min-width:0;overflow:hidden}
+.v17-rc>span b,.v17-rc>span small{display:block;max-width:100%}

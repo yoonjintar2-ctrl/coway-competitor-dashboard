@@ -1,0 +1,11 @@
+.v9-settings{border:1px solid #d3e4ed;background:#ffffffb8;border-radius:7px;padding:5px 10px;font-size:10px;color:#4b7890;cursor:pointer;margin-bottom:8px}
+.v9-settings.active{background:#25a4dc;color:#fff;border-color:#25a4dc}
+header .toolbar[hidden]{display:none!important}
+.v6-adv{flex-direction:column}
+.v6-adv small{display:block;font-size:9px;font-weight:500;color:#6f8a9a;margin-top:3px}
+.v6-adv span{display:block}
+.v9-adj{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:10px 0}
+.v9-adj label{display:flex;align-items:center;gap:8px;padding:12px;border:1px solid #e1edf3;border-radius:10px;background:#fff;font-size:12px}
+.v9-adj span{flex:1;font-weight:600;color:#2d536a}
+.v9-adj input{width:80px;padding:7px;border:1px solid #d3e4ed;border-radius:7px;font:inherit;text-align:right}
+.v9-adj em{font-style:normal;font-size:10px;color:#7a95a5}

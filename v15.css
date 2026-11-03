@@ -1,0 +1,26 @@
+/* A안 캡슐 */
+#gantt-scroll .v5-flight.v15-cap{height:42px;min-width:56px;overflow:visible}
+#gantt-scroll .v15-cap .v5-bar{height:42px!important;border-radius:21px!important;background:#e8f2fa!important;opacity:1!important;border:1px solid #bcdcef;box-sizing:border-box}
+#gantt-scroll .v15-cap.is-evergreen .v5-bar{background:#f1f6f9!important;border-style:solid;opacity:.85!important}
+#gantt-scroll .v15-cap.is-evergreen .v5-label{opacity:.75}
+#gantt-scroll .v15-cap:hover .v5-bar{background:#d9ebf8!important;border-color:#8cc3e4;box-shadow:0 3px 10px rgba(42,127,176,.18)!important}
+#gantt-scroll .v15-cap .onair-edge{height:42px;border-radius:0 21px 21px 0}
+#gantt-scroll .v15-cap .v5-label{top:0!important;height:42px;display:flex;align-items:center;gap:7px;padding:0 12px 0 4px;box-sizing:border-box;overflow:hidden;white-space:nowrap}
+#gantt-scroll .v15-thumb{flex:none;width:34px;height:34px;border-radius:50%;object-fit:cover;background:#9fc4dc;display:grid;place-items:center;color:#fff;font-style:normal;font-size:13px;font-weight:800;border:2px solid #fff;box-shadow:0 1px 3px rgba(16,43,69,.15)}
+#gantt-scroll .v15-text{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+#gantt-scroll .v15-text strong{display:block!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap;font-size:11.5px;color:#173a52!important}
+#gantt-scroll .v15-text strong>span{color:#173a52!important}
+#gantt-scroll .v15-text strong em{margin-left:5px}
+#gantt-scroll .v15-text small{display:flex!important;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin-top:2px!important;color:#5d7a8b}
+#gantt-scroll .v15-tight .v15-text small .v5-mis{display:none}
+#gantt-scroll .v15-tiny .v15-text{display:none}
+#gantt-scroll .v15-tiny .v5-label{padding-right:4px}
+/* 광고주 흰 카드 + 게이지, 이름은 2줄까지 줄바꿈(넘침 방지) */
+#gantt-scroll .v6-bands i{background:#fff;background-clip:padding-box;border:0!important;border-top:6px solid transparent!important;box-shadow:inset 0 0 0 1px #e6eef3;border-radius:16px 16px 12px 12px;left:6px;right:6px}
+#gantt-scroll .v6-bands i.odd{background:#fff}
+#gantt-scroll .gantt-track{background:#f6f9fb}
+#gantt-scroll .v6-adv{background:#fff;background-clip:padding-box;border:0!important;border-top:6px solid transparent!important;box-shadow:inset 0 0 0 1px #e6eef3;border-radius:16px 16px 12px 12px;left:6px;right:6px}
+#gantt-scroll .v6-adv.odd{background:#fff}
+#gantt-scroll .v6-adv span{white-space:normal!important;max-width:118px;display:-webkit-box!important;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;font-weight:800;color:#102b45;line-height:1.3;word-break:keep-all}
+#gantt-scroll .v6-adv span small{display:block;-webkit-line-clamp:unset;font-size:10px;font-weight:500;color:#7d93a1;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gantt-scroll .v15-gauge{display:block;width:100px;height:5px;border-radius:3px;background:linear-gradient(#2a7fb0,#2a7fb0) 0 0/var(--g,0%) 100% no-repeat,#e9f0f4;margin-top:6px}

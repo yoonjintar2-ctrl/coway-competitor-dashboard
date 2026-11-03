@@ -1,0 +1,5 @@
+/* v26 — 광고주 영역: 둥근 카드 대신 위·아래 가로선 + 흰색 띠(좌우 끝까지) */
+#gantt-scroll .v6-bands i,#gantt-scroll .v6-adv{border:0!important;border-radius:0!important;border-top:1px solid #d6e3ea!important;border-bottom:1px solid #d6e3ea!important;background:#fff!important;left:0!important;right:0!important;box-shadow:none!important}
+#gantt-scroll .gantt-track,#gantt-scroll .gantt-row{background:#f3f7fa!important}
+#gantt-scroll .v6-adv-col{background:#f3f7fa!important;border-left:0!important}
+.v6-chip.onair{display:none!important}

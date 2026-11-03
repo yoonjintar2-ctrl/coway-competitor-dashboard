@@ -1,0 +1,9 @@
+.loading.v24-loading{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;min-height:360px;display:flex;align-items:center;justify-content:center;padding:40px 0!important}
+.v24-svg{width:210px;height:147px;overflow:visible}
+.v24-word{font-family:inherit;font-size:30px;font-weight:900;letter-spacing:3px}
+.v24-svg path,.v24-svg text{stroke:none!important}
+.v24-base path,.v24-base text{fill:#c9e0ec}
+.v24-water{animation:v24rise 2.8s cubic-bezier(.42,.08,.36,1) infinite}
+.v24-water path{animation:v24wave 1.1s linear infinite}
+@keyframes v24rise{0%{transform:translateY(140px)}80%{transform:translateY(2px)}92%{transform:translateY(2px);opacity:1}100%{transform:translateY(2px);opacity:0}}
+@keyframes v24wave{from{transform:translateX(0)}to{transform:translateX(50px)}}

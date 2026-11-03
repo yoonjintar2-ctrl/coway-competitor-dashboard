@@ -1,0 +1,23 @@
+.v7-layout{display:grid;grid-template-columns:190px minmax(0,1fr);gap:20px;align-items:start}
+.v7-menu{display:grid;gap:6px;position:sticky;top:16px}
+.v7-menu button{text-align:left;padding:11px 13px;border-radius:9px;border:1px solid #fff;background:#ffffff99;color:#3c6880;font-size:12px}
+.v7-menu button b{float:right;font-size:10px;color:#8ba4b3;font-weight:500}
+.v7-menu button.active{background:#25a4dc;color:#fff;border-color:#25a4dc}
+.v7-menu button.active b{color:#dff3fc}
+.v7-help{font-size:11px;color:#5f7f92;margin:0 0 12px;line-height:1.7}
+.v7-actions{display:flex;gap:8px;flex-wrap:wrap}
+.v7-actions button{padding:8px 12px;border-radius:8px;font-size:11px}
+.v7-paste{border:1px dashed #b9d7e6;border-radius:10px;padding:12px;margin-bottom:14px;background:#f6fbfd}
+.v7-paste p{font-size:11px;color:#56788b;margin:0 0 8px}
+.v7-paste textarea{width:100%;box-sizing:border-box;font:12px/1.5 ui-monospace,Consolas,monospace;padding:10px;border:1px solid #d3e4ed;border-radius:8px;margin-bottom:8px}
+.v7-tools{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.v7-tools input{flex:1;max-width:380px;padding:8px 11px;border:1px solid #d3e4ed;border-radius:8px;font:inherit;font-size:11px}
+.v7-tools small{font-size:10px;color:#8099a8}
+.v7-table-scroll{max-height:62vh;overflow:auto;border:1px solid #e3eef4;border-radius:10px}
+.v7-table{font-size:11px}
+.v7-table th{position:sticky;top:0;background:#eef6fa;z-index:1}
+.v7-table td{padding:3px 6px}
+.v7-table input{width:100%;box-sizing:border-box;border:1px solid transparent;background:transparent;padding:5px 6px;border-radius:5px;font:inherit}
+.v7-table input:focus{border-color:#8fcbe6;background:#fff;outline:none}
+.v7-table button{border:0;background:#f3f7fa;border-radius:5px;width:24px;height:24px;color:#7a95a5;cursor:pointer}
+@media(max-width:900px){.v7-layout{grid-template-columns:1fr}.v7-menu{position:static;grid-template-columns:repeat(2,1fr)}}

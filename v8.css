@@ -1,0 +1,16 @@
+.gantt-intro,.unified-legend,#small-toggle{display:none!important}
+.v5-shell .gantt-scroll{overflow:auto;overscroll-behavior:contain}
+.v5-shell .gantt-header{position:sticky;top:0;z-index:12;background:#21445e;border-bottom:1px solid #16344a}
+.v5-shell .gantt-corner{background:#1a3a52;color:#fff;border-right:1px solid #16344a;z-index:13}
+.v5-shell .gantt-corner span{color:#fff}
+.v5-shell .gantt-month-track span{color:#e8f2f8;border-left-color:#3a5f7a}
+.v5-shell .gantt-month-track em{color:#9fe0ff;border-left-color:#5fd0ff}
+.v5-shell .gantt-category{z-index:8}
+.v5-flight .v5-bar{border-radius:0!important}
+.v5-two{align-items:start}
+.v5-two .section .v3-chart{max-height:300px}
+.v8-small{display:flex;flex-wrap:wrap;gap:8px 18px;margin:10px 0 2px}
+.v8-small-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--c);cursor:default}
+.v8-small-item i{width:14px;height:14px;background:var(--c);display:inline-block}
+.v8-small-item b{font-weight:700}
+.v8-small-item span{font-weight:600}

@@ -1,0 +1,47 @@
+/* 타임라인: 품목 첫 줄 이중선 제거, 우측 오늘 표시선(이중선) 제거 */
+#gantt-scroll .v6-bands i:first-child{border-top:0}
+#gantt-scroll .v6-adv:first-child{border-top:0}
+#gantt-scroll .gantt-month-track em{display:none}
+/* 공통: 가로 스크롤바 숨김, 좌우 이동 단추는 영역에 마우스를 올렸을 때만 */
+*::-webkit-scrollbar:horizontal{height:0;display:none}
+.material-carousel,.brand-post-rail,.other-campaign-rail,#gantt-scroll{scrollbar-width:none}
+#gantt-scroll{scrollbar-width:thin}
+.carousel-float,.v5-float{opacity:0;pointer-events:none;transition:opacity .18s}
+.carousel-section:hover .carousel-float,.other-campaigns:hover .carousel-float,.v5-posts .section:hover .carousel-float{opacity:1;pointer-events:auto}
+body.v12-gantt-hover .v5-float{opacity:1;pointer-events:auto}
+.carousel-float[hidden],.v5-float:disabled{opacity:0!important;pointer-events:none!important}
+/* 미확인 소재 주석 */
+.v12-unverified{margin-top:14px;padding-top:10px;border-top:1px dashed #d9e5eb;font-size:11px;color:#6d8797;line-height:1.6}
+.v12-unverified b{font-size:11px;color:#45667a}
+.v12-unverified ul{margin:4px 0 0;padding-left:16px}
+/* YouTube 버전 팝업 */
+button.v5-link{font:inherit;cursor:pointer;border:0}
+.v12-yt-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.v12-yt-list a{display:flex;gap:12px;align-items:center;padding:8px;border:1px solid #e1ebf0;border-radius:10px;color:inherit;text-decoration:none;background:#fff}
+.v12-yt-list a:hover{border-color:#e5203a;background:#fff7f8}
+.v12-yt-list img,.v12-yt-list i{width:132px;height:74px;object-fit:cover;border-radius:6px;background:#eef3f6;flex:none}
+.v12-yt-list div{flex:1;min-width:0}.v12-yt-list b{display:block;font-size:13px}.v12-yt-list small{color:#6d8797;font-size:11px}
+.v12-yt-list span{color:#e5203a;font-size:12px;font-weight:700;white-space:nowrap}
+/* 주차별 매체 광고비 높이 맞춤 */
+.v5-two .section .v3-chart.v12-weekly{max-height:none;height:auto!important}
+/* 쿼리 추이 */
+.v12-trend-kpi{display:flex;align-items:baseline;gap:10px;margin:6px 0 2px}
+.v12-trend-kpi strong{font-size:30px;font-weight:800;color:#102b45;letter-spacing:-.5px}
+.v12-trend-kpi em{font-style:normal;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+.v12-trend-kpi em.up{background:#ffe9ec;color:#e5203a}.v12-trend-kpi em.down{background:#e6f1fb;color:#2468b4}
+.v12-trend-kpi small{font-size:11px;color:#6d8797}
+.v12-trend-wrap{position:relative;margin:0 -24px;width:calc(100% + 48px)}
+.v5-two .v12-trend-wrap .v3-chart.v12-trend,.v12-trend-wrap .v3-chart.v12-trend{display:block;width:100%;height:auto!important;max-height:none}
+.v12-axis{font-size:10px;fill:#8aa0ad}
+.v12-dot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;border:3px solid #2b8fe0;pointer-events:none;box-shadow:0 2px 8px rgba(43,143,224,.35)}
+.v12-tip{position:absolute;pointer-events:none;background:#102b45;color:#fff;border-radius:8px;padding:7px 10px;font-size:11px;white-space:nowrap;box-shadow:0 6px 18px rgba(16,43,69,.25)}
+.v12-tip small{display:block;color:#a9c6da;font-size:10px}.v12-tip b{font-size:16px;margin-right:6px}.v12-tip span{color:#cfe2ee}
+/* 경쟁사 광고비 */
+.v12-annual-svg{cursor:crosshair}
+.v12-annual-pt{transition:r .12s}
+#annual-card.v12-multi{max-width:340px;padding:12px 14px}
+#annual-card.v12-multi>small{display:block;font-weight:700;color:#45667a;margin-bottom:6px}
+.v12-card-row{border-top:1px solid #e6eef2;padding:7px 0}.v12-card-row:first-of-type{border-top:0}
+.v12-card-row>b{font-size:12px;margin-right:8px}.v12-card-row>strong{font-size:13px}
+.v12-card-row p{display:flex;gap:8px;align-items:center;margin:5px 0 0;font-size:11px;color:#5d7a8b}
+.v12-card-row img{width:54px;height:32px;object-fit:cover;border-radius:4px}

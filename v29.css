@@ -136,3 +136,26 @@ html.nd .filter-label select{font-size:13.5px!important;padding:10px 30px 10px 1
 html.nd #refresh{font-size:13.5px!important;padding:10px 16px!important}
 /* 글자 조금 크게(약 6%): 본문 영역과 사이드바만 확대(떠 있는 툴팁 위치는 그대로) */
 html.nd main,html.nd .sidebar{zoom:1.06}
+
+/* ── v29.2 (18:25): 모노톤 배경 + 프레임을 진짜 유리처럼(투명도↑·흐림·흰 테두리 빛) ── */
+html.nd body::before{filter:grayscale(1) brightness(1.12) contrast(.92) blur(2px)!important}
+html.nd body::after{background:linear-gradient(160deg,rgba(244,245,247,.66),rgba(236,238,241,.5) 55%,rgba(244,245,247,.7))!important}
+html.nd{--glass-bg:linear-gradient(160deg,rgba(255,255,255,.58),rgba(255,255,255,.36));--glass-blur:blur(22px) saturate(170%);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.95),inset 0 0 0 1px rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.25);
+  --glass-shadow:0 10px 30px rgba(15,25,40,.10),0 2px 8px rgba(15,25,40,.05)}
+html.nd .glass{background:var(--glass-bg)!important;backdrop-filter:var(--glass-blur)!important;-webkit-backdrop-filter:var(--glass-blur)!important;
+  border:1px solid rgba(255,255,255,.7)!important;box-shadow:var(--glass-edge),var(--glass-shadow)!important}
+html.nd .sidebar{background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,.28))!important;backdrop-filter:var(--glass-blur)!important;-webkit-backdrop-filter:var(--glass-blur)!important;
+  border-right:1px solid rgba(255,255,255,.65)!important;box-shadow:inset -1px 0 0 rgba(255,255,255,.5),4px 0 24px rgba(15,25,40,.05)}
+html.nd .nav.active{background:rgba(232,240,254,.78)!important;box-shadow:inset 0 0 0 1px rgba(11,87,208,.12)!important}
+/* 유리 안쪽의 흰 판들도 반투명으로(유리가 비치도록) */
+html.nd .gantt-header{background:rgba(255,255,255,.42)!important;backdrop-filter:blur(14px) saturate(160%)}
+html.nd #gantt-scroll .gantt-track,html.nd #gantt-scroll .gantt-row{background:rgba(255,255,255,.34)!important}
+html.nd .gantt-row:nth-child(odd){background:rgba(255,255,255,.22)!important}
+html.nd .gantt-corner,html.nd .v6-corner,html.nd .gantt-header>div:first-child{background:rgba(255,255,255,.3)!important}
+html.nd .v17-rc{background:linear-gradient(160deg,rgba(255,255,255,.72),rgba(255,255,255,.5))!important;backdrop-filter:blur(16px) saturate(160%);border:1px solid rgba(255,255,255,.75)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 6px 18px rgba(15,25,40,.08)!important}
+html.nd .campaign-kpis>div,html.nd .v28-cmt-kpi>div.k2{background:linear-gradient(160deg,rgba(255,255,255,.62),rgba(255,255,255,.4))!important}
+html.nd select,html.nd input[type=date]{background:rgba(255,255,255,.7)!important;backdrop-filter:blur(10px);border-color:rgba(0,0,0,.12)!important}
+html.nd .secondary,html.nd .v5-chips button,html.nd .v28-unit button,html.nd .v6-chip.cat{background:rgba(255,255,255,.6)!important}
+html.nd .v6-heading,html.nd .analysis-heading>.glass,html.nd .v6-title{background:transparent}

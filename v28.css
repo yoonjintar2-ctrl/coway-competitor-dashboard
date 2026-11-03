@@ -1,3 +1,8 @@
 /* 트리맵 띠 배치: 가로로 긴 칸에 글자가 덜 잘리도록 */
 .v28-bands .v4-leaf span small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .v4-treemap.v28-bands{height:600px!important}
+.v28-naver{flex:1;min-width:0}
+.v28-state{display:inline-block;margin:4px 0 12px;padding:5px 11px;border-radius:12px;background:#fff4e8;color:#a35a12;font-size:12px;font-weight:700}
+.v28-state.on{background:#e6f5ee;color:#1d7a4f}
+.v28-naver form button{align-self:end;background:#25a4dc;color:#fff;border:0;border-radius:8px;padding:10px 20px;font-weight:700;cursor:pointer}
+.v28-naver form button:hover{background:#1b8fc2}

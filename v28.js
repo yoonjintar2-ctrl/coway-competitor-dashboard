@@ -37,3 +37,14 @@ annualPanel=function(d){
  return v28WithAnnualColors(()=>v28BaseAnnual(d));
 };
 var v28BaseAnnualCard=v12AnnualCard;v12AnnualCard=function(i,ev){return v28WithAnnualColors(()=>v28BaseAnnualCard(i,ev))};
+// 설정 > '외부 연결' 탭: 네이버 데이터랩 API 키(주차별 쿼리 추이 전체 브랜드·데일리 갱신용). 키 값은 화면·응답에 다시 표시하지 않음
+v7Tabs.push(['api','외부 연결']);
+function v28ApiCard(){return `<section class="glass section v28-naver">${header('네이버 데이터랩 API','주차별 쿼리 추이를 품목 내 전체 브랜드로 수집하고 매일 갱신합니다. 네이버 개발자센터 애플리케이션(데이터랩 검색어 트렌드 사용)의 Client ID/Secret을 입력하세요.')}<p class="v28-state" id="v28-naver-state">연결 상태 확인 중…</p><form id="v28-naver-form" class="category-form" autocomplete="off"><label>Client ID<input name="client_id" required autocomplete="off"></label><label>Client Secret<input name="client_secret" type="password" required autocomplete="new-password"></label><button type="submit">저장</button></form><p class="footnote">저장한 값은 이 PC에만 암호화되어 보관되며 화면에 다시 표시하지 않습니다. 키가 없으면 기존 브라우저 검증본(품목별 5개 브랜드)을 그대로 보여줍니다. 수집 키워드: 품목별 아덱스 관측 광고주 전체(72개), 묶음마다 같은 기준 키워드를 넣어 품목 안에서 서로 비교할 수 있게 보정합니다.</p></section>`}
+var v28BaseDraw=v7Draw;
+v7Draw=function(){
+ if(v7Tab!=='api')return v28BaseDraw();
+ $('#content').innerHTML=`<div class="v7-layout">${v7Menu()}${v28ApiCard()}</div>`;
+ if(listing?.static){document.getElementById('v28-naver-state').textContent='읽기 전용 사이트 · 키 입력은 PC의 로컬 대시보드에서만 할 수 있습니다.';document.getElementById('v28-naver-form').remove();return}
+ (async()=>{const el=document.getElementById('v28-naver-state');try{const r=await api('/api/activity?'+new URLSearchParams({category:listing.categories[0]?.code||'',start:listing.period.end,end:listing.period.end}));el.textContent=r.settings?.naver_configured?'연결됨 · 매일 수집 때 전체 브랜드 검색 추이를 갱신합니다.':'연결 대기 · 키를 입력하면 다음 수집부터 전체 브랜드로 갱신합니다.';el.classList.toggle('on',!!r.settings?.naver_configured)}catch(e){el.textContent='연결 상태를 확인하지 못했습니다.'}})();
+};
+document.addEventListener('submit',async e=>{if(e.target.id!=='v28-naver-form')return;e.preventDefault();e.stopImmediatePropagation();const f=e.target;try{await api('/api/naver-credentials',Object.fromEntries(new FormData(f)));f.reset();toast('저장했습니다. 다음 수집부터 전체 브랜드 검색 추이를 갱신합니다.');const el=document.getElementById('v28-naver-state');if(el){el.textContent='연결됨 · 매일 수집 때 전체 브랜드 검색 추이를 갱신합니다.';el.classList.add('on')}}catch(err){toast(err.message)}},true);

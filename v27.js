@@ -12,8 +12,7 @@ v5MediaIcons=function(c){
  const m=c.media||{},out=[];const tv=(m.terrestrial||0)+(m.general||0)+(m.cable||0);
  if(tv>0)out.push(['tv','TV',tv]);if(c.youtube_spend>0)out.push(['yt','YouTube',c.youtube_spend]);
  const dig=Math.max(0,(m.digital_video||0)-(c.youtube_spend||0))+(m.digital_banner||0);
- if(dig>1){const dv=c.devices||{};const pc=dv.PC||0,mo=dv.MO||0,etc=Math.max(0,dig-pc-mo);
-  if(pc>1)out.push(['pc','디지털 PC',pc]);if(mo>1)out.push(['mo','디지털 모바일',mo]);if(etc>1||(!pc&&!mo))out.push(['mouse','디지털',pc||mo?etc:dig])}
+ if(dig>1)out.push(['mouse','디지털(비디오·PC·MO)',dig]);
  if(m.radio>0)out.push(['radio','라디오',m.radio]);if(m.print>0)out.push(['print','신문·잡지',m.print]);
  return out.sort((a,b)=>b[2]-a[2]).map(([k,label,v])=>`<i class="v5-mi ${k}" title="${label} ${v4Money(v)}원">${v5Icon[k]}</i>`).join('');
 };

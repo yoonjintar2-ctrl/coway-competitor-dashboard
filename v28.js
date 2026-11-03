@@ -69,3 +69,17 @@ function v28FitLabels(){for(const el of document.querySelectorAll('.v28-bands .v
   if(g.clientHeight<24){lab.style.display='none';g.querySelector('.v4-group-body').style.top='0';continue}
   if(lab.scrollWidth<=lab.clientWidth+1)continue;lab.querySelector('em')?.remove();if(lab.scrollWidth<=lab.clientWidth+1)continue;lab.querySelector('b')?.remove();if(lab.scrollWidth<=lab.clientWidth+1)continue;lab.style.visibility='hidden'}}
 new MutationObserver(()=>{if(document.querySelector('.v28-bands .v4-leaf:not([data-v28]),.v28-bands .v4-group:not([data-v28])'))requestAnimationFrame(()=>requestAnimationFrame(v28FitLabels))}).observe(document.getElementById('content')||document.body,{childList:true,subtree:true});
+// YouTube 선공개(아덱스 광고비 확인 전) 캠페인: 조회수 × CPV 30원으로 역산한 예상 광고비 표기
+var V28_CPV=30;
+function v28Est(views){return v4Money((Number(String(views).replace(/,/g,''))||0)*V28_CPV)+'원'}
+function v28EstText(h){return h
+ .replace(/조회수 ([\d,]+)회 · 영상 (\d+)개 · 광고 모니터링 금액 미집계/g,(m,v,n)=>`예상 ${v28Est(v)} · 조회수 ${v}회 · CPV ${V28_CPV}원 추산`)
+ .replace(/조회수 ([\d,]+)회 · 광고 모니터링 금액 미집계/g,(m,v)=>`예상 광고비 ${v28Est(v)} · CPV ${V28_CPV}원 추산`)
+ .replace('빨간 테두리 = YouTube 선공개(광고 모니터링 금액 미집계)',`빨간 테두리 = YouTube 선공개(예상 광고비 = 조회수 × CPV ${V28_CPV}원)`)}
+var v28BaseTimeline=timeline;timeline=function(){return v28EstText(v28BaseTimeline())};
+var v28BaseRecent=v17Recent;v17Recent=function(){return v28EstText(v28BaseRecent())};
+var v28BaseShow=v5Show;v5Show=function(id,t){v28BaseShow(id,t);if(!String(id).startsWith('ytc-'))return;const c=listing.campaigns.find(x=>x.id===id),box=$('#campaign-hover');if(!c||!box)return;
+ for(const dt of box.querySelectorAll('dt')){const dd=dt.nextElementSibling;if(dd&&/광고 모니터링 금액 미집계|아덱스 광고비 확인 전/.test(dd.textContent))dd.textContent='YouTube'}
+ const first=box.querySelector('dt');if(first&&!box.querySelector('.v28-est')){first.insertAdjacentHTML('beforebegin',`<dt class="v28-est">예상 광고비</dt><dd class="v28-est">${v28Est(c.youtube_views)} <small>CPV ${V28_CPV}원 추산 · 아덱스 반영 대기</small></dd>`)}};
+var v28BaseCand=v20CandidateView;v20CandidateView=async function(c){const h=await v28BaseCand(c);
+ return h.replace(/<div class="glass"><span>관측 광고비<\/span><strong>확인 전<\/strong><small>[^<]*<\/small><\/div>/,`<div class="glass"><span>예상 광고비</span><strong>${v28Est(c.youtube_views)}</strong><small>아덱스 디지털 광고비 반영 대기, 상기 데이터는 CPV ${V28_CPV}원으로 추산</small></div>`)};

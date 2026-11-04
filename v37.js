@@ -69,3 +69,9 @@ function v37Open(x){if(!x)return;const w=v37When(x.published_at),dialog=$('#deta
  if(!dialog.open)dialog.showModal()}
 document.addEventListener('click',e=>{const r=e.target.closest('[data-v37-news]');if(!r||e.target.closest('[data-v37-share]'))return;v37Open((v37Data&&v37Data.items||[]).find(i=>i.id===r.dataset.v37News))});
 document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('[data-v37-news]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();r.click()}});
+// ---------- 3) 타임라인 마우스오버 팝업: 다른 화면(캠페인 분석 등)으로 넘어가면 닫기 (11-04 17:10) ----------
+function v37HideHover(){const a=document.getElementById('campaign-hover');if(a){a.hidden=true;a.classList.remove('v34-ghost')}
+ try{v3HoverId=''}catch(e){}try{clearTimeout(v5Pending)}catch(e){}try{clearTimeout(v8Switch)}catch(e){}try{clearTimeout(v3HoverTimer)}catch(e){}}
+var v37RenderBase2=render;render=async function(...a){if(route!=='timeline')v37HideHover();return v37RenderBase2.apply(this,a)};
+var v37ShowBase=v5Show;v5Show=function(id,target){if(target&&(!document.body.contains(target)||(route!=='timeline'&&target.closest&&target.closest('#gantt-scroll'))))return v37HideHover();return v37ShowBase.apply(this,arguments)};
+window.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#gantt-scroll [data-gantt],.sidebar [data-route]'))setTimeout(()=>{if(route!=='timeline')v37HideHover()},0)},true);

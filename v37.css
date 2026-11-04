@@ -48,3 +48,5 @@ dialog.v37-dialog{width:min(860px,94vw);max-width:860px}
 .v37-rel-row.main a{font-weight:600}
 .v37-rel-row .v37-share{width:28px;height:28px}
 .v37-pop-body{max-height:72vh;overflow:auto}
+/* 11-04 17:10 타임라인 팝업 모서리 마름모(말풍선 꼬리) 없앰 */
+#campaign-hover.v34-dock::after,#campaign-hover.v34-dock.v34-below::after{content:none!important;display:none!important}

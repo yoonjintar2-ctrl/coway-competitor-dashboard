@@ -1,0 +1,45 @@
+/* v34 — 2026-11-04 12:40 */
+/* 신규 소재 모니터링: 일자별 구분선 */
+.v34-note{margin:0 2px 6px}
+.v34-day{scroll-margin-top:18px;padding:14px 0 4px;border-top:1px solid rgba(16,43,69,.14)}
+.v34-day:first-of-type{border-top:0}
+.v34-day-head{display:flex;align-items:baseline;gap:8px;margin:0 2px 10px}
+.v34-day-head b{font-size:14px;color:#102b45}
+.v34-day-head em{font-style:normal;font-size:10.5px;font-weight:700;color:#fff;background:var(--blue,#25a4dc);border-radius:999px;padding:2px 7px}
+.v34-day-head span{font-size:12px;color:#7d93a1;font-weight:600}
+.v34-none{margin:0 2px 6px;font-size:12px;color:#9aa5ad}
+/* 캠페인 분석 머리: 오른쪽 스틸컷 */
+.analysis-heading.v34-has-hero{position:relative;overflow:hidden;isolation:isolate}
+.analysis-heading .v34-hero{position:absolute;top:0;bottom:0;left:60%;right:0;z-index:-1;background-size:cover;background-position:center 35%;background-repeat:no-repeat;pointer-events:none;
+ -webkit-mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.35) 45%,rgba(0,0,0,.85) 100%);mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.35) 45%,rgba(0,0,0,.85) 100%)}
+/* 묶음 판단 근거·캠페인명 근거는 설정 > 캠페인 묶음 근거로 옮김 */
+#content .campaign-rationale,#content .campaign-name-source{display:none!important}
+.v34-ev td small{display:block;color:#7d93a1;font-size:11px;margin-top:2px}
+.v34-ev td{vertical-align:top}
+.v34-ev-tools{margin-bottom:10px}
+.v34-ev-tools input{width:min(360px,100%);padding:9px 12px;border:1px solid #d6e3ea;border-radius:10px;font:inherit}
+/* 쉬운 추정 설명 */
+.v34-easy b{display:inline-block;margin-right:6px;color:#1f2328}
+/* 타임라인 팝업: 막대에 붙고 클릭을 막지 않음 */
+#campaign-hover.v34-dock{pointer-events:none;max-height:min(340px,48vh)!important;overflow:hidden!important;transition:left .12s ease-out,top .12s ease-out,opacity .15s}
+#campaign-hover.v34-dock.v34-ghost{opacity:.18}
+#campaign-hover.v34-dock::after{content:"";position:absolute;left:var(--v34-ax,24px);bottom:-6px;width:12px;height:12px;margin-left:-6px;transform:rotate(45deg);background:inherit;border-right:1px solid rgba(16,43,69,.12);border-bottom:1px solid rgba(16,43,69,.12)}
+#campaign-hover.v34-dock.v34-below::after{bottom:auto;top:-6px;border:0;border-left:1px solid rgba(16,43,69,.12);border-top:1px solid rgba(16,43,69,.12)}
+html.nd #campaign-hover.v34-dock{overflow:visible!important}
+#campaign-hover.v34-dock button,#campaign-hover.v34-dock a.primary{display:none!important}
+#campaign-hover .v34-hint{display:none}
+#campaign-hover.v34-dock .v34-hint{display:block;margin:10px 0 0;font-size:11px;color:#7d93a1;text-align:center}
+/* YouTube 광고비 추정 */
+.v6-chip.v34-est{background:rgba(197,34,31,.1);color:#c5221f;border-color:rgba(197,34,31,.25)}
+.v34-est-note{display:block;margin-top:6px;font-size:11px;color:#c5221f}
+.v34-yt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.v34-yt-card{display:flex;flex-direction:column;gap:4px;padding:0 0 12px;border-radius:14px;overflow:hidden;border:1px solid #e3ecf1;background:#fff;color:inherit;text-decoration:none}
+.v34-yt-card:hover{box-shadow:0 10px 24px rgba(20,40,80,.12)}
+.v34-yt-thumb{position:relative;aspect-ratio:16/9;background:#eef3f7;margin-bottom:6px}
+.v34-yt-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.v34-yt-thumb em{position:absolute;left:8px;top:8px;font-style:normal;font-size:10.5px;font-weight:700;color:#fff;background:#c5221f;border-radius:999px;padding:2px 8px}
+.v34-yt-card b,.v34-yt-card small,.v34-yt-card strong{padding:0 12px}
+.v34-yt-card b{font-size:12.5px;line-height:1.35;color:#102b45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.v34-yt-card small{font-size:11px;color:#7d93a1}
+.v34-yt-card strong{font-size:13px;color:#c5221f}
+html.nd .v34-yt-card{background:rgba(255,255,255,.6)}

@@ -28,5 +28,5 @@
    return ok({static:true,settings:{},csrf:'static'});
   }catch(e){return new Response(JSON.stringify({error:e.message}),{status:404,headers:{'Content-Type':'application/json'}})}
  };
- document.addEventListener('DOMContentLoaded',async()=>{document.body.classList.add('static-site');try{const m=await json('meta.json');const b=document.createElement('div');b.className='static-badge';b.textContent='읽기 전용 · '+m.built_at+' 기준';document.querySelector('.sidebar-bottom')?.prepend(b)}catch(e){}});
+ document.addEventListener('DOMContentLoaded',async()=>{document.body.classList.add('static-site');try{const m=await json('meta.json');const b=document.createElement('div');b.className='static-badge';b.innerHTML='<span>읽기 전용</span><span>'+String(m.built_at).replace(/[<>&]/g,'')+' 업데이트</span>';document.querySelector('.sidebar-bottom')?.prepend(b)}catch(e){}});
 })();

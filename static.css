@@ -1,2 +1,2 @@
 .static-site #refresh,.static-site [data-route="settings"],.static-site .v9-settings{display:none!important}
-.static-badge{font-size:10.5px;color:#6d8797;line-height:1.5;margin-bottom:8px}
+.static-badge{font-size:10.5px;color:#6d8797;line-height:1.5;margin-bottom:8px;display:flex;flex-direction:column;gap:1px}

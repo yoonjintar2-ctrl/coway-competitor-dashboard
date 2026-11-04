@@ -1,0 +1,58 @@
+/* v35 — 2026-11-04 14:00 */
+/* 머리: 위 줄(← 타임라인 · 다른 캠페인), 높이 1.5배 */
+.v35-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 12px}
+.v35-toolbar .v6-back{margin:0!important}
+.v35-switch{display:flex!important;align-items:center;gap:10px;font-size:12px;font-weight:600;color:#5f6368;margin:0!important}
+.v35-switch select{min-width:280px;max-width:min(520px,60vw)}
+#content .analysis-heading.v6-heading{min-height:196px;display:flex;flex-direction:column;justify-content:center;padding-top:26px;padding-bottom:26px}
+@media (max-width:760px){.v35-toolbar{flex-wrap:wrap}.v35-switch select{min-width:0;width:100%}}
+/* YouTube 추정 딱지 설명 */
+.v6-chip.v34-est{position:relative;cursor:help;outline:none}
+#v35-esttip{position:fixed;z-index:1000;pointer-events:none}
+#v35-esttip[hidden]{display:none}
+#v35-esttip .v35-tip>span{display:block}
+#v35-esttip .v35-tip{width:320px;display:flex;flex-direction:column;gap:6px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.97);border:1px solid #e3ecf1;box-shadow:0 14px 34px rgba(20,40,80,.18);color:#3c4f5c;font-size:12px;font-weight:500;line-height:1.5;text-align:left;white-space:normal}
+.v35-tip b{color:#1f2328}
+.v35-tip-calc{padding:8px 10px;border-radius:10px;background:rgba(197,34,31,.07);color:#8b1a17}
+.v35-tip-calc b{color:#c5221f}
+/* 캠페인 기간: 한 줄씩 */
+.v35-period{display:flex!important;flex-direction:column;gap:2px;line-height:1.2}
+/* 집행 매체: 진하고 크게 */
+#content .v27-media-list b{font-size:15px!important;font-weight:700!important;color:#1f2328!important}
+#content .v27-media-list em{font-size:12.5px}
+/* 신규 소재 모니터링: 날짜 섹션 아래 여백, 드롭다운 글자 */
+.v34-day{padding-bottom:30px!important}
+.v32-ctrl select,html.nd .v32-ctrl select.chip{font-size:13.5px!important}
+/* 주차별 두 그래프: 같은 주차 축 */
+.v35-chart{position:relative}
+.v35-chart svg{display:block;width:100%}
+.v35-band{fill:#2a7fb0;fill-opacity:0}
+.v35-band.on{fill-opacity:.09}
+.v35-slot.on rect:not(.v35-band){filter:brightness(1.06)}
+.v35-x{position:relative;height:30px;margin-top:4px}
+.v35-x span{position:absolute;top:0;transform:translateX(-50%);font-size:12.5px;font-weight:600;color:#5f7484;white-space:nowrap;text-align:center;line-height:1.15}
+.v35-x span i{display:block;font-style:normal;font-size:10.5px;font-weight:500;color:#9aa8b3}
+.v35-chart .v35-tip{position:absolute;z-index:5;min-width:150px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.96);border:1px solid #e3ecf1;box-shadow:0 10px 26px rgba(20,40,80,.14);font-size:12px;pointer-events:none;display:flex;flex-direction:column;gap:3px}
+.v35-chart .v35-tip[hidden]{display:none}
+.v35-chart .v35-tip small{color:#7d93a1}
+.v35-chart .v35-tip b{font-size:15px;color:#102b45}
+.v35-chart .v35-tip span{display:flex;align-items:center;gap:6px;color:#3c4f5c}
+.v35-chart .v35-tip span i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.v35-dot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;border:3px solid #2b8fe0;pointer-events:none}
+.v35-dot[hidden]{display:none}
+.v35-chiprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.v35-chiprow .v5-chips{margin:0}
+.v35-chiprow .v35-seg{margin-left:auto}
+/* 경쟁사 광고비 카드 */
+#annual-card.v35-annual-card{display:flex;flex-direction:column;gap:8px;min-width:220px;max-width:300px;padding:12px 14px}
+.v35-ac-month{color:#7d93a1;font-size:11.5px}
+.v35-ac-row{display:flex;flex-direction:column;gap:3px;padding-top:7px;border-top:1px solid rgba(16,43,69,.08)}
+.v35-ac-row:first-of-type{border-top:0;padding-top:0}
+.v35-ac-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.v35-cap{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--c);color:#fff;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.v35-ac-top strong{font-size:14px;color:#102b45}
+.v35-ac-media{font-size:11px;color:inherit;opacity:.78}
+.v35-ac-month{color:inherit!important;opacity:.75}
+.v35-ac-top strong{color:inherit!important}
+.v35-chart .v35-tip .v28-pm{display:block;line-height:1.5}
+.v35-chart .v35-tip .v28-pm i{display:inline-block;width:auto;height:auto;background:none;font-style:normal;font-weight:700;margin-right:4px}

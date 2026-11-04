@@ -1,4 +1,4 @@
-/* v37 — 2026-11-04 15:20
+/* v37 — 2026-11-04 15:20 (16:00 같은 날은 시간만 · 기타 맨 아래)
    1) 왼쪽 메뉴 '뉴스 클리핑': 코웨이·경쟁 광고주 뉴스를 발행 시각 순으로. 날짜·시간(왼쪽, 가운데 정렬) · 품목·광고주 캡슐 위에 제목(굵게)·요약(얇게 한 줄) · 오른쪽 같은 크기 이미지.
       기사를 누르면 팝업, 목록·팝업 모두 공유 버튼(원문 링크를 클립보드에 복사).
    2) 캠페인 분석: 타임라인을 거치지 않고 메뉴로 들어오면 비워 두고 '타임라인에서 분석하실 캠페인을 선택하세요'. */
@@ -21,9 +21,9 @@ function v37When(s){const d=new Date(s);if(isNaN(d))return {date:'',time:''};con
 function v37Color(a){try{return (typeof v28AnnualMap!=='undefined'&&v28AnnualMap[a])||signatureColor(a)}catch(e){return '#25a4dc'}}
 var V37_SHARE='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg>';
 function v37Items(){return (v37Data&&v37Data.items||[]).filter(x=>(!v37Cat||x.category_label===v37Cat)&&(!v37Adv||x.advertiser===v37Adv))}
-function v37Row(x){const w=v37When(x.published_at);
- return `<div class="v37-row" role="button" tabindex="0" data-v37-news="${esc(x.id)}">
-  <div class="v37-when"><b>${esc(w.date)}</b><span>${esc(w.time)}</span></div>
+function v37Row(x,k,list){const w=v37When(x.published_at),same=k>0&&v37When(list[k-1].published_at).day===w.day;  // 윗 행과 같은 날이면 시간만
+ return `<div class="v37-row${same?' same-day':''}" role="button" tabindex="0" data-v37-news="${esc(x.id)}">
+  <div class="v37-when">${same?'':`<b>${esc(w.date)}</b>`}<span>${esc(w.time)}</span></div>
   <div class="v37-main"><div class="v37-tags"><span class="v37-chip">${esc(x.category_label)}</span><span class="v37-chip adv" style="--c:${v37Color(x.advertiser)}">${esc(x.advertiser)}</span><em>${esc(x.publisher||'')}</em></div>
    <div class="v37-title">${esc(x.title)}</div><div class="v37-sum">${esc(x.summary||'')}</div></div>
   <button type="button" class="v37-share" data-v37-share="${esc(x.id)}" title="원문 링크 복사" aria-label="원문 링크 복사">${V37_SHARE}</button>
@@ -35,8 +35,8 @@ function v37Controls(show){let box=document.querySelector('main>header .v37-ctrl
 function v37Draw(){const items=v37Items();$('#subtitle').textContent='';v37Controls(true);
  const up=v37Data.updated_at?v37When(v37Data.updated_at):null;
  $('#content').innerHTML=`<p class="v32-note v37-note">코웨이와 경쟁 광고주 뉴스를 발행 시각 순으로 보여 줘요(최근 ${v37Data.days}일 · ${items.length}건). 기사를 누르면 크게 보고, 공유 버튼으로 원문 링크를 복사해요.${up?` · ${up.date} ${up.time} 업데이트${v32Static()?'':` · PC 대시보드가 켜져 있으면 ${v37Data.interval_minutes}분마다 새 기사를 모아요`}`:''}</p>
-  <section class="glass section v37-list">${items.length?items.map(v37Row).join(''):empty('조건에 맞는 뉴스가 없어요.',v37Data.items.length?'품목·광고주 선택을 바꿔 보세요.':'아직 모은 뉴스가 없어요. PC 대시보드가 켜져 있으면 곧 채워져요.')}</section>
-  <p class="footnote">네이버 뉴스 검색에서 제목에 광고주(브랜드) 이름이 들어간 기사만 모아요 · 요약은 기사 원문의 대표 설명(AI 요약 아님) · 품목은 제목·요약의 품목 단어로 정해요(없으면 '기타').</p>`}
+  <section class="glass section v37-list">${items.length?items.map((x,k,l)=>v37Row(x,k,l)).join(''):empty('조건에 맞는 뉴스가 없어요.',v37Data.items.length?'품목·광고주 선택을 바꿔 보세요.':'아직 모은 뉴스가 없어요. PC 대시보드가 켜져 있으면 곧 채워져요.')}</section>
+  <p class="footnote">네이버 뉴스 검색에서 제목에 광고주(브랜드) 이름이 들어간 기사만 모아요 · 요약은 기사 원문의 대표 설명(AI 요약 아님) · 품목은 제목·요약의 품목 단어로 정해요(품목 단어가 없는 브랜드 소식은 '기타').</p>`}
 var v37BaseRender=render;
 render=async function(...a){
  if(route==='analysis'&&v37Blank){v37Controls(false);if(typeof v32Controls==='function')v32Controls(false);

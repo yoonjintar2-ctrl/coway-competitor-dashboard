@@ -56,3 +56,6 @@
 .v35-ac-top strong{color:inherit!important}
 .v35-chart .v35-tip .v28-pm{display:block;line-height:1.5}
 .v35-chart .v35-tip .v28-pm i{display:inline-block;width:auto;height:auto;background:none;font-style:normal;font-weight:700;margin-right:4px}
+
+/* 11-04 16:00 성별(지수) 표기 */
+.v12-trend-kpi strong .v35-idx{font-size:18px;font-weight:700;color:#5f7484;margin-right:6px;letter-spacing:0}

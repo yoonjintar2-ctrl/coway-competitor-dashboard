@@ -102,7 +102,7 @@ v5TrendPanel=function(d){
   :`<p class="footnote">${esc(tr.g.definition||'')}</p>`;
  return `<section class="glass section v12-trend-panel v35-trend">${header('주차별 쿼리 추이',`${isCnt?(tr.est?'네이버 주간 추정 검색수(추정치)':'네이버 주간 추산 검색수'):'네이버 주간 상대지수(최대=100)'} · 마우스를 올리면 주차별 수치(왼쪽 광고비 그래프도 같은 주가 표시돼요) · 주황 표시는 뉴스(${[...byWeek.values()].reduce((a,l)=>a+l.length,0)}건)`)}
   <div class="v35-chiprow"><div class="v5-chips">${tr.keys.map(k=>`<button data-trend-key="${esc(k)}" class="${k===v5TrendKey?'active':''}">${esc(k)}</button>`).join('')}</div>${badge}${seg}</div>
-  <div class="v12-trend-kpi"><strong>${fmt(last&&last[0])}</strong>${chg!=null?`<em class="${chg>=0?'up':'down'}">${chg>=0?'+':''}${chg.toFixed(0)}%</em>`:''}<small>${last?`최근 주(${dateLabel(weeks[last[1]])})`:''} · 전주 대비 · 기간 평균 ${fmt(avg)}</small></div>
+  <div class="v12-trend-kpi"><strong>${!isCnt&&last?'<span class="v35-idx">지수</span>':''}${fmt(last&&last[0])}</strong>${chg!=null?`<em class="${chg>=0?'up':'down'}">${chg>=0?'+':''}${chg.toFixed(0)}%</em>`:''}<small>${last?`최근 주(${dateLabel(weeks[last[1]])})`:''} · 전주 대비 · 기간 평균 ${isCnt?'':'지수 '}${fmt(avg)}</small></div>
   <div class="v35-chart v35-tr-wrap"><svg class="v3-chart v35-trend-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="주차별 네이버 검색 추이"><defs><linearGradient id="v35-trend-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b8fe0" stop-opacity=".38"/><stop offset="1" stop-color="#2b8fe0" stop-opacity=".02"/></linearGradient></defs>${grid}${bands}${paths}<line class="v35-guide" x1="0" x2="0" y1="${T-6}" y2="${H-B}" stroke="#2b8fe0" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" visibility="hidden"/>${marks}</svg>${v35Ticks(weeks)}<div class="v35-dot" hidden></div><div class="v35-tip v35-tr-tip" hidden></div></div>
   ${note}<p class="footnote"><a href="${esc(safeUrl(tr.g.source_url||'https://datalab.naver.com/'))}" target="_blank" rel="noopener">네이버 원본 ↗</a></p></section>`};
 // 같은 주 강조(두 그래프 함께)
@@ -115,15 +115,30 @@ function v35Show(i){const weeks=v35Ctx.weeks.length?v35Ctx.weeks:[];if(i==null||
   tip.innerHTML=`<small>${v35Range(w)}</small><b>${tot?v4Money(tot)+'원':'광고비 없음'}</b>${parts.map(([k,v])=>`<span><i style="background:${V35_COLORS[k]||'#a8bbc5'}"></i>${V35_NAMES[k]||k} ${v4Money(v)}원</span>`).join('')}`;
   v35Place(wk,tip,i,6)}
  // 쿼리 카드·점
- const tw=document.querySelector('#content .v35-tr-wrap');const tr=v35Ctx.trend;if(tw&&tr){const tip=tw.querySelector('.v35-tr-tip'),row=tr.cur.get(w),svg=tw.querySelector('svg'),r=svg.getBoundingClientRect(),n=weeks.length;
+ const tw=document.querySelector('#content .v35-tr-wrap');const tr=v35Ctx.trend;if(tw&&tr){const tip=tw.querySelector('.v35-tr-tip'),row=tr.cur.get(w),svg=tw.querySelector('svg'),r0=svg.getBoundingClientRect(),r={width:svg.clientWidth||r0.width,height:svg.clientHeight||r0.height},n=weeks.length;
   const vals=weeks.map(x=>tr.cur.get(x)?tr.cur.get(x).ratio:null),peak=Math.max(1,...vals.filter(v=>v!=null)),vb=svg.viewBox.baseVal,T=78,B=8;
   const gx=(i+.5)*vb.width/n,g=svg.querySelector('.v35-guide');g.setAttribute('x1',gx);g.setAttribute('x2',gx);g.setAttribute('visibility','visible');
   const dot=tw.querySelector('.v35-dot');let top=40;
   if(row){const yv=(vb.height-B-row.ratio/peak*(vb.height-T-B))*r.height/vb.height;dot.hidden=false;dot.style.left=((i+.5)/n*r.width)+'px';dot.style.top=yv+'px';top=Math.max(0,yv-90)}else dot.hidden=true;
-  tip.innerHTML=`<small>${v35Range(w)}</small><b>${row?(tr.isCnt?number(Math.round(row.ratio))+'회':row.ratio.toFixed(1)):'자료 없음'}</b><span>${esc(v5TrendKey)} ${tr.isCnt?'쿼리수':'검색 지수'}</span>${row&&row.pc!=null&&row.mo!=null?`<span class="v28-pm"><i>PC</i> ${number(Math.round(row.pc))}회<br><i>MO</i> ${number(Math.round(row.mo))}회</span>`:''}`;
+  tip.innerHTML=`<small>${v35Range(w)}</small><b>${row?(tr.isCnt?number(Math.round(row.ratio))+'회':'지수 '+row.ratio.toFixed(1)):'자료 없음'}</b><span>${esc(v5TrendKey)} ${tr.isCnt?'쿼리수':'검색 지수'}</span>${row&&row.pc!=null&&row.mo!=null?`<span class="v28-pm"><i>PC</i> ${number(Math.round(row.pc))}회<br><i>MO</i> ${number(Math.round(row.mo))}회</span>`:''}`;
   v35Place(tw,tip,i,top)}}
-function v35Place(wrap,tip,i,top){tip.hidden=false;const n=v35Ctx.weeks.length,r=wrap.getBoundingClientRect(),cx=(i+.5)/n*r.width,tw=tip.offsetWidth,gap=Math.max(14,r.width/n/2+8);
- let x=cx+gap;if(x+tw>r.width-2)x=cx-gap-tw;tip.style.left=Math.max(0,x)+'px';tip.style.top=top+'px'}
+// 팝업이 그래프(막대·선·뉴스 표시)를 가리지 않게: 마우스 쪽 옆 칸에서 그래프 윗선보다 위에 띄우고, 자리가 없으면 카드 제목 쪽으로 올림 (11-04 16:00)
+function v35Obstacles(wrap){const svg=wrap.querySelector('svg'),r=svg.getBoundingClientRect(),c=wrap.__v35o;if(c&&c.svg===svg&&c.w===r.width&&c.h===r.height)return c.list;
+ const wr=wrap.getBoundingClientRect(),k=wr.width/(wrap.offsetWidth||wr.width)||1,list=[],add=(x1,x2,y)=>list.push([(x1-wr.left)/k,(x2-wr.left)/k,(y-wr.top)/k]);  // 카드 확대(hover) 보정 → 레이아웃 px
+ svg.querySelectorAll('.v35-slot rect:not(.v35-band)').forEach(el=>{const b=el.getBoundingClientRect();if(b.height>.5)add(b.left,b.right,b.top)});
+ svg.querySelectorAll('path').forEach(p=>{if(p.getAttribute('fill')!=='none')return;let L=0;try{L=p.getTotalLength()}catch(e){}const m=p.getScreenCTM();if(!L||!m)return;
+  const N=Math.max(24,Math.round(L/4));for(let j=0;j<=N;j++){const t=p.getPointAtLength(L*j/N),sx=m.a*t.x+m.c*t.y+m.e,sy=m.b*t.x+m.d*t.y+m.f;add(sx-3,sx+3,sy-4)}});
+ svg.querySelectorAll('.v5-news-mark rect,circle').forEach(el=>{const b=el.getBoundingClientRect();if(b.width)add(b.left,b.right,b.top)});
+ wrap.__v35o={svg,w:r.width,h:r.height,list};return list}
+function v35Place(wrap,tip,i){tip.hidden=false;const n=v35Ctx.weeks.length,br=wrap.getBoundingClientRect(),r={width:wrap.offsetWidth||br.width,height:wrap.offsetHeight||br.height},k=br.width/r.width||1,cx=(i+.5)/n*r.width,tw=tip.offsetWidth,th=tip.offsetHeight,gap=Math.max(14,r.width/n/2+8);
+ const sec=wrap.closest('.section')||wrap.parentElement,floor=(sec.getBoundingClientRect().top-br.top)/k+8,obs=v35Obstacles(wrap);
+ const fit=x=>{x=Math.max(0,Math.min(r.width-tw,x));let hi=r.height;for(const [a,b,y] of obs)if(b>x-6&&a<x+tw+6&&y<hi)hi=y;return {x,top:Math.max(floor,Math.min(hi-th-12,r.height-th-12))}};
+ const right=fit(cx+gap),left=fit(cx-gap-tw),okR=cx+gap+tw<=r.width,okL=cx-gap-tw>=0;
+ const cands=[okR&&right,okL&&left].filter(Boolean);  // 바로 옆(오른쪽 먼저) 그래프 칸 안 여백 → 안 되면 가까운 빈자리 → 그래도 없으면 덜 올라가는 쪽
+ let pick=cands.find(c=>c.top>=0);
+ if(!pick){const scan=[];for(let x=0;x<=r.width-tw;x+=12){if(x<cx+6&&x+tw>cx-6)continue;const c=fit(x);if(c.top>=0)scan.push(c)}scan.sort((a,b)=>Math.abs(a.x+tw/2-cx)-Math.abs(b.x+tw/2-cx));pick=scan[0]}
+ if(!pick)pick=cands.sort((a,b)=>b.top-a.top)[0]||right;
+ tip.style.left=pick.x+'px';tip.style.top=pick.top+'px'}
 function v35Hide(){document.querySelectorAll('#content .v35-band.on,#content .v35-slot.on').forEach(x=>x.classList.remove('on'));document.querySelectorAll('#content .v35-chart .v35-tip,#content .v35-dot').forEach(x=>x.hidden=true);
  const g=document.querySelector('#content .v35-guide');if(g)g.setAttribute('visibility','hidden')}
 document.addEventListener('pointermove',e=>{const wrap=e.target.closest&&e.target.closest('.v35-chart');if(!wrap)return;const svg=wrap.querySelector('svg'),r=svg.getBoundingClientRect(),n=v35Ctx.weeks.length;if(!n)return;

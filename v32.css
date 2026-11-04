@@ -62,3 +62,27 @@ dialog.v32-rename::backdrop{background:rgba(32,33,36,.38)}
 .v32-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
 .v32-btns button{padding:8px 14px;border-radius:9px;border:1px solid #d6e3ea;background:#fff;font:inherit;cursor:pointer}
 .v32-btns .primary{background:var(--blue,#25a4dc);border-color:var(--blue,#25a4dc);color:#fff}
+
+/* v32.1 (10:40): 날짜·광고주 드롭다운, 카드 길이·메시지/스타일, 영상 */
+.v32-ctrl{display:flex;gap:12px;align-items:flex-end;margin-left:auto;align-self:flex-end}
+.v32-ctrl label{display:grid;gap:6px;font-size:12px;font-weight:600;color:#5f6368}
+.v32-ctrl select{min-width:170px;padding:10px 34px 10px 14px;border:1px solid #d6e3ea;border-radius:12px;background:#fff;font:600 13px/1.2 inherit;color:#1f2328}
+html.nd .v32-ctrl select.chip{border-radius:12px!important}
+@media (max-width:900px){.v32-ctrl{width:100%;justify-content:flex-start}}
+.v32-thumb .v32-cardvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:transparent}
+.v32-tag.vid{left:auto;right:10px;background:rgba(16,43,69,.72)}
+.v32-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.v32-meta i{font-style:normal;font-size:11px;font-weight:600;color:#1a8cc2;background:rgba(37,164,220,.1);border-radius:999px;padding:3px 8px}
+.v32-pop-media{display:grid;gap:12px}
+.v32-pop-video{display:block;max-width:100%;width:auto;height:auto;max-height:70vh;border-radius:12px;background:#000}
+/* 캠페인 분석 소재 영상 */
+.material-thumb.v32-has-video{position:relative}
+.material-thumb .v32-matvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:1}
+.material-thumb.v32-has-video .story-hint{z-index:2}
+.v32-story-video{margin:0 0 14px}
+.v32-story-video video{display:block;max-width:100%;width:auto;height:auto;border-radius:10px;background:#000}
+.v32-vtabs{display:flex;gap:6px;margin-bottom:8px}
+.v32-vtabs button{padding:5px 10px;border-radius:999px;border:1px solid #d6e3ea;background:#fff;font:600 12px inherit;cursor:pointer}
+.v32-vtabs button.on{background:var(--blue,#25a4dc);border-color:var(--blue,#25a4dc);color:#fff}
+.v32-pen.sm{width:24px;height:24px}
+.v32-ctitle{display:inline-flex!important}

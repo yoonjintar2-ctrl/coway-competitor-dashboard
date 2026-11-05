@@ -41,7 +41,7 @@ function v38View(d){
  ctx.font='500 11px Pretendard, "Noto Sans KR", sans-serif';
  const news=[];for(const n of [...d.news].sort((a,b)=>a.d.localeCompare(b.d))){const txt=`${md(n.d)} ${n.t}${n.n>1?` 외 ${n.n-1}건`:''}`;let x0=xd(n.d);const room=PW-6-x0-36;if(room<70)x0=Math.max(0,PW-6-36-70);let w=Math.min(240,ctx.measureText(txt).width,PW-6-x0-36),t=txt;while(t.length>6&&ctx.measureText(t+'…').width>w)t=t.slice(0,-1);if(t!==txt)t+='…';const x1=x0+36+w;const k=fit(x0,x1);if(k<0)continue;news.push({...n,txt,short:t,x0,x1,k})}
  const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=180,BAR_TOP=LINE_TOP+LINE_H-56,BAR_H=325,BASE=BAR_TOP+BAR_H;
- const QQ=[...Q.slice(0,-1),...QY.slice(0,-1)].filter(v=>v!=null),QLO=QQ.length?Math.min(...QQ)*.85:0,QHI=QQ.length?Math.max(...QQ,...Q.filter(v=>v!=null)):1,QT=LINE_TOP+17,QH=LINE_H-34,QYP=v=>QT+QH-(v-QLO)/((QHI-QLO)||1)*QH;
+ const QQ=[...Q.slice(0,-1),...QY].filter(v=>v!=null),QLO=QQ.length?Math.min(...QQ)*.85:0,QHI=QQ.length?Math.max(...QQ,...Q.filter(v=>v!=null)):1,QT=LINE_TOP+17,QH=LINE_H-34,QYP=v=>QT+QH-(v-QLO)/((QHI-QLO)||1)*QH;
  let RAW=Math.max(1e7,Math.max(...TOT,...AVG,...YOY.map(v=>v||0))*1.1);
  // 막대 금액 글자(막대 위 20px)가 쿼리 표식(반지름 약 19px)과 겹치면 Y축 최대값을 키워 막대를 낮춤
  Q.forEach((v,i)=>{if(v==null||!TOT[i])return;const lim=QYP(v)+19+21;if(lim>BAR_TOP)RAW=Math.max(RAW,TOT[i]*BAR_H/Math.max(8,BASE-lim))});
@@ -64,10 +64,10 @@ function v38View(d){
  // 기사(점·글자, x축 연결선)
  news.forEach(n=>{const y=CT+n.k*(CH+CG)+CH/2,t=n.short||n.txt;s+=`<g class="v38-news" data-v38-news="${esc(n.u)}"><line class="gd" x1="${n.x0+13}" x2="${n.x0+13}" y1="${y+7}" y2="${BASE}" stroke="#8d98a3"/><rect x="${n.x0}" y="${y-7}" width="26" height="14" rx="7" fill="rgba(125,138,150,.13)"/><text x="${n.x0+13}" y="${y+3.2}" text-anchor="middle" font-size="9" font-weight="700" fill="#7d8a96">기사</text><text x="${n.x0+31}" y="${y+3.8}" font-size="11" fill="#5f6b77"><tspan font-weight="700" fill="#8d98a3">${esc(t.slice(0,5))}</tspan>${esc(t.slice(5))}</text><title>${esc(n.p?n.p+' · ':'')}${esc(n.t)}</title></g>`});
  // 네이버 쿼리(올해 + 전년 같은 달)
- const qv=[...Q.slice(0,-1),...QY.slice(0,-1)].filter(v=>v!=null);let CAP=null;const QP=M.map(()=>null);
+ const qv=[...Q.slice(0,-1),...QY].filter(v=>v!=null);let CAP=null;const QP=M.map(()=>null);
  if(qv.length){const qy=QYP;
   const seg=(vals,keep)=>{const parts=[];vals.forEach((v,i)=>{if(v==null||!keep(i))return;const l=parts.at(-1);const p=[X(i),qy(v),v,i];if(l&&l.at(-1)[3]===i-1)l.push(p);else parts.push([p])});return parts};
-  const yp=seg(QY,i=>i<N-1);s+=`<path d="${yp.map(v38Smooth).join(' ')}" fill="none" stroke="${V38_G}" stroke-opacity=".22" stroke-width="4" stroke-linecap="round"/>`;
+  const yp=seg(QY,()=>true);s+=`<path d="${yp.map(v38Smooth).join(' ')}" fill="none" stroke="${V38_G}" stroke-opacity=".22" stroke-width="4" stroke-linecap="round"/>`;
   const okL=p=>{const ly=p[1]+18,i=p[3],cq=Q[i]!=null?qy(Q[i]):null;return !(TOT[i]&&ly>sy(TOT[i])-34)&&!(cq!=null&&Math.abs(cq-ly)<26)};const fy=yp.flat().find(p=>p[3]>=VIS0+3&&okL(p));const fyy=fy?fy[1]+18:0;if(fy)s+=`<text x="${fy[0]}" y="${fyy}" text-anchor="middle" font-size="10" font-weight="700" fill="${V38_G}" fill-opacity=".6">전년 같은 달</text>`;
   const cp=seg(Q,()=>true),fl=cp.flat(),lp=fl.at(-1),pp=fl.at(-2),fade=lp&&pp&&(M[lp[3]]===CUR||QD[lp[3]]<v38Days(M[lp[3]]));if(fade)s+=`<defs><linearGradient id="v38-qf" gradientUnits="userSpaceOnUse" x1="${pp[0]}" x2="${lp[0]}" y1="0" y2="0"><stop offset="0" stop-color="${V38_G}"/><stop offset="1" stop-color="${V38_G}" stop-opacity=".28"/></linearGradient></defs>`;s+=`<path d="${cp.map(v38Smooth).join(' ')}" fill="none" stroke="${fade?'url(#v38-qf)':V38_G}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
   cp.flat().forEach(([px,py,v,i])=>{const part=M[i]===CUR||QD[i]<v38Days(M[i]);const [n,u]=v38K(v);s+=`<g class="v38-q" data-v38-i="${i}"><circle cx="${px}" cy="${py}" r="15.5" fill="#fff" stroke="${V38_G}" stroke-width="5"${part?' stroke-opacity=".32"':''}/><text x="${px}" y="${py+3.6}" text-anchor="middle" fill="${V38_G}"${part?' fill-opacity=".55"':''}><tspan font-size="${n.length>=3?9.5:10.5}" font-weight="900">${n}</tspan><tspan font-size="8" font-weight="500" dx=".3">${u}</tspan></text></g>`});

@@ -48,7 +48,7 @@ table.mt.v38-t,table.mt.v38-names{border-collapse:collapse;font-size:11.5px;font
 #v38-tip .r.p{justify-content:flex-start}#v38-tip .r em{font-style:normal;color:#8aa0ae;white-space:nowrap}
 #v38-tip .s{padding-left:14px;color:#7d8a96;display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:2px}
 #v38-tip .f{display:flex;justify-content:space-between;gap:8px;color:#8aa0ae;margin-top:8px}
-/* 설정 > 리서치애드 규칙 */
+/* 설정 > 디지털 자료 규칙 */
 .v38-rules .section{margin-bottom:14px}
 .v38-st{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;font-size:13px;color:#5b6874;margin:4px 0 8px}
 .v38-st a.primary{padding:8px 14px;border-radius:10px;background:#25a4dc;color:#fff;text-decoration:none;font-weight:600;font-size:12.5px}
@@ -63,3 +63,26 @@ table.mt.v38-t,table.mt.v38-names{border-collapse:collapse;font-size:11.5px;font
 .v38-fbtn svg{width:18px!important;height:18px!important}
 /* 아이콘용 svg 선 스타일이 그래프로 이어지지 않게 */
 .v38-box svg{stroke:none;stroke-width:1;fill:#000}
+/* 왼쪽 메뉴 간격 좁게 (2026-11-05) */
+.sidebar nav{gap:3px!important}
+.sidebar nav .nav{padding-top:10px;padding-bottom:10px}
+/* 2026-11-05 11:00 — 여백·글자 넓게, 표 분리, 스크롤 그림자 */
+.v38-water,.v38-kpis{display:none!important}
+.v38-card{padding:30px 36px 22px!important}
+.v38-t{margin-top:14px}
+table.mt.v38-t,table.mt.v38-names{font-size:12.5px}
+.v38-t td,.v38-names td{height:33px;background:rgba(236,242,246,.55);border-top:1px solid rgba(255,255,255,.9)!important}
+.v38-t tr:first-child td{box-shadow:inset 0 1px 0 rgba(16,43,69,.06)}
+.v38-names tr:first-child td{border-top-left-radius:12px}.v38-names tr:last-child td{border-bottom-left-radius:12px}
+.v38-names td.h{padding-left:12px;font-size:12px;color:#4d5964}
+.v38-t tr:last-child td.tot{border-bottom-right-radius:12px}.v38-t tr:first-child td.tot{border-top-right-radius:12px}
+.v38-t td.tot{background:#eef3f6}
+.v38-t tr.sum td,.v38-names tr.sum td{background:rgba(226,234,240,.75);border-top:1px solid rgba(16,43,69,.1)!important}
+.v38-t tr.post td,.v38-names tr.post td{height:64px}
+.v38-t td.cur{background:rgba(213,236,248,.6)}
+.v38-edge{position:absolute;top:0;bottom:0;width:26px;pointer-events:none;z-index:3;opacity:0;transition:opacity .25s}
+.v38-edge.l{background:linear-gradient(90deg,rgba(20,50,80,.10),rgba(20,50,80,0));border-left:1px solid rgba(20,50,80,.08)}
+.v38-edge.r{right:0;background:linear-gradient(270deg,rgba(20,50,80,.08),rgba(20,50,80,0))}
+.v38-box.sl .v38-edge.l,.v38-box.sr .v38-edge.r{opacity:1}
+.v38-legend{font-size:12.5px;gap:10px 26px;margin-top:18px;padding-top:16px}
+.v38-note{font-size:11.5px;margin-top:12px}

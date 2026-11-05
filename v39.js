@@ -28,7 +28,8 @@ async function v39Load(){const key=(v39Cat||'')+'|'+(v39Year||'');if(v39Cache[ke
 // ---------- 색·모양 ----------
 const V39_BG=[244,247,250];const V39_ORDER=['정수기','매트리스','공기청정기','안마의자','비데','음식물처리기','전기레인지'];
 // [백분위, 색상(h), 채도, 밝기, 불투명도] — 하위 약 30%는 무채색·투명, 중간(노랑) 넓게
-const V39_PS=[[0,40,4,72,.16],[.3,44,28,70,.4],[.5,48,88,61,1],[.78,30,88,57,1],[1,6,76,53,1]];
+const V39_PS=[[0,40,5,79,1],[.3,45,20,77,1],[.5,48,88,62,1],[.78,30,88,57,1],[1,6,76,53,1]];  // 낮은 쪽은 배경과 구분되는 회색 톤(불투명)
+const V39_NQ=[[214,220,226],[194,202,209],[181,190,198]];  // 검색 자료가 없는 날(광고비만): 윗면·앞면·옆면
 function v39Hsl(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return [f(0),f(8),f(4)].map(x=>x*255)}
 function v39ColP(p,f=1){p=Math.max(0,Math.min(1,p));let i=0;while(i<V39_PS.length-2&&p>V39_PS[i+1][0])i++;const A=V39_PS[i],B=V39_PS[i+1],u=(p-A[0])/(B[0]-A[0]);const [h,s,l,al]=[1,2,3,4].map(j=>A[j]+(B[j]-A[j])*u);
  return v39Hsl(h,s,l*(.55+.45*f)).map((x,k)=>Math.round(x*al+V39_BG[k]*(1-al)*(.8+.2*f)))}
@@ -69,12 +70,12 @@ function v39Build(m){
   if(mm>1)s+=`<line x1="${xa}" x2="${xa}" y1="${ya+4}" y2="${ya+T-4}" stroke="#b5c3ce" stroke-width="1"/>`;
   s+=`<text x="${xm}" y="${ya+T/2+4.2}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${fut?'#a9b6c0':'#566b7b'}">${mm}월</text>`}
  // 요일: 팔레트 양쪽 여백에 누운 글자
- WK.forEach((t,r)=>{const tt=(6-r)+.2;s+=`<text transform="${lie(-10,tt)}" text-anchor="end" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text><text transform="${lie(NCOL*CW-pad+10,tt)}" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text>`});
+ WK.forEach((t,r)=>{const tt=(6-r)+.2;s+=`<text transform="${lie(-20,tt)}" text-anchor="end" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text><text transform="${lie(NCOL*CW-pad+16,tt)}" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text>`});
  // 이슈: 풍선 자리
  const zoneTop=4,zoneBot=OY+7*DY-hk-26,lanes=Math.max(2,Math.min(8,Math.floor((zoneBot-zoneTop)/34))),LH=(zoneBot-zoneTop-26)/Math.max(1,lanes-1);
  const used=Array.from({length:lanes},()=>[]);let bal='';const pins={};
  const cellXY=(i,r)=>{const [x,y]=F(col(i)*CW,6-r);return [x,y]};
- m.ev.forEach((e,k)=>{const i=m.days.indexOf(e.d);if(i<0)return;const r=wd(e.d),[x,y]=cellXY(i,r),live=src.q[e.d]!=null,h=live?Hh(src.s[e.d]||0):0,ax=x+cw/2+dx/2,ay=y+dy/2-h;
+ m.ev.forEach((e,k)=>{const i=m.days.indexOf(e.d);if(i<0)return;const r=wd(e.d),[x,y]=cellXY(i,r),live=src.q[e.d]!=null||(src.s[e.d]||0)>0,h=live?Hh(src.s[e.d]||0):0,ax=x+cw/2+dx/2,ay=y+dy/2-h;
   const [lab]=V39_EVT[e.type]||['이슈'];const txt=v39Short((v39Adv?'':(e.adv||'')+' ')+(e.title||''),v39Adv?13:15),w=Math.min(210,26+lab.length*10.5+txt.length*11.2+14);
   let bx=Math.max(4,Math.min(W-w-4,ax-w/2)),lane=-1,best=1e9;for(let L=0;L<lanes;L++){if(!used[L].every(([a,b])=>bx+w<a-6||bx>b+6))continue;const sc=used[L].length*10+Math.abs(L-((k*3)%lanes));if(sc<best){best=sc;lane=L}}if(lane<0)return;used[lane].push([bx,bx+w]);
   const by=zoneTop+lane*LH,ly=by+26,len=Math.max(4,ay-ly),mc=V39_EVM[e.type]||'#b3bbc2',dl=(.15+ax/W*.9).toFixed(2);
@@ -82,8 +83,8 @@ function v39Build(m){
   (pins[e.d]=pins[e.d]||[]).push(`<g class="v39-evp" data-v39-ev="${k}" style="transition-delay:${dl}s"><line class="v39-evl" x1="${ax}" x2="${ax}" y1="${ly}" y2="${ay}" stroke="#8a96a0" stroke-opacity=".26" stroke-width="1.1" style="stroke-dasharray:${len};stroke-dashoffset:${len};transition-delay:${dl}s"/><circle r="4.2" transform="matrix(1,0,${(DX*.05).toFixed(3)},${(DY*.05).toFixed(3)},${ax},${ay})" fill="#8a96a0" fill-opacity=".3"/></g>`);
   bal+=`<g class="v39-ev" data-v39-ev="${k}" style="transition-delay:${dl}s"><rect x="${bx}" y="${by}" width="${w}" height="26" rx="13" fill="rgba(255,255,255,.8)" stroke="rgba(200,212,222,.8)" stroke-width=".8"/><circle cx="${bx+13}" cy="${by+13}" r="3.6" fill="${mc}"/><text x="${bx+22}" y="${by+17.2}" font-size="10.5" font-weight="700" fill="#9aa5ae">${lab}</text><text x="${bx+26+lab.length*10}" y="${by+17.2}" font-size="11" font-weight="600" fill="#6b7782">${esc(txt)}</text></g>`});
  const order=m.days.map((x,i)=>({x,i,r:wd(x)})).sort((a,b)=>(a.r-b.r)||(a.i-b.i));
- for(const o of order){const [x,y]=cellXY(o.i,o.r),q=src.q[o.x],sp=src.s[o.x]||0,fut=o.x>m.today,live=!fut&&q!=null,p=live?pct(q):0;
-  const c={d:o.x,x,y,live,q,sp,h:live?Hh(sp):0,top:live?v39ColP(p,1.07):V39_FLAT[0],front:live?v39ColP(p,.82):V39_FLAT[0],side:live?v39ColP(p,.66):V39_FLAT[0]};
+ for(const o of order){const [x,y]=cellXY(o.i,o.r),q=src.q[o.x],sp=src.s[o.x]||0,fut=o.x>m.today,live=!fut&&(q!=null||sp>0),hq=q!=null,p=hq?pct(q):0;
+  const c={d:o.x,x,y,live,q,sp,h:live?Hh(sp):0,top:!live?V39_FLAT[0]:hq?v39ColP(p,1.07):V39_NQ[0],front:!live?V39_FLAT[0]:hq?v39ColP(p,.82):V39_NQ[1],side:!live?V39_FLAT[0]:hq?v39ColP(p,.66):V39_NQ[2]};
   c.idx=cells.length;cells.push(c);s+=live?`<g class="v39-c" data-i="${c.idx}"><path/><path/><path/><path class="hl" fill="url(#v39hl)"/></g>`:`<g class="v39-c flat" data-i="${c.idx}"><path d="M${x},${y} L${x+cw},${y} L${x+cw+dx},${y+dy} L${x+dx},${y+dy}Z" fill="${o.x===m.today?'#25a4dc':'#e3e9ee'}"/></g>`;
   if(pins[o.x])s+=pins[o.x].join('')}
  const label=v39Adv||`${v39Cat||'전체'} 업종 전체`,kw=v39Adv?((v39D.keywords||{})[v39Adv]||[]).join('·')||'검색 키워드 없음':`${m.n}개사 합계`;
@@ -113,7 +114,7 @@ function v39Years(){const ys=(v39D&&v39D.years)||[],y=v39D?v39D.year:v39Year,i=y
  return `<div class="v39-years"><button type="button" class="yb" data-v39-y="${ys[i-1]||''}" ${i>0?'':'disabled'} aria-label="이전 해">‹</button>${ys.map(v=>`<button type="button" class="y ${v===y?'on':''}" data-v39-y="${v}">${v}</button>`).join('')}<button type="button" class="yb" data-v39-y="${ys[i+1]||''}" ${i<ys.length-1?'':'disabled'} aria-label="다음 해">›</button></div>`}
 function v39Legend(){const g=[0,.15,.3,.4,.5,.6,.7,.78,.88,1].map(p=>v39Rgb(v39ColP(p))).join(',');const c=v39ColP(.8),c2=v39ColP(.8,.64),c3=v39ColP(.8,.8);
  const bars=[5,11,19].map((h,i)=>{const x=6+i*20,y=26;return `<path d="M${x},${y} L${x+11},${y} L${x+11},${y-h} L${x},${y-h} Z" fill="${v39Rgb(c3)}"/><path d="M${x+11},${y} L${x+15},${y-5} L${x+15},${y-5-h} L${x+11},${y-h} Z" fill="${v39Rgb(c2)}"/><path d="M${x},${y-h} L${x+11},${y-h} L${x+15},${y-5-h} L${x+4},${y-5-h} Z" fill="${v39Rgb(c)}"/>`}).join('');
- return `<div class="v39-legend"><span>검색 적음 <i class="grad" style="background:linear-gradient(90deg,${g})"></i> 검색 많음</span><span><svg width="64" height="30">${bars}</svg> 광고비 많을수록 높게</span><span><svg width="22" height="16"><path d="M3,13 L14,13 L18,8 L7,8 Z" fill="#e3e9ee"/></svg> 아직 오지 않은 날</span><span><svg width="22" height="16"><path d="M3,13 L14,13 L18,8 L7,8 Z" fill="#25a4dc"/></svg> 오늘</span></div>`}
+ return `<div class="v39-legend"><span>검색 적음 <i class="grad" style="background:linear-gradient(90deg,${g})"></i> 검색 많음</span><span><svg width="64" height="30">${bars}</svg> 광고비 많을수록 높게</span>${v39Last&&v39Last.cells.some(c=>c.live&&c.q==null)?`<span><svg width="22" height="18"><path d="M3,15 L14,15 L14,8 L3,8Z" fill="rgb(194,202,209)"/><path d="M3,8 L14,8 L18,4 L7,4Z" fill="rgb(214,220,226)"/></svg> 검색 자료 없는 날(광고비만)</span>`:''}</div>`}
 function v39View(){const d=v39D,m=v39Model(d);
  if(!m.me)return `<section class="glass section">${empty(`${v39Adv} · ${v39Cat||'전체'} ${d.year}년 자료가 없어요.`,'다른 품목이나 연도를 골라 보세요.')}</section>`;
  const b=v39Build(m);v39Last={...b,today:m.today,m};

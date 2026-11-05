@@ -47,7 +47,7 @@ function v38View(d){
  Q.forEach((v,i)=>{if(v==null||!TOT[i])return;const lim=QYP(v)+19+21;if(lim>BAR_TOP)RAW=Math.max(RAW,TOT[i]*BAR_H/Math.max(8,BASE-lim))});
  const YST=[5e9,2e9,1e9,5e8,2e8,1e8,5e7,2e7,1e7].find(k=>RAW/k>=3)||1e7,mx=RAW,sy=v=>BASE-v/mx*BAR_H;
  const top=(x,w,y)=>`M${x},${BASE} V${y} H${x+w} V${BASE} Z`;
- let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3acb4" stop-opacity=".16"/><stop offset="1" stop-color="#a3acb4" stop-opacity=".06"/></linearGradient>
+ let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3acb4" stop-opacity=".22"/><stop offset="1" stop-color="#a3acb4" stop-opacity=".09"/></linearGradient>
   <linearGradient id="v38-yoy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3bcc4" stop-opacity=".36"/><stop offset="1" stop-color="#d9dfe3" stop-opacity=".26"/></linearGradient>
   <pattern id="v38-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#25a4dc" stroke-width="1.4" stroke-opacity=".06"/></pattern>
   <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".13"/></pattern>
@@ -73,10 +73,13 @@ function v38View(d){
   cp.flat().forEach(([px,py,v,i])=>{const part=M[i]===CUR||QD[i]<v38Days(M[i]);const [n,u]=v38K(v);s+=`<g class="v38-q" data-v38-i="${i}"><circle cx="${px}" cy="${py}" r="15.5" fill="#fff" stroke="${V38_G}" stroke-width="5"${part?' stroke-opacity=".32"':''}/><text x="${px}" y="${py+3.6}" text-anchor="middle" fill="${V38_G}"${part?' fill-opacity=".55"':''}><tspan font-size="${n.length>=3?9.5:10.5}" font-weight="900">${n}</tspan><tspan font-size="8" font-weight="500" dx=".3">${u}</tspan></text></g>`});
   fl.forEach(p=>QP[p[3]]=p[1]);CAP=fl.find(p=>p[3]>=VIS0)||null}
  // 경쟁사 평균(영역)
- const ap=M.map((m,i)=>[X(i),sy(AVG[i])]);if(AVG.some(v=>v)){const ext=[[0,ap[0][1]],...ap,[PW,ap.at(-1)[1]]];s+=`<path d="${v38Smooth(ext)} L${PW},${BASE} L0,${BASE} Z" fill="url(#v38-avg)"/>`}
+ const ap=M.map((m,i)=>[X(i),sy(AVG[i])]);if(AVG.some(v=>v)){const ext=[[0,ap[0][1]],...ap,[PW,ap.at(-1)[1]]];s+=`<path d="${v38Smooth(ext)} L${PW},${BASE} L0,${BASE} Z" fill="url(#v38-avg)"/>`;
+  // 영역 안 이름표: 보이는 구간에서 영역이 가장 높은 달 사이(막대 사이 빈칸)에 흰색 굵은 글씨 (11-05 15:24)
+  let bi=-1,bh=0;for(let i=Math.max(VIS0,0);i<N-1;i++){const h=BASE-Math.max(sy(AVG[i]||0),sy(AVG[i+1]||0));if(h>bh){bh=h;bi=i}}
+  if(bi>=0&&bh>=20)s+=`<text x="${slot*(bi+1)}" y="${BASE-9}" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="#9aa5ae" stroke-opacity=".28" stroke-width="2" paint-order="stroke" class="v38-avglab">경쟁사 평균</text>`}
  // 전년 막대(회색 한 톤) + 올해 막대 위 모서리와 잇는 옅은 선
  M.forEach((m,i)=>{const yv=YOY[i];if(!yv)return;const x=YX(i)-ybw/2,y=sy(yv);s+=`<path d="${top(x,ybw,y)}" fill="url(#v38-yoyh)"/>`;
-  if(TOT[i]){const bx=BX(i)-bw/2,by=sy(TOT[i]);s+=`<line x1="${x}" y1="${y}" x2="${bx}" y2="${by}" stroke="#3b4450" stroke-opacity=".14" stroke-width=".8"/><line x1="${x+ybw}" y1="${y}" x2="${bx+bw}" y2="${by}" stroke="#3b4450" stroke-opacity=".14" stroke-width=".8"/>`}});
+  });  // 전년 막대와 올해 막대 잇는 선은 없앰 (11-05 15:24)
  // 올해 막대(대분류만, 사이 간격)
  M.forEach((m,i)=>{if(!TOT[i])return;let run=0;const op=m===CUR?.3:.62;let g=`<g clip-path="url(#v38-bar${i})">`;
   V38_CATS.forEach(([k,,c])=>{const v=CV[i][k];if(!v)return;const y0=sy(run),y1=sy(run+v);run+=v;const last=Math.abs(run-TOT[i])<1;const gap=last?0:2.5;g+=`<rect x="${BX(i)-bw/2}" y="${y1+gap}" width="${bw}" height="${Math.max(.8,y0-y1-gap)}" fill="${c}" fill-opacity="${op}"/>`});
@@ -298,3 +301,6 @@ addEventListener('popstate',async()=>{if(/news=/.test(location.hash))return;if(!
  if(typeof listing!=='undefined'&&listing){await render();if(route!=='timeline')window.scrollTo({top:0,behavior:'instant'})}});
 // 처음 열 때·새로고침: 주소의 페이지로
 if(v38ApplyHash()&&typeof listing!=='undefined'&&listing){v38Hist.pop=true;render()}
+
+// ---------- 뉴스 클리핑 링크 복사: 공유용 기사 페이지(n/<ID>.html) — 메신저 미리보기에 우리 사이트 썸네일·기사 설명 (11-05 15:24) ----------
+if(typeof v37Link==='function')v37Link=function(id){const base=v32Static()?location.origin+location.pathname.replace(/[^/]*$/,''):V37_PUBLIC;return base+'n/'+encodeURIComponent(id)+'.html'};

@@ -27,7 +27,7 @@ function v38Cv(s){return Object.fromEntries(V38_CATS.map(([k,,,subs])=>[k,subs.r
 var V38_TG=10,V38_ADJ=0,V38_FIX=0;
 function v38View(d){
  const M=d.months,N=M.length,CUR=d.current,VIEW=Math.min(12,N),VIS0=N-VIEW;
- const host=$('#content');const VW=Math.max(900,(host.clientWidth||1200)-72-V38_ADJ),GUT=56,TW=66,slot=(VW-GUT-TW)/VIEW,CW=N*slot+TW,PW=N*slot,bw=slot*.6,ybw=bw*.86;
+ const host=$('#content');const VW=Math.max(900,(host.clientWidth||1200)-72-V38_ADJ),GUT=56,TW=66,slot=(VW-GUT-TW)/VIEW,CW=N*slot+TW,PW=N*slot,bw=slot*.39,ybw=bw*.86;
  const X=i=>slot*i+slot/2,BX=i=>X(i)+6,YX=i=>X(i)-bw*.2;
  const S=M.map(m=>d.spend[m]||{}),CV=S.map(v38Cv),TOT=S.map(v38Sum),YOY=M.map((m,i)=>i>=12?TOT[i-12]:null),AVG=M.map(m=>d.avg[m]||0);
  const Q=M.map(m=>d.query[m]),QY=M.map((m,i)=>i>=12?Q[i-12]:null),QD=M.map(m=>d.query_days[m]||0);
@@ -40,7 +40,7 @@ function v38View(d){
  const camps=[];for(const c of [...CL].sort((a,b)=>(b.amount||0)-(a.amount||0))){const nm=c.name.replace(new RegExp('^'+d.advertiser.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'),'').replace(/^·\s*/,'')||c.name;const txt=`${nm} · ${md(c.s)}–${md(c.e)}`;const x0=xd(c.s),x1=Math.max(xd(c.e),x0+ctx.measureText(txt).width+CH+16);const k=fit(x0,x1);if(k<0)continue;camps.push({...c,txt,x0,x1,k})}
  ctx.font='500 11px Pretendard, "Noto Sans KR", sans-serif';
  const news=[];for(const n of [...d.news].sort((a,b)=>a.d.localeCompare(b.d))){const txt=`${md(n.d)} ${n.t}${n.n>1?` 외 ${n.n-1}건`:''}`;let x0=xd(n.d);const room=PW-6-x0-36;if(room<70)x0=Math.max(0,PW-6-36-70);let w=Math.min(240,ctx.measureText(txt).width,PW-6-x0-36),t=txt;while(t.length>6&&ctx.measureText(t+'…').width>w)t=t.slice(0,-1);if(t!==txt)t+='…';const x1=x0+36+w;const k=fit(x0,x1);if(k<0)continue;news.push({...n,txt,short:t,x0,x1,k})}
- const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=150,BAR_TOP=LINE_TOP+LINE_H-56,BAR_H=255,BASE=BAR_TOP+BAR_H;
+ const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=180,BAR_TOP=LINE_TOP+LINE_H-56,BAR_H=325,BASE=BAR_TOP+BAR_H;
  const QQ=[...Q.slice(0,-1),...QY.slice(0,-1)].filter(v=>v!=null),QLO=QQ.length?Math.min(...QQ)*.85:0,QHI=QQ.length?Math.max(...QQ,...Q.filter(v=>v!=null)):1,QT=LINE_TOP+17,QH=LINE_H-34,QYP=v=>QT+QH-(v-QLO)/((QHI-QLO)||1)*QH;
  let RAW=Math.max(1e7,Math.max(...TOT,...AVG,...YOY.map(v=>v||0))*1.1);
  // 막대 금액 글자(막대 위 20px)가 쿼리 표식(반지름 약 19px)과 겹치면 Y축 최대값을 키워 막대를 낮춤
@@ -50,7 +50,7 @@ function v38View(d){
  let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8aa3b8" stop-opacity=".17"/><stop offset="1" stop-color="#8aa3b8" stop-opacity=".07"/></linearGradient>
   <linearGradient id="v38-yoy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3bcc4" stop-opacity=".36"/><stop offset="1" stop-color="#d9dfe3" stop-opacity=".26"/></linearGradient>
   <pattern id="v38-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#25a4dc" stroke-width="1.4" stroke-opacity=".06"/></pattern>
-  <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".2"/></pattern>
+  <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".13"/></pattern>
   <filter id="v38-soft" x="-20%" y="-60%" width="140%" height="220%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#14405a" flood-opacity=".09"/></filter>
   ${camps.map((c,i)=>`<clipPath id="v38-cl${i}"><circle cx="${c.x0+CH/2}" cy="${CT+c.k*(CH+CG)+CH/2}" r="${CH/2-3}"/></clipPath>`).join('')}
   ${M.map((m,i)=>TOT[i]?`<clipPath id="v38-bar${i}"><path d="${top(BX(i)-bw/2,bw,sy(TOT[i]))}"/></clipPath>`:'').join('')}</defs>`;

@@ -136,7 +136,7 @@ function v39Scroll0(){const sc=document.getElementById('v39-sc'),b=v39Last;if(!s
  sc.scrollLeft=c?Math.max(0,c.x-sc.clientWidth*.72):(b.m.Y<new Date().getFullYear()?0:sc.scrollWidth);v39Arrows()}
 function v39Arrows(){const sc=document.getElementById('v39-sc');if(!sc)return;document.querySelectorAll('[data-v39-scroll]').forEach(btn=>{const dir=+btn.dataset.v39Scroll;btn.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
 function v39Draw(anim){v39HotCol=null;$('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';v39Controls(true);$('#content').innerHTML=v39View();v39Scroll0();v39Animate(!anim);
- const sc=document.getElementById('v39-sc');if(sc)sc.addEventListener('scroll',()=>{v39Arrows();const t=document.getElementById('v39-tip');if(t)t.hidden=true},{passive:true})}
+ const sc=document.getElementById('v39-sc');if(sc)sc.addEventListener('scroll',()=>{v39Arrows();v39Hot(null)},{passive:true})}
 
 var v39BaseRender=render;
 render=async function(...a){
@@ -162,26 +162,34 @@ document.addEventListener('click',e=>{
  if(e.target.closest&&e.target.closest('[data-v39-png]')){v39Png();return}
  if(e.target.closest&&e.target.closest('[data-v39-xls]')){v39XlsDown();return}});
 
-// 마우스를 올리면 그 주(열) 막대 7개를 키우고 나머지는 흐리게 + 그 주 값을 한눈에
-var v39HotCol=null,v39HotT=0;
-function v39Hot(col){const sv=document.getElementById('v39-svg');if(!sv||!v39Last){v39HotCol=null;return}if(col===v39HotCol)return;v39HotCol=col;let ov=document.getElementById('v39-hot');
- if(col==null){sv.classList.remove('v39-col');if(ov)ov.remove();return}
+// 막대 위에 정확히 올렸을 때만: 그 주(열) 막대 7개를 키우고 나머지는 흐리게 + 그 주 합계(크게)·요일별(작게)
+var v39HotCol=null,v39HotT=0,v39HotDay=null;
+function v39Hot(col){const sv=document.getElementById('v39-svg');if(!sv||!v39Last){v39HotCol=null;return}if(col===v39HotCol)return;v39HotCol=col;v39HotDay=null;let ov=document.getElementById('v39-hot');
+ if(col==null){sv.classList.remove('v39-col');if(ov)ov.remove();const t=document.getElementById('v39-tip');if(t)t.hidden=true;return}
  if(!ov){ov=document.createElementNS('http://www.w3.org/2000/svg','g');ov.id='v39-hot';sv.insertBefore(ov,sv.querySelector('.v39-evs'))}
  ov.classList.remove('on');ov.textContent='';const els=sv.querySelectorAll(':scope>.v39-c');
- v39Last.cells.forEach((c,k)=>{if(c.col===col&&c.d<=v39Last.today){const n=els[k].cloneNode(true);n.removeAttribute('data-i');n.classList.add('hot');ov.appendChild(n)}});
- if(v39Last.cells.some(c=>c.col===col&&c.d===v39Last.today)){const t=document.getElementById('v39-today');if(t&&t.firstChild){const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','v39-c hot');g.innerHTML=t.innerHTML;ov.appendChild(g)}}
+ v39Last.cells.forEach((c,k)=>{if(c.col===col&&c.d<=v39Last.today){const n=els[k].cloneNode(true);n.classList.add('hot');ov.appendChild(n)}});
+ const ti=v39Last.cells.findIndex(c=>c.col===col&&c.d===v39Last.today);if(ti>=0){const t=document.getElementById('v39-today');if(t&&t.firstChild){const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','v39-c hot');g.dataset.i=ti;g.innerHTML=t.innerHTML;ov.appendChild(g)}}
  sv.classList.add('v39-col');ov.getBoundingClientRect();ov.classList.add('on')}
-document.addEventListener('pointermove',e=>{if(route!=='heatmap'||!v39Last)return;const tip=document.getElementById('v39-tip');if(!tip)return;const g=e.target.closest&&e.target.closest('#v39-svg>.v39-c');
- const off=()=>{clearTimeout(v39HotT);v39HotT=setTimeout(()=>{tip.hidden=true;v39Hot(null)},140)};
- if(!g){off();return}const c=v39Last.cells[+g.dataset.i];if(!c||c.d>v39Last.today){off();return}clearTimeout(v39HotT);v39Hot(c.col);
- const m=v39Last.m,fm=v=>v?v38Money(v):'-',n=v=>v==null?'-':Math.round(v).toLocaleString(),WK='일월화수목금토';
- const wk=v39Last.cells.filter(z=>z.col===c.col).sort((a,b)=>a.d<b.d?-1:1),d0=wk[0].d,d1=wk[wk.length-1].d;
+function v39WeekTip(c){const tip=document.getElementById('v39-tip');if(!tip||!v39Last)return;const m=v39Last.m;
+ const fm=v=>v?v38Money(v):'-',n=v=>v==null?'-':Math.round(v).toLocaleString(),WK='일월화수목금토',dd=x=>x.slice(5).replace('-','.');
+ const wk=v39Last.cells.filter(z=>z.col===c.col).sort((a,b)=>a.d<b.d?-1:1),d0=wk[0].d,d1=wk[wk.length-1].d,past=wk.filter(z=>z.d<=v39Last.today);
+ const sq=past.reduce((a,z)=>a+(m.me.q[z.d]||0),0),hasq=past.some(z=>m.me.q[z.d]!=null),ss=past.reduce((a,z)=>a+(m.me.s[z.d]||0),0);
  const evs=m.ev.filter(z=>z.d>=d0&&z.d<=d1);
- const rows=wk.map(z=>{const fut=z.d>v39Last.today;return `<tr class="${z.d===c.d?'on':''}${fut?' fut':''}"><td>${WK[new Date(z.d+'T00:00:00').getDay()]} <small>${z.d.slice(5).replace('-','.')}</small></td><td>${fut?'':n(m.me.q[z.d])}</td><td>${fut?'':fm(m.me.s[z.d])}</td></tr>`}).join('');
- const sq=wk.reduce((a,z)=>a+(m.me.q[z.d]||0),0),ss=wk.reduce((a,z)=>a+(m.me.s[z.d]||0),0);
- tip.classList.add('wk');
- tip.innerHTML=`<b>${d0.slice(5).replace('-','.')} ~ ${d1.slice(5).replace('-','.')} 한 주</b><table><thead><tr><th></th><th>네이버 검색</th><th>광고비</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td>${n(sq)}</td><td>${fm(ss)}</td></tr></tfoot></table>${evs.map(z=>`<div class="e"><em style="color:${(V39_EVT[z.type]||[])[1]}">${(V39_EVT[z.type]||['이슈'])[0]}</em>${esc(v39Short((v39Adv?'':(z.adv||'')+' ')+z.title,22))}</div>`).join('')}`;
- tip.hidden=false;const vp=tip.parentElement.getBoundingClientRect();let x=e.clientX-vp.left+22,yy=e.clientY-vp.top-tip.offsetHeight-16;if(x+tip.offsetWidth>vp.width-8)x=e.clientX-vp.left-tip.offsetWidth-22;if(yy<0)yy=e.clientY-vp.top+20;tip.style.left=x+'px';tip.style.top=yy+'px'},{passive:true});
+ tip.className='v39-tip wk';
+ tip.innerHTML=`<div class="h">${dd(d0)} ~ ${dd(d1)} 한 주</div><div class="big"><div><span>네이버 검색</span><b>${hasq?n(sq):'-'}</b></div><div><span>광고비</span><b>${fm(ss)}</b></div></div>
+  <div class="mini">${wk.map(z=>{const fut=z.d>v39Last.today;return `<div class="${z.d===c.d?'on':''}${fut?' fut':''}"><i>${WK[new Date(z.d+'T00:00:00').getDay()]}</i><span>${fut?'':n(m.me.q[z.d])}</span><span>${fut?'':fm(m.me.s[z.d])}</span></div>`}).join('')}</div>
+  ${evs.map(z=>`<div class="e"><em style="color:${(V39_EVT[z.type]||[])[1]}">${(V39_EVT[z.type]||['이슈'])[0]}</em>${esc(v39Short((v39Adv?'':(z.adv||'')+' ')+z.title,18))}</div>`).join('')}`}
+function v39TipPlace(){const tip=document.getElementById('v39-tip'),ov=document.getElementById('v39-hot');if(!tip||!ov)return;tip.hidden=false;
+ const vp=tip.parentElement.getBoundingClientRect(),r=ov.getBoundingClientRect(),grow=r.height*.32,w=tip.offsetWidth,h=tip.offsetHeight;
+ let x=r.right-vp.left+14;if(x+w>vp.width-6)x=r.left-vp.left-w-14;x=Math.max(4,x);
+ let y=r.top-grow-vp.top;y=Math.max(4,Math.min(vp.height-h-4,y));tip.style.left=x+'px';tip.style.top=y+'px'}
+document.addEventListener('pointermove',e=>{if(route!=='heatmap'||!v39Last)return;const tip=document.getElementById('v39-tip');if(!tip)return;
+ const g=e.target.closest&&e.target.closest('#v39-svg .v39-c[data-i]');const c=g&&v39Last.cells[+g.dataset.i];
+ if(!c||!c.live||c.d>v39Last.today){if(v39HotCol!=null&&!v39HotT)v39HotT=setTimeout(()=>{v39HotT=0;v39Hot(null)},90);return}
+ clearTimeout(v39HotT);v39HotT=0;const newCol=c.col!==v39HotCol;v39Hot(c.col);if(newCol||c.d!==v39HotDay){v39HotDay=c.d;v39WeekTip(c);if(newCol)v39TipPlace()}},{passive:true});
+document.addEventListener('pointerleave',()=>{if(v39HotCol!=null)v39Hot(null)});
+window.addEventListener('blur',()=>{if(v39HotCol!=null)v39Hot(null)});
 
 // 이미지(PNG): 1월~12월 전체, 왼쪽 이름표·요일 포함
 async function v39Png(){const svg=document.getElementById('v39-svg'),st=document.querySelector('.v39-stick');if(!svg||!v39Last)return;v39Animate(true);v39Hot(null);
@@ -205,15 +213,21 @@ if(v39FromHash()&&typeof listing!=='undefined'&&listing){render()}
 const V39_MED={terrestrial:'지상파',general:'종편',cable:'케이블',radio:'라디오',print:'인쇄',digital_video:'디지털 동영상',digital_banner:'디지털 배너'};
 function v39MediaBars(media){const e=Object.entries(media||{}).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);const t=e.reduce((a,[,v])=>a+v,0);if(!t)return '';
  return `<div class="v39-med">${e.map(([k,v])=>`<div class="r"><span>${V39_MED[k]||k}</span><i><b style="width:${Math.max(3,v/t*100).toFixed(1)}%"></b></i><em>${v38Money(v)}</em></div>`).join('')}</div>`}
-document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('#v39-svg [data-v39-ev]');if(!g||!v39Last)return;const z=v39Last.m.ev[+g.dataset.v39Ev];if(!z)return;
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('#v39-svg [data-v39-ev]');if(!g||!v39Last)return;v39Hot(null);const z=v39Last.m.ev[+g.dataset.v39Ev];if(!z)return;
  const [lab,color]=V39_EVT[z.type]||['이슈','#7d8a96'],dl=$('#detail');dl.className='v39-evdialog';const d=z.d.replaceAll('-','.'),dd=x=>String(x||'').replaceAll('-','.');
  const img=u=>u?`<img class="v39-evimg" src="${esc(safeUrl(u))}" alt="" onerror="this.remove()">`:'';
  let body='';
- if(z.type==='camp')body=`${img(z.thumb)}<h2>${esc(z.title)}</h2>
-  <div class="v39-kv"><span>광고주</span><b>${esc(z.adv)}</b><span>기간</span><b>${d} ~ ${dd(z.e)}${z.ongoing?' · 진행 중':''}</b><span>광고비</span><b>${v38Money(z.amount)}</b>${(z.products||[]).length?`<span>상품</span><b>${z.products.map(esc).join(', ')}</b>`:''}${z.ncre?`<span>소재</span><b>${z.ncre}개</b>`:''}</div>
-  ${v39MediaBars(z.media)}${z.why?`<p class="v39-evsum">${esc(z.why)}</p>`:''}${z.id?`<button type="button" class="primary" data-campaign="${esc(z.id)}">캠페인 분석 보기</button>`:''}`;
- else if(z.type==='creative')body=`${z.storyboard?`<img class="v39-evimg sb" src="${esc(safeUrl(z.storyboard))}" alt="" onerror="this.remove()">`:img(z.thumb)}<h2>${esc(z.title)}</h2>
+ const goCamp=(t)=>z.id?`<div class="v39-go"><p>${t}</p><button type="button" class="primary" data-campaign="${esc(z.id)}">캠페인 분석에서 자세히 보기 →</button></div>`:'';
+ if(z.type==='camp'){const cres=(z.cres||[]),med=Object.entries(z.media||{}).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]),mt=med.reduce((a,[,v])=>a+v,0);
+  body=`<h2>${esc(z.title)}</h2>
+  <div class="v39-kv"><span>광고주</span><b>${esc(z.adv)}</b><span>기간</span><b>${d} ~ ${dd(z.e)}${z.ongoing?' · 진행 중':''}</b><span>광고비</span><b>${v38Money(z.amount)}</b>${(z.products||[]).length?`<span>상품</span><b>${z.products.map(esc).join(', ')}</b>`:''}</div>
+  ${cres.length?`<div class="v39-sub">쓰인 소재 ${z.ncre||cres.length}개${(z.ncre||0)>cres.length?` <small>· 광고비 많은 ${cres.length}개</small>`:''}</div><div class="v39-cres">${cres.map(x=>`<div class="c">${x.thumb?`<img src="${esc(safeUrl(x.thumb))}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'noimg',textContent:'${esc(x.kind)}'}))">`:`<i class="noimg">${esc(x.kind)}</i>`}<b>${esc(x.copy||'(카피 없음)')}</b><small>${esc(x.kind)}${x.sec?` · ${x.sec}초`:''}</small></div>`).join('')}</div>`:''}
+  ${med.length?`<div class="v39-sub">집행 매체</div><div class="v39-chips">${med.map(([k,v])=>`<span class="m">${V39_MED[k]||k} <em>${Math.round(v/mt*100)}%</em></span>`).join('')}</div>${(z.chans||[]).length?`<div class="v39-chips ch">${z.chans.map(c=>`<span>${esc(c)}</span>`).join('')}</div>`:''}`:''}
+  ${goCamp('소재별 집행·채널·기간별 광고비는 캠페인 분석에서 볼 수 있어요.')}`}
+ else if(z.type==='creative'){const vs=z.video&&typeof v32Vid==='function'?v32Vid(z.video,z.video_web):null,still=z.storyboard||z.thumb;
+  const fb=still?`this.outerHTML='<img class=&quot;v39-evimg${z.storyboard?' sb':''}&quot; src=&quot;${esc(safeUrl(still))}&quot; alt=&quot;&quot;>'`:`this.remove()`;
+  body=`${vs?`<video class="v39-evvid" src="${esc(vs)}" ${z.thumb?`poster="${esc(safeUrl(z.thumb))}"`:''} controls autoplay muted playsinline onerror="${fb}"></video>${z.storyboard?`<details class="v39-sbd"><summary>스토리보드 보기</summary><img class="v39-evimg sb" src="${esc(safeUrl(z.storyboard))}" alt="" onerror="this.parentElement.remove()"></details>`:''}`:(z.storyboard?`<img class="v39-evimg sb" src="${esc(safeUrl(z.storyboard))}" alt="" onerror="this.remove()">`:img(z.thumb))}<h2>${esc(z.title)}</h2>
   <div class="v39-kv"><span>광고주</span><b>${esc(z.adv)}</b>${z.product?`<span>상품</span><b>${esc(z.product)}</b>`:''}${z.scene?`<span>장면</span><b>${esc(z.scene)}</b>`:''}<span>TV 방송</span><b>${d} 첫 방송 ~ ${dd(z.e)}</b>${z.spots?`<span>집행</span><b>${Number(z.spots).toLocaleString()}회 · 채널 ${z.channels||0}곳</b>`:''}<span>TV 광고비</span><b>${v38Money(z.amount)} <small>(아덱스 원금액)</small></b></div>
-  ${z.id?`<button type="button" class="primary" data-campaign="${esc(z.id)}">이 소재가 든 캠페인 보기</button>`:''}`;
+  ${goCamp('이 소재가 든 캠페인의 매체·기간·다른 소재는 캠페인 분석에서 볼 수 있어요.')}`}
  else body=`${img(z.thumb)}<h2>${esc(z.title)}</h2><div class="v39-kv"><span>광고주</span><b>${esc(z.adv)}</b><span>매체</span><b>${esc(z.publisher||'')}</b><span>날짜</span><b>${d}</b>${z.n>1?`<span>같은 소식</span><b>${z.n}건</b>`:''}</div>${z.summary?`<p class="v39-evsum">${esc(z.summary)}…</p>`:''}${z.url?`<a class="primary" href="${esc(safeUrl(z.url))}" target="_blank" rel="noopener">원문 보기 ↗</a>`:''}`;
  $('#detail-body').innerHTML=`<div class="v39-ev-pop"><span class="v39-evtag" style="background:${color}">${lab}</span>${body}</div>`;if(!dl.open)dl.showModal()});

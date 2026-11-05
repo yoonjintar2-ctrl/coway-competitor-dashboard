@@ -21,7 +21,7 @@ async function v38Load(){if(!v38Opt){v38Opt=(await api('/api/monthly/options')).
 function v38Controls(show){let box=document.querySelector('main>header .v38-ctrl');if(!show){if(box)box.remove();return}
  const head=document.querySelector('main>header');if(!head)return;if(!box){box=document.createElement('div');box.className='v32-ctrl v38-ctrl';head.appendChild(box)}
  const o=(v38Opt||[]).find(x=>x.advertiser===v38Adv);
- box.innerHTML=`<label>광고주<select id="v38-adv" class="chip">${(v38Opt||[]).map(x=>`<option value="${esc(x.advertiser)}" ${x.advertiser===v38Adv?'selected':''}>${esc(x.advertiser)}</option>`).join('')}</select></label><label>세부 품목<select id="v38-cat" class="chip"><option value="">전체</option>${(o?o.categories:[]).map(c=>`<option value="${esc(c)}" ${c===v38Cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label>`}
+ box.innerHTML=`<label>세부 품목<select id="v38-cat" class="chip"><option value="">전체</option>${(o?o.categories:[]).map(c=>`<option value="${esc(c)}" ${c===v38Cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label>광고주<select id="v38-adv" class="chip">${(v38Opt||[]).map(x=>`<option value="${esc(x.advertiser)}" ${x.advertiser===v38Adv?'selected':''}>${esc(x.advertiser)}</option>`).join('')}</select></label>`}
 function v38Sum(s){return Object.values(s||{}).reduce((a,b)=>a+(b||0),0)}
 function v38Cv(s){return Object.fromEntries(V38_CATS.map(([k,,,subs])=>[k,subs.reduce((a,[sk])=>a+(s[sk]||0),0)]))}
 var V38_TG=10,V38_ADJ=0,V38_FIX=0;
@@ -40,7 +40,7 @@ function v38View(d){
  const camps=[];for(const c of [...CL].sort((a,b)=>(b.amount||0)-(a.amount||0))){const nm=c.name.replace(new RegExp('^'+d.advertiser.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'),'').replace(/^·\s*/,'')||c.name;const txt=`${nm} · ${md(c.s)}–${md(c.e)}`;const x0=xd(c.s),x1=Math.max(xd(c.e),x0+ctx.measureText(txt).width+CH+16);const k=fit(x0,x1);if(k<0)continue;camps.push({...c,txt,x0,x1,k})}
  ctx.font='500 11px Pretendard, "Noto Sans KR", sans-serif';
  const news=[];for(const n of [...d.news].sort((a,b)=>a.d.localeCompare(b.d))){const txt=`${md(n.d)} ${n.t}${n.n>1?` 외 ${n.n-1}건`:''}`;let x0=xd(n.d);const room=PW-6-x0-36;if(room<70)x0=Math.max(0,PW-6-36-70);let w=Math.min(240,ctx.measureText(txt).width,PW-6-x0-36),t=txt;while(t.length>6&&ctx.measureText(t+'…').width>w)t=t.slice(0,-1);if(t!==txt)t+='…';const x1=x0+36+w;const k=fit(x0,x1);if(k<0)continue;news.push({...n,txt,short:t,x0,x1,k})}
- const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=108,BAR_TOP=LINE_TOP+LINE_H-34,BAR_H=210,BASE=BAR_TOP+BAR_H;
+ const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=150,BAR_TOP=LINE_TOP+LINE_H-56,BAR_H=255,BASE=BAR_TOP+BAR_H;
  const QQ=[...Q.slice(0,-1),...QY.slice(0,-1)].filter(v=>v!=null),QLO=QQ.length?Math.min(...QQ)*.85:0,QHI=QQ.length?Math.max(...QQ,...Q.filter(v=>v!=null)):1,QT=LINE_TOP+17,QH=LINE_H-34,QYP=v=>QT+QH-(v-QLO)/((QHI-QLO)||1)*QH;
  let RAW=Math.max(1e7,Math.max(...TOT,...AVG,...YOY.map(v=>v||0))*1.1);
  // 막대 금액 글자(막대 위 20px)가 쿼리 표식(반지름 약 19px)과 겹치면 Y축 최대값을 키워 막대를 낮춤
@@ -97,25 +97,25 @@ function v38View(d){
  t+=`<tr class="post">${M.map((m,i)=>{const y=(d.yt[m]||[]).length,g=(d.ig[m]||[]).length;return `<td class="${m===CUR?'cur':''}"><span class="v38-pill yt${y?'':' zero'}" data-v38-post="yt:${m}"><i>▶</i>${y}</span><span class="v38-pill ig${g?'':' zero'}" data-v38-post="ig:${m}"><i>◎</i>${g}</span></td>`}).join('')}<td class="tot"></td></tr>`;
  const chev=dir=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="${dir<0?'M15 5l-7 7 7 7':'M9 5l7 7-7 7'}"/></svg>`;
  return {html:`<div class="v38-box" style="--gut:${GUT}px"><div class="v38-scroller" id="v38-scroller"><div class="v38-snap">${M.map(()=>`<i style="width:${slot}px"></i>`).join('')}</div><svg class="v38-chart" width="${CW}" height="${H}" viewBox="0 0 ${CW} ${H}" style="width:${CW}px;height:${H}px">${s}</svg>
-   <table class="mt v38-t" style="width:${CW}px"><colgroup>${M.map(()=>`<col style="width:${slot}px">`).join('')}<col style="width:${TW}px"></colgroup>${t}</table></div>
+</div>
    <i class="v38-edge l" style="left:${GUT}px"></i><i class="v38-edge r"></i>
    <svg class="v38-ygut" width="${GUT}" height="${BASE-BAR_TOP+30}" viewBox="0 ${BAR_TOP-20} ${GUT} ${BASE-BAR_TOP+30}" style="top:${BAR_TOP-20}px;width:${GUT}px;height:${BASE-BAR_TOP+30}px">${yl}</svg>
    <svg class="v38-lgut" width="${GUT+slot}" height="${LINE_TOP+LINE_H}" style="width:${GUT+slot}px;height:${LINE_TOP+LINE_H}px">${cap}</svg>
-   <table class="mt v38-names" style="top:${H+V38_TG}px">${names}</table>
    <button type="button" class="v38-fbtn" data-v38-scroll="-1" style="top:${BAR_TOP+BAR_H/2-18}px;left:-20px" aria-label="이전 달">${chev(-1)}</button><button type="button" class="v38-fbtn" data-v38-scroll="1" style="top:${BAR_TOP+BAR_H/2-18}px;right:-20px" aria-label="다음 달">${chev(1)}</button></div>`,
+  thtml:`<div class="v38-box v38-tbox" style="--gut:${GUT}px"><div class="v38-scroller" id="v38-tscroller"><table class="mt v38-t" style="width:${CW}px"><colgroup>${M.map(()=>`<col style="width:${slot}px">`).join('')}<col style="width:${TW}px"></colgroup>${t}</table></div><i class="v38-edge l" style="left:${GUT}px"></i><i class="v38-edge r"></i><table class="mt v38-names" style="top:0">${names}</table></div>`,
   CW,VW,GUT,slot,QP,scrollTo:CW-(VW-GUT),M,S,CV,TOT,YOY,AVG,Q,QY,BX,bw,sy,VIS0}}
 function v38Draw(){const d=v38D;if(!d)return;v38Controls(true);
  const has=d.months.some(m=>v38Sum(d.spend[m]));
  const head='';
  if(!has&&!d.camps.length){$('#content').innerHTML=`${head}<section class="glass section">${empty('이 광고주·품목은 최근 2년 광고비 자료가 없어요.')}</section>`;return}
  const v=v38View(d);window.__v38=v;const M=d.months,VIS=M.slice(v.VIS0),T=v.TOT.slice(v.VIS0),pk=T.indexOf(Math.max(...T)),Qv=v.Q.slice(v.VIS0,-1).filter(x=>x!=null);
- $('#content').innerHTML=`<section class="glass section v38-card"><div class="v38-glass">${v.html}</div>
+ $('#content').innerHTML=`<section class="glass section v38-card"><div class="v38-glass">${v.html}</div><div class="v38-glass v38-tglass">${v.thtml}</div>
   <div class="v38-legend">${V38_CATS.slice(0,3).map(([,n,c])=>`<span><i class="sw" style="background:${c};opacity:.85"></i>${n}</span>`).join('')}<span><i class="ln" style="background:${V38_G}"></i>네이버 쿼리</span></div>
   <div class="v38-kwline">네이버 쿼리 키워드 <b>${d.keywords.length?d.keywords.map(esc).join(' · '):'없음'}</b><button type="button" class="v38-kwbtn" data-v38-kw="${esc(d.advertiser)}|${esc(d.category_code||'')}" title="키워드 추가·제거" aria-label="키워드 추가·제거">${V38_PEN}</button></div><p class="v38-note">${v38Note(d)}</p></section>`;
- const sc=document.getElementById('v38-scroller');if(sc){const diff=(v.VW-v.GUT)-sc.clientWidth;if(Math.abs(diff)>1&&!V38_FIX){V38_ADJ+=diff;V38_FIX=1;v38Draw();V38_FIX=0;return}sc.scrollLeft=v.scrollTo;v38Btns()}}
+ const sc=document.getElementById('v38-scroller');if(sc){const diff=(v.VW-v.GUT)-sc.clientWidth;if(Math.abs(diff)>1&&!V38_FIX){V38_ADJ+=diff;V38_FIX=1;v38Draw();V38_FIX=0;return}sc.scrollLeft=v.scrollTo;const ts=document.getElementById('v38-tscroller');if(ts)ts.scrollLeft=sc.scrollLeft;v38Btns()}}
 function v38Note(d){const st=v32Static(),dm=d.digital_months||[];
  return `${st?'TV·라디오·인쇄는 매체 집행 자료, 디지털(동영상·PC·MO)은 디지털 집행 자료':`TV·라디오·인쇄는 아덱스, 디지털(동영상·PC·MO)은 ${esc(d.digital_source||'디지털 자료')}(설정 &gt; 디지털 자료 규칙의 포함 기준)`} · TV는 SM C&C 실집행 추정(설정 &gt; 광고비 보정: 지상파 15%·종편/케이블 39%, 24년 21%·36%) · 막대 뒤 회색은 전년 같은 달, 옅은 영역은 ${d.avg_basis==='경쟁사 전체'?'경쟁사 전체':'같은 품목 경쟁사'} 평균(그달 광고비가 있는 경쟁사끼리) · 네이버 쿼리는 ${d.keywords.length?esc(d.keywords.join('·'))+' ':''}추정 검색수 월 합계(옅은 표식은 자료가 덜 찬 달) · 캠페인은 3줄까지(${d.category?'큰 캠페인부터':'광고주 전체 보기는 5억 원 이상 주요 캠페인만'}) · 자료가 없는 달은 비워 둬요(추정하지 않음)${dm.length?` · 디지털 자료 ${dm[0].replace('-','.')}~${dm.at(-1).replace('-','.')}`:''}`}
-function v38Btns(){const sc=document.getElementById('v38-scroller');if(!sc)return;const box=sc.closest('.v38-box'),v=window.__v38;if(box){box.classList.toggle('sl',sc.scrollLeft>2);box.classList.toggle('sr',sc.scrollLeft<sc.scrollWidth-sc.clientWidth-2)}
+function v38Btns(){const sc=document.getElementById('v38-scroller');if(!sc)return;const v=window.__v38;document.querySelectorAll('.v38-box').forEach(box=>{box.classList.toggle('sl',sc.scrollLeft>2);box.classList.toggle('sr',sc.scrollLeft<sc.scrollWidth-sc.clientWidth-2)});
  const g=document.getElementById('v38-cap');if(g&&v){const k=Math.max(0,Math.round(sc.scrollLeft/v.slot));let y=null;for(let i=k;i<v.QP.length&&y==null;i++)y=v.QP[i];if(y!=null)g.style.transform=`translateY(${y-+g.dataset.y}px)`}
 document.querySelectorAll('[data-v38-scroll]').forEach(b=>{const dir=+b.dataset.v38Scroll;b.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
 var v38BaseRender=render;
@@ -144,7 +144,7 @@ document.addEventListener('mousemove',e=>{if(route!=='monthly'){return}const v=w
  const q=e.target.closest&&e.target.closest('.v38-q');if(q){const i=+q.dataset.v38I,m=d.months[i],v1=v.Q[i],v0=v.QY[i];return v38Tip(`<b class="h">${m.slice(2,4)}.${m.slice(5)} · 네이버 쿼리 ${Math.round(v1).toLocaleString()}회</b><div class="s">전년 같은 달 ${v0!=null?Math.round(v0).toLocaleString()+'회':'자료 없음'}${v0?` (${v1>=v0?'+':''}${Math.round((v1/v0-1)*100)}%)`:''} · 자료 ${d.query_days[m]||0}일/${v38Days(m)}일</div>`,e.clientX,e.clientY)}
  const c=e.target.closest&&e.target.closest('[data-v38-camp]');if(c){const x=d.camps.find(z=>z.id===c.dataset.v38Camp);if(x)return v38Tip(`<b class="h">${esc(x.name)}</b><div class="s">${x.s.replace(/-/g,'.')} ~ ${x.e.replace(/-/g,'.')} · ${v38Money(x.amount)}${x.category?' · '+esc(x.category):''}</div><div class="s">누르면 캠페인 분석으로 이동</div>`,e.clientX,e.clientY)}
  v38Tip(null)},{passive:true});
-document.addEventListener('scroll',e=>{if(e.target&&e.target.id==='v38-scroller')v38Btns()},true);
+var v38SyncLock=0;document.addEventListener('scroll',e=>{const id=e.target&&e.target.id;if(id!=='v38-scroller'&&id!=='v38-tscroller')return;if(!v38SyncLock){const o=document.getElementById(id==='v38-scroller'?'v38-tscroller':'v38-scroller');if(o&&Math.abs(o.scrollLeft-e.target.scrollLeft)>.5){v38SyncLock=1;o.scrollLeft=e.target.scrollLeft;setTimeout(()=>v38SyncLock=0,30)}}v38Btns()},true);
 
 // ---------- 설정 > 디지털 자료 규칙 ----------
 if(typeof v7Tabs!=='undefined')v7Tabs.push(['digitalrules','디지털 자료 규칙']);
@@ -225,3 +225,26 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 
 // 설정 > 소재 제외 탭 (포함=O 상품 안의 일부 소재만 빼기, 11-05)
 if(typeof v7Tabs!=='undefined'&&!v7Tabs.some(t=>t[0]==='creative')){const i=v7Tabs.findIndex(t=>t[0]==='competitor');v7Tabs.splice(i>=0?i+1:v7Tabs.length,0,['creative','소재 제외'])}
+
+// ---------- 신규 소재 모니터링: 날짜 필터 → 품목 필터, 코웨이 맨 위 (11-05 14:05) ----------
+var v38DCat='';
+function v38CowayFirst(list){return [...list].sort((a,b)=>(b==='코웨이')-(a==='코웨이'))}
+if(typeof v32Items==='function'){
+ v32Items=function(){return (v32Data.items||[]).filter(x=>(!v32Adv||x.advertiser===v32Adv)&&(!v38DCat||x.category_label===v38DCat)).sort((a,b)=>(b.advertiser==='코웨이')-(a.advertiser==='코웨이'))};
+ v32Controls=function(show){let box=document.querySelector('main>header .v32-ctrl:not(.v37-ctrl):not(.v38-ctrl)');
+  if(!show){if(box)box.remove();return}
+  const head=document.querySelector('main>header');if(!head)return;
+  if(!box){box=document.createElement('div');box.className='v32-ctrl v38-dctrl';head.appendChild(box)}
+  const order=['정수기','매트리스','공기청정기','안마의자','비데','음식물처리기','전기레인지'];
+  const cats=['',...[...new Set((v32Data.items||[]).map(x=>x.category_label).filter(Boolean))].sort((a,b)=>(order.indexOf(a)<0?99:order.indexOf(a))-(order.indexOf(b)<0?99:order.indexOf(b)))];
+  const advs=['',...v38CowayFirst(v32Data.advertisers||[])];if(v32Adv&&!advs.includes(v32Adv))advs.push(v32Adv);
+  box.innerHTML=`<label>품목<select id="v38-dcat" class="chip">${cats.map(c=>`<option value="${esc(c)}" ${c===v38DCat?'selected':''}>${c?esc(c):'전체 품목'}</option>`).join('')}</select></label><label>광고주<select id="v32-adv" class="chip">${advs.map(a=>`<option value="${esc(a)}" ${a===v32Adv?'selected':''}>${a?esc(a):'전체 광고주'}</option>`).join('')}</select></label>`;v38PlaceCtrl()};
+ window.addEventListener('change',e=>{if(e.target.id==='v38-dcat'){e.stopPropagation();v38DCat=e.target.value;v32Draw()}},true);
+ if(typeof v32View==='function'){var v38BaseV32View=v32View;v32View=function(d){return v38BaseV32View(d).replace('날짜를 고르면 그 날로 이동해요.','품목·광고주로 걸러 볼 수 있어요(코웨이 먼저).')}}
+}
+// ---------- 상단 필터 위치·크기 통일: 타임라인처럼 '업데이트' 버튼 왼쪽에 ----------
+function v38PlaceCtrl(){const head=document.querySelector('main>header');if(!head)return;const tb=head.querySelector('.toolbar'),btn=tb&&tb.querySelector('#refresh');
+ head.querySelectorAll(':scope>.v32-ctrl').forEach(c=>{if(tb){btn?tb.insertBefore(c,btn):tb.appendChild(c)}});
+ // 광고주 목록은 코웨이 먼저(전체·경쟁사 묶음 바로 다음)
+ head.querySelectorAll('select').forEach(sel=>{if(!/adv/.test(sel.id))return;const o=[...sel.options].find(x=>x.value==='코웨이'||x.textContent.trim()==='코웨이');if(!o)return;const first=[...sel.options].find(x=>x.value&&!['all','competitors','코웨이'].includes(x.value)&&x!==o);if(first&&o.index>first.index)sel.insertBefore(o,first)})}
+new MutationObserver(()=>v38PlaceCtrl()).observe(document.querySelector('main>header')||document.body,{childList:true,subtree:true});

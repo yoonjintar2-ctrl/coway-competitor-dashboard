@@ -133,3 +133,13 @@ dialog.v38-kwdialog{width:min(620px,94vw)}
 .v38-ampsec{position:relative}
 .v38-xlsbtn{position:absolute;top:18px;right:20px;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:9px;border:1px solid #cfe2d6;background:#f3faf5;color:#1f7a45;font:600 12px inherit;font-family:inherit;cursor:pointer}
 .v38-xlsbtn:hover{background:#e6f5ec}
+/* 2026-11-05 14:05 — 상단 필터 통일(타임라인 기준): 업데이트 버튼 왼쪽, 알약 모양 37px */
+.toolbar .v32-ctrl{display:flex;gap:11px;align-items:flex-end;margin:0;align-self:auto}
+.v32-ctrl label{display:grid;gap:6px;font-size:12px;font-weight:600;color:#5f6368}
+.v32-ctrl select,html.nd .v32-ctrl select.chip{height:37px;min-width:150px;padding:9px 30px 9px 12px!important;border-radius:999px!important;font-size:12px!important;font-weight:600;box-sizing:border-box}
+html.nd .filter-label select,html.nd .filter-label select.chip{height:37px;min-width:150px;box-sizing:border-box;border-radius:999px!important}
+/* 월별 통합 분석: 표는 그래프 아래 별도 상자 */
+.v38-tglass{margin-top:14px;padding:10px 14px!important}
+.v38-tbox .v38-t{margin-top:0}
+.v38-tbox .v38-names{top:0}
+.v32-ctrl select,html.nd .v32-ctrl select.chip,html.nd .filter-label select,html.nd .filter-label select.chip{width:170px!important;min-width:170px!important}

@@ -2,8 +2,8 @@
    광고주(또는 세부 품목)를 고르면 최근 25개월(화면엔 12개월, 좌우 버튼으로 이동)을 월 단위로:
    캠페인 캡슐·관련 기사(같은 띠, 높이 고정) → 네이버 쿼리(올해·전년) → 매체별 광고비 막대(전년 막대·경쟁사 평균 영역) → 표 → 유튜브·인스타그램 게시물. */
 var V38_TITLE='월별 통합 분석',v38Opt=null,v38Adv='',v38Cat='',v38D=null,v38Req=0;
-var V38_CATS=[['tv','TV','#3b4450',[['tv_terr','지상파'],['tv_cable','종편·케이블']]],['dg','디지털','#6c7681',[['dg_video','동영상'],['dg_pc','PC'],['dg_mo','MO']]],['radio','라디오','#99a3ac',[['radio','라디오']]],['print','인쇄','#c3cad0',[['news','신문'],['mag','잡지']]]];
-var V38_G='#08a34f';
+var V38_CATS=[['tv','TV','#1b84bd',[['tv_terr','지상파'],['tv_cable','종편·케이블']]],['dg','디지털','#4aa9da',[['dg_video','동영상'],['dg_pc','PC'],['dg_mo','MO']]],['radio','라디오','#8cc7e5',[['radio','라디오']]],['print','인쇄','#bfdfef',[['news','신문'],['mag','잡지']]]];
+var V38_G='#858f99';  // 네이버 쿼리: 무채색(광고비 막대가 주인공, 11-05 14:58)
 function v38Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="monthly"]'))return;
  const b=document.createElement('button');b.className='nav';b.dataset.route='monthly';b.textContent=V38_TITLE;
  const after=nav.querySelector('[data-route="news"]')||nav.querySelector('[data-route="daily"]');if(after)after.after(b);else nav.appendChild(b)}
@@ -47,7 +47,7 @@ function v38View(d){
  Q.forEach((v,i)=>{if(v==null||!TOT[i])return;const lim=QYP(v)+19+21;if(lim>BAR_TOP)RAW=Math.max(RAW,TOT[i]*BAR_H/Math.max(8,BASE-lim))});
  const YST=[5e9,2e9,1e9,5e8,2e8,1e8,5e7,2e7,1e7].find(k=>RAW/k>=3)||1e7,mx=RAW,sy=v=>BASE-v/mx*BAR_H;
  const top=(x,w,y)=>`M${x},${BASE} V${y} H${x+w} V${BASE} Z`;
- let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8aa3b8" stop-opacity=".17"/><stop offset="1" stop-color="#8aa3b8" stop-opacity=".07"/></linearGradient>
+ let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3acb4" stop-opacity=".16"/><stop offset="1" stop-color="#a3acb4" stop-opacity=".06"/></linearGradient>
   <linearGradient id="v38-yoy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3bcc4" stop-opacity=".36"/><stop offset="1" stop-color="#d9dfe3" stop-opacity=".26"/></linearGradient>
   <pattern id="v38-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#25a4dc" stroke-width="1.4" stroke-opacity=".06"/></pattern>
   <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".13"/></pattern>
@@ -67,7 +67,7 @@ function v38View(d){
  const qv=[...Q.slice(0,-1),...QY].filter(v=>v!=null);let CAP=null;const QP=M.map(()=>null);
  if(qv.length){const qy=QYP;
   const seg=(vals,keep)=>{const parts=[];vals.forEach((v,i)=>{if(v==null||!keep(i))return;const l=parts.at(-1);const p=[X(i),qy(v),v,i];if(l&&l.at(-1)[3]===i-1)l.push(p);else parts.push([p])});return parts};
-  const yp=seg(QY,()=>true);s+=`<path d="${yp.map(v38Smooth).join(' ')}" fill="none" stroke="${V38_G}" stroke-opacity=".22" stroke-width="4" stroke-linecap="round"/>`;
+  const yp=seg(QY,()=>true);s+=`<g opacity=".22"><path d="${yp.map(v38Smooth).join(' ')}" fill="none" stroke="${V38_G}" stroke-width="4" stroke-linecap="round"/>${yp.flat().map(([px,py])=>`<circle cx="${px}" cy="${py}" r="6"/>`).join('')}</g>`.replace(/<circle /g,`<circle fill="${V38_G}" `);
   const okL=p=>{const ly=p[1]+18,i=p[3],cq=Q[i]!=null?qy(Q[i]):null;return !(TOT[i]&&ly>sy(TOT[i])-34)&&!(cq!=null&&Math.abs(cq-ly)<26)};const fy=yp.flat().find(p=>p[3]>=VIS0+3&&okL(p));const fyy=fy?fy[1]+18:0;if(fy)s+=`<text x="${fy[0]}" y="${fyy}" text-anchor="middle" font-size="10" font-weight="700" fill="${V38_G}" fill-opacity=".6">전년 같은 달</text>`;
   const cp=seg(Q,()=>true),fl=cp.flat(),lp=fl.at(-1),pp=fl.at(-2),fade=lp&&pp&&(M[lp[3]]===CUR||QD[lp[3]]<v38Days(M[lp[3]]));if(fade)s+=`<defs><linearGradient id="v38-qf" gradientUnits="userSpaceOnUse" x1="${pp[0]}" x2="${lp[0]}" y1="0" y2="0"><stop offset="0" stop-color="${V38_G}"/><stop offset="1" stop-color="${V38_G}" stop-opacity=".28"/></linearGradient></defs>`;s+=`<path d="${cp.map(v38Smooth).join(' ')}" fill="none" stroke="${fade?'url(#v38-qf)':V38_G}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
   cp.flat().forEach(([px,py,v,i])=>{const part=M[i]===CUR||QD[i]<v38Days(M[i]);const [n,u]=v38K(v);s+=`<g class="v38-q" data-v38-i="${i}"><circle cx="${px}" cy="${py}" r="15.5" fill="#fff" stroke="${V38_G}" stroke-width="5"${part?' stroke-opacity=".32"':''}/><text x="${px}" y="${py+3.6}" text-anchor="middle" fill="${V38_G}"${part?' fill-opacity=".55"':''}><tspan font-size="${n.length>=3?9.5:10.5}" font-weight="900">${n}</tspan><tspan font-size="8" font-weight="500" dx=".3">${u}</tspan></text></g>`});

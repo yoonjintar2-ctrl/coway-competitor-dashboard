@@ -12,7 +12,7 @@ function v38Money(v){if(!v)return '–';if(v>=1e8){const x=v/1e8;return (x>=100?
 function v38K(v){if(v==null)return '';if(v>=1e6)return [(v/1e6).toFixed(1).replace(/\.0$/,''),'m'];if(v>=1e4)return [String(Math.round(v/1e3)),'k'];if(v>=1e3)return [(v/1e3).toFixed(1),'k'];return [String(Math.round(v)),'']}
 function v38Smooth(p){if(p.length<2)return p.length?`M${p[0][0]},${p[0][1]}`:'';let d=`M${p[0][0]},${p[0][1]}`;for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c,t=.18;d+=` C${b[0]+(c[0]-a[0])*t},${b[1]+(c[1]-a[1])*t} ${c[0]-(e[0]-b[0])*t},${c[1]-(e[1]-b[1])*t} ${c[0]},${c[1]}`}return d}
 function v38Days(m){return new Date(+m.slice(0,4),+m.slice(5,7),0).getDate()}
-async function v38Load(){if(!v38Opt){v38Opt=(await api('/api/monthly/options')).options||[];if(!v38Adv&&v38Opt.length)v38Adv=(v38Opt.find(o=>o.advertiser!=='코웨이')||v38Opt[0]).advertiser}
+async function v38Load(){if(!v38Opt){v38Opt=(await api('/api/monthly/options')).options||[];if(!v38Adv&&v38Opt.length){const cw=v38Opt.find(o=>o.advertiser==='코웨이');if(cw){v38Adv='코웨이';if((cw.categories||[]).includes('정수기'))v38Cat='정수기'}else v38Adv=v38Opt[0].advertiser}}
  const o=v38Opt.find(x=>x.advertiser===v38Adv);if(o&&v38Cat&&!o.categories.includes(v38Cat))v38Cat='';
  const req=++v38Req;let d;
  if(o&&o.files){d=await api('/api/monthly-file/'+encodeURIComponent(o.files[v38Cat||'']||''))}
@@ -147,7 +147,7 @@ document.addEventListener('mousemove',e=>{if(route!=='monthly'){return}const v=w
 var v38SyncLock=0;document.addEventListener('scroll',e=>{const id=e.target&&e.target.id;if(id!=='v38-scroller'&&id!=='v38-tscroller')return;if(!v38SyncLock){const o=document.getElementById(id==='v38-scroller'?'v38-tscroller':'v38-scroller');if(o&&Math.abs(o.scrollLeft-e.target.scrollLeft)>.5){v38SyncLock=1;o.scrollLeft=e.target.scrollLeft;setTimeout(()=>v38SyncLock=0,30)}}v38Btns()},true);
 
 // ---------- 설정 > 디지털 자료 규칙 ----------
-if(typeof v7Tabs!=='undefined')v7Tabs.push(['digitalrules','디지털 자료 규칙']);
+if(typeof v7Tabs!=='undefined')v7Tabs.push(['researchad','디지털 자료 규칙']);
 var v38Rules=null,v38RaStatus=null,v38RaFilter='';
 function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  const tbl=(cols,rows,lim=400)=>`<div class="v38-tw"><table class="v32-rn"><thead><tr>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rows.slice(0,lim).map(r=>`<tr>${cols.map(c=>`<td>${esc(String(r[c[0]]??''))}</td>`).join('')}</tr>`).join('')}</tbody></table>${rows.length>lim?`<small>앞 ${lim}줄만 보여요(전체 ${rows.length}줄)</small>`:''}</div>`;
@@ -161,9 +161,9 @@ function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  <section class="glass section">${header('index · 경쟁사 선별 규칙','업종(소)+브랜드 마다 포함 여부·품목(업종수정)·광고주명 수정·주요 경쟁을 정해요. 포함=O 인 브랜드만 디지털 광고비에 들어가요(품목이 없는 브랜드 광고는 \'브랜드\').')}
   <input type="search" id="v38-ra-filter" class="v38-filter" placeholder="광고주·브랜드·업종으로 찾기" value="${esc(v38RaFilter)}">${tbl([['industry_m','업종(중)'],['industry_s','업종(소)'],['advertiser','광고주'],['brand','브랜드'],['include','포함'],['category','업종수정(품목)'],['display','광고주명 수정'],['competitor','주요경쟁']],idx,300)}${paste('index')}</section>
  <section class="glass section">${header('매체 구분','유튜브·메타로 따로 보는 매체예요(나머지는 기타).')}${tbl([['media','매체'],['group','구분']],(R.media_groups||[]).filter(m=>m.group!=='기타'))}</section>`}
-if(typeof v7Draw==='function'){var v38BaseDraw=v7Draw;v7Draw=function(){if(v7Tab!=='digitalrules')return v38BaseDraw();
+if(typeof v7Draw==='function'){var v38BaseDraw=v7Draw;v7Draw=function(){if(v7Tab!=='researchad')return v38BaseDraw();
  $('#content').innerHTML=`<div class="v7-layout">${v7Menu()}<div class="v38-rules">${v38Rules?v38RulesView():empty('규칙을 불러오는 중이에요.')}</div></div>`;
- if(!v38Rules)Promise.all([api('/api/ra/rules'),api('/api/ra/status')]).then(([r,s])=>{v38Rules=r;v38RaStatus=s;if(v7Tab==='digitalrules'&&route==='settings')v7Draw()}).catch(e=>{const el=document.querySelector('.v38-rules');if(el)el.innerHTML=empty('디지털 자료 규칙을 불러오지 못했어요.',e.message)})}}
+ if(!v38Rules)Promise.all([api('/api/ra/rules'),api('/api/ra/status')]).then(([r,s])=>{v38Rules=r;v38RaStatus=s;if(v7Tab==='researchad'&&route==='settings')v7Draw()}).catch(e=>{const el=document.querySelector('.v38-rules');if(el)el.innerHTML=empty('디지털 자료 규칙을 불러오지 못했어요.',e.message)})}}
 document.addEventListener('input',e=>{if(e.target.id==='v38-ra-filter'){v38RaFilter=e.target.value;clearTimeout(window.__v38f);window.__v38f=setTimeout(()=>{const p=e.target.selectionStart;v7Draw();const i=document.getElementById('v38-ra-filter');if(i){i.focus();i.setSelectionRange(p,p)}},250)}});
 var V38_COLS={advertisers:['ra_name','nielsen','display','competitor','note'],industry_map:['industry_s','category','note'],index:['industry_m','industry_s','advertiser','brand','include','category','display','competitor']};
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-v38-save]');if(!b)return;const k=b.dataset.v38Save,ta=document.querySelector(`[data-v38-paste="${k}"]`);const lines=(ta.value||'').split(/\r?\n/).filter(l=>l.trim());
@@ -248,3 +248,20 @@ function v38PlaceCtrl(){const head=document.querySelector('main>header');if(!hea
  // 광고주 목록은 코웨이 먼저(전체·경쟁사 묶음 바로 다음)
  head.querySelectorAll('select').forEach(sel=>{if(!/adv/.test(sel.id))return;const o=[...sel.options].find(x=>x.value==='코웨이'||x.textContent.trim()==='코웨이');if(!o)return;const first=[...sel.options].find(x=>x.value&&!['all','competitors','코웨이'].includes(x.value)&&x!==o);if(first&&o.index>first.index)sel.insertBefore(o,first)})}
 new MutationObserver(()=>v38PlaceCtrl()).observe(document.querySelector('main>header')||document.body,{childList:true,subtree:true});
+
+// ---------- 신규 소재 모니터링: 소재 없는 날이 이어지면 'MM.DD~MM.DD 신규 소재 없음'으로 합치기 (11-05 14:35) ----------
+if(typeof v34DaySection==='function'){
+ function v38MD(d){return d.slice(5,7)+'.'+d.slice(8,10)}
+ function v38EmptyRun(run){// run: 최신→과거 순
+  const a=run[run.length-1],b=run[0],lab=run.length>1?`${v38MD(a)}~${v38MD(b)}`:v32DayLabel(a);
+  return `<section class="v34-day v38-empty" id="v34-d-${b}" data-v34-day="${b}">${run.slice(1).map(x=>`<span id="v34-d-${x}" data-v34-day="${x}" class="v38-anchor"></span>`).join('')}<div class="v34-day-head"><b>${lab}</b><span>신규 소재 없음</span></div></section>`}
+ v32View=function(d){
+  const items=v32Items(),by={};items.forEach(x=>(by[x.day]=by[x.day]||[]).push(x));
+  const out=[];let run=[];
+  const flush=()=>{if(run.length){out.push(v38EmptyRun(run));run=[]}};
+  for(const x of d.days||[]){if((by[x.day]||[]).length){flush();out.push(v34DaySection(x.day,by[x.day]))}else run.push(x.day)}
+  flush();
+  return `<p class="v32-note v34-note">AdCreative에 새로 올라온 소재만 방송일 기준 일자별로 보여 줘요(최근 ${d.period_days||60}일). 품목·광고주로 걸러 볼 수 있어요(코웨이 먼저). 소재가 없는 날이 이어지면 한 줄로 합쳐 보여 줘요.</p>
+   ${out.join('')}
+   <p class="footnote v32-foot">매체(채널)·길이·메시지/스타일은 AdCreative 표기 그대로 · 한 소재에 길이가 다른 영상이 있으면 따로 표시 · 아덱스 집행액·캠페인과는 연결하지 않음 · YouTube 카드는 경쟁사 공식 채널에 그날 올라온 조회수 ${v32Num(d.config.yt_min_views)}회 이상 영상(TV 소재와 따로) · 카드에 마우스를 올리면 영상이 재생돼요.</p>`};
+}

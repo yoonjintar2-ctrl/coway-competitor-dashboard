@@ -57,3 +57,21 @@ dialog.v39-evdialog{width:min(460px,92vw)}
 .v39-med i{height:8px;border-radius:6px;background:#eef3f6;overflow:hidden}.v39-med b{display:block;height:100%;background:linear-gradient(90deg,#7cc2e3,#25a4dc);border-radius:6px}.v39-med em{font-style:normal;font-weight:800;color:#1d3447;text-align:right}
 .v39-evimg.sb{max-height:none;object-fit:contain;background:#f3f6f8}
 dialog.v39-evdialog{width:min(560px,94vw)}
+/* 열(주) 강조: 그 주 막대는 커지고 나머지는 흐리게 */
+#v39-svg>.v39-c,#v39-svg #v39-today,#v39-svg .v39-evs{transition:opacity .2s ease}
+#v39-svg.v39-ready .v39-evp{transition:opacity .2s ease!important;transition-delay:0s!important}
+#v39-svg.v39-col>.v39-c,#v39-svg.v39-col #v39-today{opacity:.14}
+#v39-svg.v39-col .v39-evs,#v39-svg.v39-col .v39-evp{opacity:.18}
+#v39-hot{pointer-events:none}
+#v39-hot .v39-c{transform-box:fill-box;transform-origin:50% 100%;transform:scale(1);transition:transform .24s cubic-bezier(.2,.8,.3,1.15)}
+#v39-hot.on .v39-c{transform:scale(1.32);filter:drop-shadow(0 5px 6px rgba(20,60,90,.18))}
+.v39-tip.wk{width:auto;min-width:236px}
+.v39-tip table{border-collapse:collapse;width:100%;font-size:11.5px;margin-top:2px}
+.v39-tip th{font-weight:700;color:#8a9aa6;font-size:10.5px;text-align:right;padding:0 0 3px 12px}
+.v39-tip td{padding:2px 0 2px 12px;text-align:right;color:#1d3447;font-weight:700;white-space:nowrap}
+.v39-tip td:first-child,.v39-tip th:first-child{text-align:left;padding-left:0;color:#55697a;font-weight:800}
+.v39-tip td small{color:#9aa7b1;font-weight:600;margin-left:2px}
+.v39-tip tr.on td{background:#eef6fb;color:#0d6f9c}.v39-tip tr.on td:first-child{border-radius:6px 0 0 6px;padding-left:5px}.v39-tip tr.on td:last-child{border-radius:0 6px 6px 0;padding-right:5px}
+.v39-tip tr.fut td{color:#b7c2ca}
+.v39-tip tfoot td{border-top:1px solid #eef3f6;padding-top:4px;color:#102b45;font-weight:900}
+.v39-ch .v39-kw{margin:4px 0 0;font-size:12px;color:#7d8f9b;font-weight:500}

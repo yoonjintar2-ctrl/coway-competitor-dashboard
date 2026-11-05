@@ -70,11 +70,11 @@ function v39Build(m){
   if(mm>1)s+=`<line x1="${xa}" x2="${xa}" y1="${ya+4}" y2="${ya+T-4}" stroke="#b5c3ce" stroke-width="1"/>`;
   s+=`<text x="${xm}" y="${ya+T/2+4.2}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${fut?'#a9b6c0':'#566b7b'}">${mm}월</text>`}
  // 요일: 팔레트 양쪽 여백에 누운 글자
- WK.forEach((t,r)=>{const tt=(6-r)+.2;s+=`<text transform="${lie(-20,tt)}" text-anchor="end" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text><text transform="${lie(NCOL*CW-pad+16,tt)}" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text>`});
+ WK.forEach((t,r)=>{const tt=r+.2;s+=`<text transform="${lie(-20,tt)}" text-anchor="end" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text><text transform="${lie(NCOL*CW-pad+16,tt)}" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text>`});
  // 이슈: 풍선 자리
  const zoneTop=4,zoneBot=OY+7*DY-hk-26,lanes=Math.max(2,Math.min(8,Math.floor((zoneBot-zoneTop)/34))),LH=(zoneBot-zoneTop-26)/Math.max(1,lanes-1);
  const used=Array.from({length:lanes},()=>[]);let bal='';const pins={};
- const cellXY=(i,r)=>{const [x,y]=F(col(i)*CW,6-r);return [x,y]};
+ const cellXY=(i,r)=>{const [x,y]=F(col(i)*CW,r);return [x,y]};  // 월요일이 앞(가까운 쪽), 일요일이 맨 뒤(위)
  m.ev.forEach((e,k)=>{const i=m.days.indexOf(e.d);if(i<0)return;const r=wd(e.d),[x,y]=cellXY(i,r),live=src.q[e.d]!=null||(src.s[e.d]||0)>0,h=live?Hh(src.s[e.d]||0):0,ax=x+cw/2+dx/2,ay=y+dy/2-h;
   const [lab]=V39_EVT[e.type]||['이슈'];const txt=v39Short((v39Adv?'':(e.adv||'')+' ')+(e.title||''),v39Adv?13:15),w=Math.min(210,26+lab.length*10.5+txt.length*11.2+14);
   let bx=Math.max(4,Math.min(W-w-4,ax-w/2)),lane=-1,best=1e9;for(let L=0;L<lanes;L++){if(!used[L].every(([a,b])=>bx+w<a-6||bx>b+6))continue;const sc=used[L].length*10+Math.abs(L-((k*3)%lanes));if(sc<best){best=sc;lane=L}}if(lane<0)return;used[lane].push([bx,bx+w]);
@@ -82,15 +82,15 @@ function v39Build(m){
   // 선·닿는 점은 그 막대 바로 뒤에 그려서 앞 막대에 가려지게
   (pins[e.d]=pins[e.d]||[]).push(`<g class="v39-evp" data-v39-ev="${k}" style="transition-delay:${dl}s"><line class="v39-evl" x1="${ax}" x2="${ax}" y1="${ly}" y2="${ay}" stroke="#8a96a0" stroke-opacity=".26" stroke-width="1.1" style="stroke-dasharray:${len};stroke-dashoffset:${len};transition-delay:${dl}s"/><circle r="4.2" transform="matrix(1,0,${(DX*.05).toFixed(3)},${(DY*.05).toFixed(3)},${ax},${ay})" fill="#8a96a0" fill-opacity=".3"/></g>`);
   bal+=`<g class="v39-ev" data-v39-ev="${k}" style="transition-delay:${dl}s"><rect x="${bx}" y="${by}" width="${w}" height="26" rx="13" fill="rgba(255,255,255,.8)" stroke="rgba(200,212,222,.8)" stroke-width=".8"/><circle cx="${bx+13}" cy="${by+13}" r="3.6" fill="${mc}"/><text x="${bx+22}" y="${by+17.2}" font-size="10.5" font-weight="700" fill="#9aa5ae">${lab}</text><text x="${bx+26+lab.length*10}" y="${by+17.2}" font-size="11" font-weight="600" fill="#6b7782">${esc(txt)}</text></g>`});
- const order=m.days.map((x,i)=>({x,i,r:wd(x)})).sort((a,b)=>(a.r-b.r)||(a.i-b.i));
+ const order=m.days.map((x,i)=>({x,i,r:wd(x)})).sort((a,b)=>(b.r-a.r)||(a.i-b.i));
  for(const o of order){const [x,y]=cellXY(o.i,o.r),q=src.q[o.x],sp=src.s[o.x]||0,fut=o.x>m.today,live=!fut&&(q!=null||sp>0),hq=q!=null,p=hq?pct(q):0;
-  const c={d:o.x,x,y,live,q,sp,h:live?Hh(sp):0,top:!live?V39_FLAT[0]:hq?v39ColP(p,1.07):V39_NQ[0],front:!live?V39_FLAT[0]:hq?v39ColP(p,.82):V39_NQ[1],side:!live?V39_FLAT[0]:hq?v39ColP(p,.66):V39_NQ[2]};
+  const c={d:o.x,x,y,col:col(o.i),r:o.r,live,q,sp,h:live?Hh(sp):0,top:!live?V39_FLAT[0]:hq?v39ColP(p,1.07):V39_NQ[0],front:!live?V39_FLAT[0]:hq?v39ColP(p,.82):V39_NQ[1],side:!live?V39_FLAT[0]:hq?v39ColP(p,.66):V39_NQ[2]};
   c.idx=cells.length;cells.push(c);s+=live?`<g class="v39-c" data-i="${c.idx}"><path/><path/><path/><path class="hl" fill="url(#v39hl)"/></g>`:`<g class="v39-c flat" data-i="${c.idx}"><path d="M${x},${y} L${x+cw},${y} L${x+cw+dx},${y+dy} L${x+dx},${y+dy}Z" fill="${o.x===m.today?'#25a4dc':'#e3e9ee'}"/></g>`;
   if(pins[o.x])s+=pins[o.x].join('')}
  const label=v39Adv||`${v39Cat||'전체'} 업종 전체`,kw=v39Adv?((v39D.keywords||{})[v39Adv]||[]).join('·')||'검색 키워드 없음':`${m.n}개사 합계`;
- stick+=`<text x="10" y="${OY+7*DY-hk*.62-4}" font-size="14" font-weight="900" fill="#102b45" stroke="#f6f9fb" stroke-width="4" paint-order="stroke">${esc(label)}<tspan dx="8" font-size="11" font-weight="500" fill="#7d8f9b">${esc(kw)}</tspan></text>`;
+ // 이름·키워드는 그래프를 가리지 않게 카드 제목 아래로(2026-11-05)
  s+=`<g id="v39-today"></g><g class="v39-evs">${bal}</g>`;
- return {svg:s,stick,cells,W,H,cw,dx,dy,OY}}
+ return {svg:s,stick,cells,W,H,cw,dx,dy,OY,label,kw}}
 function v39Paint(el,c,p){if(!c.live)return;const h=c.h*p,{x,y}=c,{cw,dx,dy}=v39Last;const ps=el.children;
  const mix=k=>v39Rgb(v39Mix(V39_FLAT[0],[c.top,c.front,c.side][k],p));
  ps[0].setAttribute('d',`M${x},${y} L${x+cw},${y} L${x+cw},${y-h} L${x},${y-h} Z`);ps[0].setAttribute('fill',mix(1));
@@ -118,24 +118,24 @@ function v39Legend(){const g=[0,.15,.3,.4,.5,.6,.7,.78,.88,1].map(p=>v39Rgb(v39C
 function v39View(){const d=v39D,m=v39Model(d);
  if(!m.me)return `<section class="glass section">${empty(`${v39Adv} · ${v39Cat||'전체'} ${d.year}년 자료가 없어요.`,'다른 품목이나 연도를 골라 보세요.')}</section>`;
  const b=v39Build(m);v39Last={...b,today:m.today,m};
- return `<section class="glass section v39-card"><div class="v39-ch"><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2>
+ return `<section class="glass section v39-card"><div class="v39-ch"><div><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2><p class="v39-kw">${v39Adv?'검색 키워드 · ':''}${esc(b.kw)}</p></div>
   <div class="v39-icons">${v39Years()}<button type="button" class="v39-ic" data-v39-png title="이미지로 저장(1월~12월 전체)" aria-label="이미지로 저장">${V39_IMG}</button><button type="button" class="v39-ic" data-v39-xls title="엑셀 원본 내려받기" aria-label="엑셀 원본 내려받기">${V39_XLS}</button></div></div>
   <div class="v39-vp"><div class="v39-sc" id="v39-sc"><svg id="v39-svg" width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}">${b.svg}</svg></div>
   <svg class="v39-stick" width="360" height="${b.H}">${b.stick}</svg>
   <button type="button" class="v39-arr l" data-v39-scroll="-1" aria-label="이전">‹</button><button type="button" class="v39-arr r" data-v39-scroll="1" aria-label="다음">›</button><div class="v39-tip" id="v39-tip" hidden></div></div>
   <div class="v39-below">${v39Legend()}<p class="footnote">칸 = 하루 · 색 = 네이버 검색수 순위(그해 기준) · 높이 = 그날 광고비 · 풍선 = 캠페인 시작·신규 소재·주요 기사(누르면 자세히) · 좌우로 넘겨 1월~12월</p>
   <p class="footnote">${esc(d.note||'')}${v39Adv?'':' · 업종 전체는 같은 품목 경쟁사(인덱스 경쟁사=O)와 코웨이의 합계'}</p></div></section>`}
-function v39Animate(full){const b=v39Last;if(!b)return;const els=[...document.querySelectorAll('#v39-svg .v39-c')];const id=++v39Anim;const N=b.cells.length;
+function v39Animate(full){const b=v39Last;if(!b)return;v39Hot(null);const els=[...document.querySelectorAll('#v39-svg>.v39-c')];const id=++v39Anim;const N=b.cells.length;
  const ncol=Math.max(...b.cells.map(c=>c.x));const t0=performance.now(),D0=650,DUR=750;
  const ease=t=>1-Math.pow(1-t,3);
  const frame=now=>{if(id!==v39Anim)return;let done=true;for(let k=0;k<N;k++){const c=b.cells[k];const delay=(c.x/ncol)*D0;let p=full?1:Math.max(0,Math.min(1,(now-t0-delay)/DUR));if(p<1)done=false;v39Paint(els[k],c,ease(p))}
   if(!done)requestAnimationFrame(frame);else{const t=document.getElementById('v39-today');if(t)t.innerHTML=v39Today()}};
- const sv=document.getElementById('v39-svg');if(sv){sv.classList.remove('v39-on');if(full)sv.classList.add('v39-on','v39-now');else setTimeout(()=>{if(id===v39Anim)sv.classList.add('v39-on')},D0*.6)}
+ const sv=document.getElementById('v39-svg');if(sv){sv.classList.remove('v39-on');if(full)sv.classList.add('v39-on','v39-now');else setTimeout(()=>{if(id===v39Anim)sv.classList.add('v39-on')},D0*.6);setTimeout(()=>{if(id===v39Anim)sv.classList.add('v39-ready')},full?0:D0*.6+1900)}
  if(full){frame(performance.now()+1e6)}else{b.cells.forEach((c,k)=>v39Paint(els[k],c,0));requestAnimationFrame(frame)}}
 function v39Scroll0(){const sc=document.getElementById('v39-sc'),b=v39Last;if(!sc||!b)return;const c=b.cells.find(z=>z.d===b.today);
  sc.scrollLeft=c?Math.max(0,c.x-sc.clientWidth*.72):(b.m.Y<new Date().getFullYear()?0:sc.scrollWidth);v39Arrows()}
 function v39Arrows(){const sc=document.getElementById('v39-sc');if(!sc)return;document.querySelectorAll('[data-v39-scroll]').forEach(btn=>{const dir=+btn.dataset.v39Scroll;btn.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
-function v39Draw(anim){$('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';v39Controls(true);$('#content').innerHTML=v39View();v39Scroll0();v39Animate(!anim);
+function v39Draw(anim){v39HotCol=null;$('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';v39Controls(true);$('#content').innerHTML=v39View();v39Scroll0();v39Animate(!anim);
  const sc=document.getElementById('v39-sc');if(sc)sc.addEventListener('scroll',()=>{v39Arrows();const t=document.getElementById('v39-tip');if(t)t.hidden=true},{passive:true})}
 
 var v39BaseRender=render;
@@ -162,17 +162,30 @@ document.addEventListener('click',e=>{
  if(e.target.closest&&e.target.closest('[data-v39-png]')){v39Png();return}
  if(e.target.closest&&e.target.closest('[data-v39-xls]')){v39XlsDown();return}});
 
-// 마우스를 올리면 그날 값
-document.addEventListener('pointermove',e=>{if(route!=='heatmap'||!v39Last)return;const tip=document.getElementById('v39-tip');if(!tip)return;const g=e.target.closest&&e.target.closest('#v39-svg .v39-c');
- if(!g){tip.hidden=true;return}const c=v39Last.cells[+g.dataset.i];if(!c||c.d>v39Last.today){tip.hidden=true;return}
- const m=v39Last.m,fm=v=>v?v38Money(v):'집행 없음',n=v=>v==null?'자료 없음':Math.round(v).toLocaleString()+'회',wk='일월화수목금토'[new Date(c.d+'T00:00:00').getDay()];
- const evs=m.ev.filter(z=>z.d===c.d);
- tip.innerHTML=`<b>${c.d.replaceAll('-','.')} (${wk})</b><div class="r"><span>네이버 검색</span><i>${n(m.me.q[c.d])}</i></div><div class="r"><span>광고비</span><i>${fm(m.me.s[c.d])}</i></div>${evs.map(z=>`<div class="e"><em style="color:${(V39_EVT[z.type]||[])[1]}">${(V39_EVT[z.type]||['이슈'])[0]}</em>${esc(v39Short((v39Adv?'':(z.adv||'')+' ')+z.title,22))}</div>`).join('')}`;
- tip.hidden=false;const vp=tip.parentElement.getBoundingClientRect();let x=e.clientX-vp.left+16,yy=e.clientY-vp.top-tip.offsetHeight-12;if(x+tip.offsetWidth>vp.width-8)x=e.clientX-vp.left-tip.offsetWidth-16;if(yy<0)yy=e.clientY-vp.top+18;tip.style.left=x+'px';tip.style.top=yy+'px'},{passive:true});
+// 마우스를 올리면 그 주(열) 막대 7개를 키우고 나머지는 흐리게 + 그 주 값을 한눈에
+var v39HotCol=null,v39HotT=0;
+function v39Hot(col){const sv=document.getElementById('v39-svg');if(!sv||!v39Last){v39HotCol=null;return}if(col===v39HotCol)return;v39HotCol=col;let ov=document.getElementById('v39-hot');
+ if(col==null){sv.classList.remove('v39-col');if(ov)ov.remove();return}
+ if(!ov){ov=document.createElementNS('http://www.w3.org/2000/svg','g');ov.id='v39-hot';sv.insertBefore(ov,sv.querySelector('.v39-evs'))}
+ ov.classList.remove('on');ov.textContent='';const els=sv.querySelectorAll(':scope>.v39-c');
+ v39Last.cells.forEach((c,k)=>{if(c.col===col&&c.d<=v39Last.today){const n=els[k].cloneNode(true);n.removeAttribute('data-i');n.classList.add('hot');ov.appendChild(n)}});
+ if(v39Last.cells.some(c=>c.col===col&&c.d===v39Last.today)){const t=document.getElementById('v39-today');if(t&&t.firstChild){const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','v39-c hot');g.innerHTML=t.innerHTML;ov.appendChild(g)}}
+ sv.classList.add('v39-col');ov.getBoundingClientRect();ov.classList.add('on')}
+document.addEventListener('pointermove',e=>{if(route!=='heatmap'||!v39Last)return;const tip=document.getElementById('v39-tip');if(!tip)return;const g=e.target.closest&&e.target.closest('#v39-svg>.v39-c');
+ const off=()=>{clearTimeout(v39HotT);v39HotT=setTimeout(()=>{tip.hidden=true;v39Hot(null)},140)};
+ if(!g){off();return}const c=v39Last.cells[+g.dataset.i];if(!c||c.d>v39Last.today){off();return}clearTimeout(v39HotT);v39Hot(c.col);
+ const m=v39Last.m,fm=v=>v?v38Money(v):'-',n=v=>v==null?'-':Math.round(v).toLocaleString(),WK='일월화수목금토';
+ const wk=v39Last.cells.filter(z=>z.col===c.col).sort((a,b)=>a.d<b.d?-1:1),d0=wk[0].d,d1=wk[wk.length-1].d;
+ const evs=m.ev.filter(z=>z.d>=d0&&z.d<=d1);
+ const rows=wk.map(z=>{const fut=z.d>v39Last.today;return `<tr class="${z.d===c.d?'on':''}${fut?' fut':''}"><td>${WK[new Date(z.d+'T00:00:00').getDay()]} <small>${z.d.slice(5).replace('-','.')}</small></td><td>${fut?'':n(m.me.q[z.d])}</td><td>${fut?'':fm(m.me.s[z.d])}</td></tr>`}).join('');
+ const sq=wk.reduce((a,z)=>a+(m.me.q[z.d]||0),0),ss=wk.reduce((a,z)=>a+(m.me.s[z.d]||0),0);
+ tip.classList.add('wk');
+ tip.innerHTML=`<b>${d0.slice(5).replace('-','.')} ~ ${d1.slice(5).replace('-','.')} 한 주</b><table><thead><tr><th></th><th>네이버 검색</th><th>광고비</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td>${n(sq)}</td><td>${fm(ss)}</td></tr></tfoot></table>${evs.map(z=>`<div class="e"><em style="color:${(V39_EVT[z.type]||[])[1]}">${(V39_EVT[z.type]||['이슈'])[0]}</em>${esc(v39Short((v39Adv?'':(z.adv||'')+' ')+z.title,22))}</div>`).join('')}`;
+ tip.hidden=false;const vp=tip.parentElement.getBoundingClientRect();let x=e.clientX-vp.left+22,yy=e.clientY-vp.top-tip.offsetHeight-16;if(x+tip.offsetWidth>vp.width-8)x=e.clientX-vp.left-tip.offsetWidth-22;if(yy<0)yy=e.clientY-vp.top+20;tip.style.left=x+'px';tip.style.top=yy+'px'},{passive:true});
 
 // 이미지(PNG): 1월~12월 전체, 왼쪽 이름표·요일 포함
-async function v39Png(){const svg=document.getElementById('v39-svg'),st=document.querySelector('.v39-stick');if(!svg||!v39Last)return;v39Animate(true);
- const b=v39Last,head=58,W=b.W,H=b.H+head+14;const title=`${v39Adv||((v39Cat||'전체')+' 업종 전체')} — ${v39D.year}년 연간 히트맵`;
+async function v39Png(){const svg=document.getElementById('v39-svg'),st=document.querySelector('.v39-stick');if(!svg||!v39Last)return;v39Animate(true);v39Hot(null);
+ const b=v39Last,head=58,W=b.W,H=b.H+head+14;const title=`${v39Adv||((v39Cat||'전체')+' 업종 전체')} — ${v39D.year}년 연간 히트맵`+(v39Adv&&b.kw?` · ${b.kw}`:'');
  const stick=[...st.querySelectorAll('text')].map(t=>t.outerHTML).join('');
  const xml=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif"><rect width="${W}" height="${H}" fill="#f6f9fb"/><text x="12" y="34" font-size="20" font-weight="900" fill="#102b45">${esc(title)}</text><text x="12" y="54" font-size="12" fill="#6b7c88">칸 = 하루 · 색 = 네이버 검색수 순위(그해 기준) · 높이 = 그날 광고비 · 코웨이 경쟁사 분석 플랫폼</text><g transform="translate(0,${head})">${svg.innerHTML}${stick}</g></svg>`;
  const img=new Image();img.onload=()=>{const k=2,cv=document.createElement('canvas');cv.width=W*k;cv.height=H*k;const ctx=cv.getContext('2d');ctx.scale(k,k);ctx.drawImage(img,0,0);

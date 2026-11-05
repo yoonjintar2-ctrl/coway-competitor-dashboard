@@ -157,3 +157,8 @@ html.nd .glass.v38-card,.glass.v38-card{background:none!important;background-ima
 .v34-day.v38-empty .v34-day-head{opacity:.72}
 .v34-day.v38-empty .v34-day-head span{color:#98a3ad}
 .v38-anchor{display:block;height:0}
+/* 뉴스 클리핑: 광고주 캡슐을 품목 캡슐과 비슷한 밝기로(광고주 색은 옅은 바탕·글씨로만) (11-05 15:02) */
+.v37-chip.adv{background:color-mix(in srgb,var(--c) 13%,#fff)!important;color:color-mix(in srgb,var(--c) 78%,#1c2733)!important;border:1px solid color-mix(in srgb,var(--c) 26%,#fff)!important}
+/* 캠페인 분석 하단 월별 매체 광고비: '월 합계' 행 배경 조금 더 진하게, 첫 열·12개월 합계 열까지 모든 열 같은 색 (11-05 15:05) */
+.v38-amp tfoot{background:none!important}
+.v38-amp tfoot th,.v38-amp tfoot td,.v38-amp tfoot .v4-total-col{background:#d6e6ef!important;color:#1f4a62!important;font-weight:700}

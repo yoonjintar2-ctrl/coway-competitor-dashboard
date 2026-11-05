@@ -47,7 +47,7 @@ function v38View(d){
  Q.forEach((v,i)=>{if(v==null||!TOT[i])return;const lim=QYP(v)+19+21;if(lim>BAR_TOP)RAW=Math.max(RAW,TOT[i]*BAR_H/Math.max(8,BASE-lim))});
  const YST=[5e9,2e9,1e9,5e8,2e8,1e8,5e7,2e7,1e7].find(k=>RAW/k>=3)||1e7,mx=RAW,sy=v=>BASE-v/mx*BAR_H;
  const top=(x,w,y)=>`M${x},${BASE} V${y} H${x+w} V${BASE} Z`;
- let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3acb4" stop-opacity=".22"/><stop offset="1" stop-color="#a3acb4" stop-opacity=".09"/></linearGradient>
+ let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3acb4" stop-opacity=".26"/><stop offset="1" stop-color="#a3acb4" stop-opacity=".2"/></linearGradient>
   <linearGradient id="v38-yoy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3bcc4" stop-opacity=".36"/><stop offset="1" stop-color="#d9dfe3" stop-opacity=".26"/></linearGradient>
   <pattern id="v38-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#25a4dc" stroke-width="1.4" stroke-opacity=".06"/></pattern>
   <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".13"/></pattern>
@@ -73,10 +73,11 @@ function v38View(d){
   cp.flat().forEach(([px,py,v,i])=>{const part=M[i]===CUR||QD[i]<v38Days(M[i]);const [n,u]=v38K(v);s+=`<g class="v38-q" data-v38-i="${i}"><circle cx="${px}" cy="${py}" r="15.5" fill="#fff" stroke="${V38_G}" stroke-width="5"${part?' stroke-opacity=".32"':''}/><text x="${px}" y="${py+3.6}" text-anchor="middle" fill="${V38_G}"${part?' fill-opacity=".55"':''}><tspan font-size="${n.length>=3?9.5:10.5}" font-weight="900">${n}</tspan><tspan font-size="8" font-weight="500" dx=".3">${u}</tspan></text></g>`});
   fl.forEach(p=>QP[p[3]]=p[1]);CAP=fl.find(p=>p[3]>=VIS0)||null}
  // 경쟁사 평균(영역)
+ let v38AvgLab='';
  const ap=M.map((m,i)=>[X(i),sy(AVG[i])]);if(AVG.some(v=>v)){const ext=[[0,ap[0][1]],...ap,[PW,ap.at(-1)[1]]];s+=`<path d="${v38Smooth(ext)} L${PW},${BASE} L0,${BASE} Z" fill="url(#v38-avg)"/>`;
   // 영역 안 이름표: 보이는 구간에서 영역이 가장 높은 달 사이(막대 사이 빈칸)에 흰색 굵은 글씨 (11-05 15:24)
   let bi=-1,bh=0;for(let i=Math.max(VIS0,0);i<N-1;i++){const h=BASE-Math.max(sy(AVG[i]||0),sy(AVG[i+1]||0));if(h>bh){bh=h;bi=i}}
-  if(bi>=0&&bh>=20)s+=`<text x="${slot*(bi+1)}" y="${BASE-9}" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="#9aa5ae" stroke-opacity=".28" stroke-width="2" paint-order="stroke" class="v38-avglab">경쟁사 평균</text>`}
+  if(bi>=0&&bh>=20)v38AvgLab=`<text x="${((X(bi)+6+bw/2)+(X(bi+1)-bw*.2-ybw/2))/2}" y="${BASE-9}" text-anchor="middle" font-size="10" font-weight="800" fill="#fff" stroke="#8f9aa4" stroke-opacity=".4" stroke-width="2.2" paint-order="stroke" class="v38-avglab">경쟁사 평균</text>`}
  // 전년 막대(회색 한 톤) + 올해 막대 위 모서리와 잇는 옅은 선
  M.forEach((m,i)=>{const yv=YOY[i];if(!yv)return;const x=YX(i)-ybw/2,y=sy(yv);s+=`<path d="${top(x,ybw,y)}" fill="url(#v38-yoyh)"/>`;
   });  // 전년 막대와 올해 막대 잇는 선은 없앰 (11-05 15:24)
@@ -90,6 +91,7 @@ function v38View(d){
  M.forEach((m,i)=>{const cur=m===CUR,col=cur?'#1a8cc2':'#5d6a76';s+=`<text x="${X(i)}" y="${BASE+16}" text-anchor="middle" font-size="12" font-weight="${cur?800:700}" fill="${col}">${+m.slice(5)}월</text><text x="${X(i)}" y="${BASE+29}" text-anchor="middle" font-size="10" font-weight="500" fill="${cur?'#1a8cc2':'#9aa6b1'}">${m.slice(2,4)}년</text>`+(cur?`<rect x="${X(i)-28}" y="${BASE+35}" width="56" height="15" rx="7.5" fill="#e3f3fb"/><text x="${X(i)}" y="${BASE+45.5}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a8cc2">수집 중 · ${d.current_day}일</text>`:'')});
  const H=BASE+54;
  // 고정 Y축(10억 단위)·이름 캡슐
+ s+=v38AvgLab;  // 경쟁사 평균 이름표는 막대 위에(가리지 않게)
  let yl='';for(let v=0;v<=mx+1;v+=YST){const y=sy(v);if(y<BAR_TOP+38)continue;yl+=`<text x="${GUT-12}" y="${y+4}" text-anchor="end" font-size="10" fill="#a3b0ba">${v?(+(v/1e8).toFixed(1))+'억':'0'}</text>`}
  let cap='';if(CAP){const x1=GUT+slot/2-23,tw=Math.min(72,x1-4),x0=x1-tw;cap=`<g id="v38-cap" data-y="${CAP[1]}" style="transition:transform .28s ease"><rect x="${x0}" y="${CAP[1]-10}" width="${tw}" height="20" rx="10" fill="${V38_G}"/><text x="${x0+tw/2}" y="${CAP[1]+3.8}" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">네이버 쿼리</text></g>`}
  // 표(대분류) + 게시물(유튜브·인스타 세로)

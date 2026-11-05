@@ -33,7 +33,7 @@ function v39Hsl(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),
 function v39ColP(p,f=1){p=Math.max(0,Math.min(1,p));let i=0;while(i<V39_PS.length-2&&p>V39_PS[i+1][0])i++;const A=V39_PS[i],B=V39_PS[i+1],u=(p-A[0])/(B[0]-A[0]);const [h,s,l,al]=[1,2,3,4].map(j=>A[j]+(B[j]-A[j])*u);
  return v39Hsl(h,s,l*(.55+.45*f)).map((x,k)=>Math.round(x*al+V39_BG[k]*(1-al)*(.8+.2*f)))}
 const V39_FLAT=[[227,233,238],[211,220,227],[200,210,218]];  // 윗면·앞면·옆면(평평한 회색)
-const V39_V={CW:27,DX:10,DY:-21,pad:3.4,h0:3,hk:46,OX:62};
+const V39_V={CW:27,DX:9,DY:-18,pad:3.4,h0:3,hk:46,OX:64,ML:46,MR:46,T:18};  // 경사 조금 더 눕힘 · 팔레트 여백·두께
 function v39Rgb(c){return `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`}
 function v39Mix(a,b,p){return [a[0]+(b[0]-a[0])*p,a[1]+(b[1]-a[1])*p,a[2]+(b[2]-a[2])*p]}
 
@@ -49,82 +49,89 @@ function v39Short(t,n){t=String(t||'').replace(/\s+/g,' ').trim();return t.lengt
 const V39_EVT={camp:['캠페인','#25a4dc'],creative:['신규 소재','#f08a3c'],news:['기사','#7d8a96']};
 const V39_EVM={camp:'#9fc3d6',creative:'#dcb89a',news:'#b3bbc2'};  // 풍선 점: 옅은 색(히트맵이 주인공)
 function v39Build(m){
- const {CW,DX,DY,pad,h0,hk,OX}=V39_V,cw=CW-pad,dx=DX*.86,dy=DY*.86;
+ const {CW,DX,DY,pad,h0,hk,OX,ML,MR,T}=V39_V,cw=CW-pad,dx=DX*.86,dy=DY*.86;
  const wd=x=>(new Date(x+'T00:00:00').getDay()+6)%7,wd0=wd(m.days[0]),col=i=>Math.floor((i+wd0)/7),NCOL=col(m.days.length-1)+1;
- const H=Math.max(400,Math.min(780,(window.innerHeight||900)-372)),OY=H-52,W=OX+NCOL*CW+7*DX+44;
+ const H=Math.max(400,Math.min(780,(window.innerHeight||900)-330)),OY=H-T-14,W=OX+NCOL*CW+MR+8*DX+20;
  const Hh=v=>h0+Math.sqrt(Math.min(1,(v||0)/m.smax))*hk;
- let s=`<defs><linearGradient id="v39bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".55" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity=".95"/></linearGradient><filter id="v39sh" x="-5%" y="-30%" width="110%" height="160%"><feGaussianBlur stdDeviation="9"/></filter><filter id="v39glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3"/></filter><filter id="v39bs" x="-20%" y="-40%" width="140%" height="200%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#14405a" flood-opacity=".14"/></filter></defs>`,stick='';
- const cells=[];const WK=['월','화','수','목','금','토','일'],src=m.me;
+ const F=(u,t)=>[OX+u+t*DX,OY+t*DY];  // 팔레트 윗면 좌표(u: 가로 px, t: 줄 깊이)
+ const lie=(u,t,k=.052)=>`matrix(1,0,${(-DX*k).toFixed(3)},${(-DY*k).toFixed(3)},${F(u,t)})`;  // 바닥에 누운 글자
+ let s=`<defs><filter id="v39sh" x="-5%" y="-40%" width="110%" height="180%"><feGaussianBlur stdDeviation="10"/></filter><linearGradient id="v39pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef3f7"/><stop offset="1" stop-color="#dfe7ee"/></linearGradient><linearGradient id="v39hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>`,stick='';
+ const cells=[],src=m.me,WK=['월','화','수','목','금','토','일'];
  const sorted=m.days.filter(x=>x<=m.today).map(x=>src.q[x]).filter(v=>v!=null).sort((a,b)=>a-b);
  const pct=v=>{let a=0,b=sorted.length;while(a<b){const k=(a+b)>>1;if(sorted[k]<v)a=k+1;else b=k}return sorted.length>1?a/(sorted.length-1):.5};
- const P=(i,r)=>[OX+col(i)*CW+(6-r)*DX,OY+(6-r)*DY];
- {const a=[OX-4,OY+8],b=[OX+NCOL*CW-pad+4,OY+8],c=[b[0]+7*DX,OY+8+7*DY],e=[a[0]+7*DX,OY+8+7*DY];
-  s+=`<rect x="0" y="0" width="${W}" height="${H}" fill="url(#v39bg)"/><path d="M${a} L${b} L${c} L${e} Z" fill="rgba(20,60,90,.12)" filter="url(#v39sh)"/><path d="M${a} L${b} L${c} L${e} Z" fill="rgba(255,255,255,.82)" stroke="rgba(200,216,228,.9)"/>`}
- // 이슈 풍선 자리(막대 윗면 가운데에서 위로 선)
- const zoneTop=6,zoneBot=OY+7*DY-hk-30,lanes=Math.max(2,Math.min(8,Math.floor((zoneBot-zoneTop)/34))),LH=(zoneBot-zoneTop-26)/Math.max(1,lanes-1);
- const used=Array.from({length:lanes},()=>[]);let evs='';const evcells=[];
- const byDay={};m.ev.forEach((e,k)=>{(byDay[e.d]=byDay[e.d]||[]).push(k)});
- m.ev.forEach((e,k)=>{const i=m.days.indexOf(e.d);if(i<0)return;const [x,y]=P(i,wd(e.d));const h=Hh(src.s[e.d]||0),ax=x+cw/2+dx/2,ay=y+dy/2-h;
-  const [lab,color]=V39_EVT[e.type]||['이슈','#7d8a96'];const txt=v39Short((v39Adv?'':(e.adv||'')+' ')+(e.title||''),v39Adv?13:15),w=Math.min(210,26+lab.length*10.5+txt.length*11.2+14);
-  let bx=ax-w/2;bx=Math.max(4,Math.min(W-w-4,bx));let lane=-1,best=1e9;for(let L=0;L<lanes;L++){if(!used[L].every(([a,b])=>bx+w<a-6||bx>b+6))continue;const sc=used[L].length*10+Math.abs(L-((k*3)%lanes));if(sc<best){best=sc;lane=L}}if(lane<0)return;used[lane].push([bx,bx+w]);
-  const by=zoneTop+lane*LH,ly=by+26,len=Math.max(4,ay-ly);
-  evcells.push({k,i});
-  const mc=V39_EVM[e.type]||'#b3bbc2',ex=4.2,ey=1.9;
-  evs+=`<g class="v39-ev" data-v39-ev="${k}" style="transition-delay:${(.15+ax/W*.9).toFixed(2)}s"><line class="v39-evl" x1="${ax}" x2="${ax}" y1="${ly}" y2="${ay-ey}" stroke="#8a96a0" stroke-opacity=".28" stroke-width="1.1" style="stroke-dasharray:${len};stroke-dashoffset:${len};transition-delay:${(.15+ax/W*.9).toFixed(2)}s"/><ellipse cx="${ax}" cy="${ay+.6}" rx="${ex+.8}" ry="${ey+.5}" fill="rgba(40,60,80,.18)"/><ellipse cx="${ax}" cy="${ay}" rx="${ex}" ry="${ey}" fill="#fff" stroke="rgba(120,135,148,.55)" stroke-width=".8"/><ellipse cx="${ax}" cy="${ay-.5}" rx="${ex*.45}" ry="${ey*.4}" fill="${mc}"/>
-   <g class="v39-bal"><rect x="${bx}" y="${by}" width="${w}" height="26" rx="13" fill="rgba(255,255,255,.78)" stroke="rgba(200,212,222,.8)" stroke-width=".8"/><circle cx="${bx+13}" cy="${by+13}" r="3.6" fill="${mc}"/><text x="${bx+22}" y="${by+17.2}" font-size="10.5" font-weight="700" fill="#9aa5ae">${lab}</text><text x="${bx+26+lab.length*10}" y="${by+17.2}" font-size="11" font-weight="600" fill="#6b7782">${esc(txt)}</text></g></g>`});
+ // 팔레트(입체): 윗면·앞면(x축)·오른쪽 옆면, 테두리 없음
+ const u0=-ML,u1=NCOL*CW-pad+MR,t0=-.55,t1=7.25,A=F(u0,t0),B=F(u1,t0),C=F(u1,t1),D=F(u0,t1);
+ s+=`<path d="M${A[0]-6},${A[1]+T+10} L${B[0]+10},${B[1]+T+10} L${C[0]+16},${C[1]+T+4} L${D[0]},${D[1]+T}Z" fill="rgba(20,60,90,.16)" filter="url(#v39sh)"/>`;
+ s+=`<path d="M${A} L${B} L${C} L${D}Z" fill="#f7fafc"/><path d="M${A} L${B} L${B[0]},${B[1]+T} L${A[0]},${A[1]+T}Z" fill="url(#v39pf)"/><path d="M${B} L${C} L${C[0]},${C[1]+T} L${B[0]},${B[1]+T}Z" fill="#d6e0e8"/>`;
+ // 월: 앞면에 구분선 + 달 가운데 글자
+ const mstart=mm=>col(m.days.indexOf(`${m.Y}-${String(mm).padStart(2,'0')}-01`))*CW;
+ for(let mm=1;mm<=12;mm++){const ua=mstart(mm),ub=mm<12?mstart(mm+1):NCOL*CW-pad,[xa,ya]=F(ua,t0),[xm]=F((ua+ub)/2,t0),fut=`${m.Y}-${String(mm).padStart(2,'0')}-01`>m.today;
+  if(mm>1)s+=`<line x1="${xa}" x2="${xa}" y1="${ya+4}" y2="${ya+T-4}" stroke="#b5c3ce" stroke-width="1"/>`;
+  s+=`<text x="${xm}" y="${ya+T/2+4.2}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${fut?'#a9b6c0':'#566b7b'}">${mm}월</text>`}
+ // 요일: 팔레트 양쪽 여백에 누운 글자
+ WK.forEach((t,r)=>{const tt=(6-r)+.2;s+=`<text transform="${lie(-10,tt)}" text-anchor="end" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text><text transform="${lie(NCOL*CW-pad+10,tt)}" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text>`});
+ // 이슈: 풍선 자리
+ const zoneTop=4,zoneBot=OY+7*DY-hk-26,lanes=Math.max(2,Math.min(8,Math.floor((zoneBot-zoneTop)/34))),LH=(zoneBot-zoneTop-26)/Math.max(1,lanes-1);
+ const used=Array.from({length:lanes},()=>[]);let bal='';const pins={};
+ const cellXY=(i,r)=>{const [x,y]=F(col(i)*CW,6-r);return [x,y]};
+ m.ev.forEach((e,k)=>{const i=m.days.indexOf(e.d);if(i<0)return;const r=wd(e.d),[x,y]=cellXY(i,r),live=src.q[e.d]!=null,h=live?Hh(src.s[e.d]||0):0,ax=x+cw/2+dx/2,ay=y+dy/2-h;
+  const [lab]=V39_EVT[e.type]||['이슈'];const txt=v39Short((v39Adv?'':(e.adv||'')+' ')+(e.title||''),v39Adv?13:15),w=Math.min(210,26+lab.length*10.5+txt.length*11.2+14);
+  let bx=Math.max(4,Math.min(W-w-4,ax-w/2)),lane=-1,best=1e9;for(let L=0;L<lanes;L++){if(!used[L].every(([a,b])=>bx+w<a-6||bx>b+6))continue;const sc=used[L].length*10+Math.abs(L-((k*3)%lanes));if(sc<best){best=sc;lane=L}}if(lane<0)return;used[lane].push([bx,bx+w]);
+  const by=zoneTop+lane*LH,ly=by+26,len=Math.max(4,ay-ly),mc=V39_EVM[e.type]||'#b3bbc2',dl=(.15+ax/W*.9).toFixed(2);
+  // 선·닿는 점은 그 막대 바로 뒤에 그려서 앞 막대에 가려지게
+  (pins[e.d]=pins[e.d]||[]).push(`<g class="v39-evp" data-v39-ev="${k}" style="transition-delay:${dl}s"><line class="v39-evl" x1="${ax}" x2="${ax}" y1="${ly}" y2="${ay}" stroke="#8a96a0" stroke-opacity=".26" stroke-width="1.1" style="stroke-dasharray:${len};stroke-dashoffset:${len};transition-delay:${dl}s"/><circle r="4.2" transform="matrix(1,0,${(DX*.05).toFixed(3)},${(DY*.05).toFixed(3)},${ax},${ay})" fill="#8a96a0" fill-opacity=".3"/></g>`);
+  bal+=`<g class="v39-ev" data-v39-ev="${k}" style="transition-delay:${dl}s"><rect x="${bx}" y="${by}" width="${w}" height="26" rx="13" fill="rgba(255,255,255,.8)" stroke="rgba(200,212,222,.8)" stroke-width=".8"/><circle cx="${bx+13}" cy="${by+13}" r="3.6" fill="${mc}"/><text x="${bx+22}" y="${by+17.2}" font-size="10.5" font-weight="700" fill="#9aa5ae">${lab}</text><text x="${bx+26+lab.length*10}" y="${by+17.2}" font-size="11" font-weight="600" fill="#6b7782">${esc(txt)}</text></g>`});
  const order=m.days.map((x,i)=>({x,i,r:wd(x)})).sort((a,b)=>(a.r-b.r)||(a.i-b.i));
- for(const o of order){const [x,y]=P(o.i,o.r),q=src.q[o.x],sp=src.s[o.x]||0,fut=o.x>m.today,live=!fut&&q!=null;
-  const c={band:0,d:o.x,x,y,live,q,sp,h:live?Hh(sp):1.5,top:live?v39ColP(pct(q)):V39_FLAT[0],front:live?v39ColP(pct(q),.8):V39_FLAT[1],side:live?v39ColP(pct(q),.64):V39_FLAT[2]};
-  c.idx=cells.length;cells.push(c);s+=`<g class="v39-c" data-i="${c.idx}"><path/><path/><path/></g>`}
- WK.forEach((t,r)=>{const yy=OY+(6-r)*DY;stick+=`<text x="54" y="${yy-3}" text-anchor="end" font-size="10" font-weight="700" fill="#8a9aa6">${t}</text>`;
-  s+=`<text x="${OX+NCOL*CW+(6-r)*DX+8}" y="${yy-3}" font-size="10" font-weight="700" fill="#8a9aa6">${t}</text>`});
+ for(const o of order){const [x,y]=cellXY(o.i,o.r),q=src.q[o.x],sp=src.s[o.x]||0,fut=o.x>m.today,live=!fut&&q!=null,p=live?pct(q):0;
+  const c={d:o.x,x,y,live,q,sp,h:live?Hh(sp):0,top:live?v39ColP(p,1.07):V39_FLAT[0],front:live?v39ColP(p,.82):V39_FLAT[0],side:live?v39ColP(p,.66):V39_FLAT[0]};
+  c.idx=cells.length;cells.push(c);s+=live?`<g class="v39-c" data-i="${c.idx}"><path/><path/><path/><path class="hl" fill="url(#v39hl)"/></g>`:`<g class="v39-c flat" data-i="${c.idx}"><path d="M${x},${y} L${x+cw},${y} L${x+cw+dx},${y+dy} L${x+dx},${y+dy}Z" fill="${o.x===m.today?'#25a4dc':'#e3e9ee'}"/></g>`;
+  if(pins[o.x])s+=pins[o.x].join('')}
  const label=v39Adv||`${v39Cat||'전체'} 업종 전체`,kw=v39Adv?((v39D.keywords||{})[v39Adv]||[]).join('·')||'검색 키워드 없음':`${m.n}개사 합계`;
- stick+=`<text x="10" y="${OY+7*DY-hk*.62-6}" font-size="14" font-weight="900" fill="#102b45">${esc(label)}<tspan dx="8" font-size="11" font-weight="500" fill="#7d8f9b">${esc(kw)}</tspan></text>`;
- for(let mm=1;mm<=12;mm++){const d1=`${m.Y}-${String(mm).padStart(2,'0')}-01`,i=m.days.indexOf(d1),x=OX+col(i)*CW;
-  s+=`<line x1="${x}" x2="${x}" y1="${OY+12}" y2="${OY+20}" stroke="#b9c8d3"/><text x="${x+2}" y="${OY+34}" font-size="13" font-weight="800" fill="${d1>m.today?'#a7b5c0':'#4a6273'}">${mm}월</text>`}
- s+=`<g id="v39-today"></g><g class="v39-evs">${evs}</g>`;
+ stick+=`<text x="10" y="${OY+7*DY-hk*.62-4}" font-size="14" font-weight="900" fill="#102b45" stroke="#f6f9fb" stroke-width="4" paint-order="stroke">${esc(label)}<tspan dx="8" font-size="11" font-weight="500" fill="#7d8f9b">${esc(kw)}</tspan></text>`;
+ s+=`<g id="v39-today"></g><g class="v39-evs">${bal}</g>`;
  return {svg:s,stick,cells,W,H,cw,dx,dy,OY}}
-function v39Paint(el,c,p){const h=1.5+(c.h-1.5)*p,{x,y}=c,{cw,dx,dy}=v39Last;const ps=el.children;
- const mix=k=>v39Rgb(c.live?v39Mix(V39_FLAT[k],[c.top,c.front,c.side][k],p):V39_FLAT[k]);
+function v39Paint(el,c,p){if(!c.live)return;const h=c.h*p,{x,y}=c,{cw,dx,dy}=v39Last;const ps=el.children;
+ const mix=k=>v39Rgb(v39Mix(V39_FLAT[0],[c.top,c.front,c.side][k],p));
  ps[0].setAttribute('d',`M${x},${y} L${x+cw},${y} L${x+cw},${y-h} L${x},${y-h} Z`);ps[0].setAttribute('fill',mix(1));
  ps[1].setAttribute('d',`M${x+cw},${y} L${x+cw+dx},${y+dy} L${x+cw+dx},${y+dy-h} L${x+cw},${y-h} Z`);ps[1].setAttribute('fill',mix(2));
- ps[2].setAttribute('d',`M${x},${y-h} L${x+cw},${y-h} L${x+cw+dx},${y+dy-h} L${x+dx},${y+dy-h} Z`);ps[2].setAttribute('fill',mix(0));ps[2].setAttribute('stroke','rgba(255,255,255,.55)');ps[2].setAttribute('stroke-width','.7')}
-function v39Today(){const b=v39Last;if(!b)return '';const c=b.cells.find(z=>z.d===v39Last.today);if(!c)return '';const h=c.h,{x,y}=c,{cw,dx,dy}=b;
- return `<path d="M${x},${y} L${x+cw},${y} L${x+cw},${y-h} L${x},${y-h} Z" fill="#1d8fc4"/><path d="M${x+cw},${y} L${x+cw+dx},${y+dy} L${x+cw+dx},${y+dy-h} L${x+cw},${y-h} Z" fill="#177aa8"/><path d="M${x},${y-h} L${x+cw},${y-h} L${x+cw+dx},${y+dy-h} L${x+dx},${y+dy-h} Z" fill="#25a4dc" stroke="rgba(255,255,255,.6)" stroke-width=".7"/>`}
+ ps[2].setAttribute('d',`M${x},${y-h} L${x+cw},${y-h} L${x+cw+dx},${y+dy-h} L${x+dx},${y+dy-h} Z`);ps[2].setAttribute('fill',mix(0));
+ ps[3].setAttribute('d',`M${x},${y} L${x+cw},${y} L${x+cw},${y-h} L${x},${y-h} Z`);ps[3].setAttribute('opacity',p)}
+function v39Today(){const b=v39Last;if(!b)return '';const c=b.cells.find(z=>z.d===v39Last.today);if(!c||!c.live)return '';const h=c.h,{x,y}=c,{cw,dx,dy}=b;
+ return `<path d="M${x},${y} L${x+cw},${y} L${x+cw},${y-h} L${x},${y-h} Z" fill="#1d8fc4"/><path d="M${x+cw},${y} L${x+cw+dx},${y+dy} L${x+cw+dx},${y+dy-h} L${x+cw},${y-h} Z" fill="#177aa8"/><path d="M${x},${y-h} L${x+cw},${y-h} L${x+cw+dx},${y+dy-h} L${x+dx},${y+dy-h} Z" fill="#25a4dc"/>`}
 
 // ---------- 화면 ----------
 const V39_IMG='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="m21 15-4.5-4.5L6 21"/></svg>';
 const V39_XLS='<svg width="18" height="18" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="3.5" fill="#1f7a45" stroke="none"/><path d="M8 8l3 4-3 4M16 8l-3 4 3 4" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>';
-function v39Controls(show){let box=document.querySelector('main>header .v39-ctrl'),yb=document.querySelector('main>header .v39-years');const head=document.querySelector('main>header');
- if(!show){if(box)box.remove();if(yb)yb.remove();if(head)head.classList.remove('v39-head');return}
- if(!head)return;head.classList.add('v39-head');
+function v39Controls(show){let box=document.querySelector('main>header .v39-ctrl');
+ if(!show){if(box)box.remove();return}
+ const head=document.querySelector('main>header');if(!head)return;
  if(!box){box=document.createElement('div');box.className='v32-ctrl v39-ctrl';head.appendChild(box)}
  const opts=(typeof v38Opt!=='undefined'&&v38Opt)||[];const o=v39Adv?opts.find(x=>x.advertiser===v39Adv):{categories:[...new Set(opts.flatMap(x=>x.categories))].sort((a,b)=>(V39_ORDER.indexOf(a)<0?99:V39_ORDER.indexOf(a))-(V39_ORDER.indexOf(b)<0?99:V39_ORDER.indexOf(b)))};
  box.innerHTML=`<label>세부 품목<select id="v39-cat" class="chip"><option value="">전체</option>${(o?o.categories:[]).filter(c=>c!=='브랜드').map(c=>`<option value="${esc(c)}" ${c===v39Cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label>광고주<select id="v39-adv" class="chip"><option value="" ${v39Adv?'':'selected'}>전체 (업종)</option>${opts.map(x=>`<option value="${esc(x.advertiser)}" ${x.advertiser===v39Adv?'selected':''}>${esc(x.advertiser)}</option>`).join('')}</select></label>`;
- if(!yb){yb=document.createElement('div');yb.className='v39-years';head.appendChild(yb)}
- const ys=(v39D&&v39D.years)||[],y=v39D?v39D.year:v39Year,i=ys.indexOf(y);
- yb.innerHTML=`<button type="button" class="yb" data-v39-y="${ys[i-1]||''}" ${i>0?'':'disabled'} aria-label="이전 해">‹</button>${ys.slice(Math.max(0,i-1),i+1).map(v=>`<button type="button" class="y ${v===y?'on':''}" data-v39-y="${v}">${v}</button>`).join('')}${i<ys.length-1?`<button type="button" class="y" data-v39-y="${ys[i+1]}">${ys[i+1]}</button>`:''}<button type="button" class="yb" data-v39-y="${ys[i+1]||''}" ${i<ys.length-1?'':'disabled'} aria-label="다음 해">›</button>`;
  if(typeof v38PlaceCtrl==='function')v38PlaceCtrl()}
+function v39Years(){const ys=(v39D&&v39D.years)||[],y=v39D?v39D.year:v39Year,i=ys.indexOf(y);
+ return `<div class="v39-years"><button type="button" class="yb" data-v39-y="${ys[i-1]||''}" ${i>0?'':'disabled'} aria-label="이전 해">‹</button>${ys.map(v=>`<button type="button" class="y ${v===y?'on':''}" data-v39-y="${v}">${v}</button>`).join('')}<button type="button" class="yb" data-v39-y="${ys[i+1]||''}" ${i<ys.length-1?'':'disabled'} aria-label="다음 해">›</button></div>`}
 function v39Legend(){const g=[0,.15,.3,.4,.5,.6,.7,.78,.88,1].map(p=>v39Rgb(v39ColP(p))).join(',');const c=v39ColP(.8),c2=v39ColP(.8,.64),c3=v39ColP(.8,.8);
  const bars=[5,11,19].map((h,i)=>{const x=6+i*20,y=26;return `<path d="M${x},${y} L${x+11},${y} L${x+11},${y-h} L${x},${y-h} Z" fill="${v39Rgb(c3)}"/><path d="M${x+11},${y} L${x+15},${y-5} L${x+15},${y-5-h} L${x+11},${y-h} Z" fill="${v39Rgb(c2)}"/><path d="M${x},${y-h} L${x+11},${y-h} L${x+15},${y-5-h} L${x+4},${y-5-h} Z" fill="${v39Rgb(c)}"/>`}).join('');
- return `<div class="v39-legend"><span>검색 적음 <i class="grad" style="background:linear-gradient(90deg,${g})"></i> 검색 많음</span><span><svg width="64" height="30">${bars}</svg> 광고비 많을수록 높게</span><span><svg width="22" height="16"><path d="M3,13 L14,13 L18,8 L7,8 Z" fill="#dfe6ec" stroke="#cbd5dd" stroke-width=".8"/></svg> 아직 오지 않은 날</span></div>`}
+ return `<div class="v39-legend"><span>검색 적음 <i class="grad" style="background:linear-gradient(90deg,${g})"></i> 검색 많음</span><span><svg width="64" height="30">${bars}</svg> 광고비 많을수록 높게</span><span><svg width="22" height="16"><path d="M3,13 L14,13 L18,8 L7,8 Z" fill="#e3e9ee"/></svg> 아직 오지 않은 날</span><span><svg width="22" height="16"><path d="M3,13 L14,13 L18,8 L7,8 Z" fill="#25a4dc"/></svg> 오늘</span></div>`}
 function v39View(){const d=v39D,m=v39Model(d);
  if(!m.me)return `<section class="glass section">${empty(`${v39Adv} · ${v39Cat||'전체'} ${d.year}년 자료가 없어요.`,'다른 품목이나 연도를 골라 보세요.')}</section>`;
  const b=v39Build(m);v39Last={...b,today:m.today,m};
- return `<section class="glass section v39-card"><div class="v39-ch"><div><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2><p>칸 = 하루 · 색 = 네이버 검색수 순위(그해 기준) · 높이 = 그날 광고비 · 풍선 = 캠페인 시작·신규 소재·주요 기사(누르면 자세히)</p>${v39Legend()}</div>
-  <div class="v39-icons"><button type="button" class="v39-ic" data-v39-png title="이미지로 저장(1월~12월 전체)" aria-label="이미지로 저장">${V39_IMG}</button><button type="button" class="v39-ic" data-v39-xls title="엑셀 원본 내려받기" aria-label="엑셀 원본 내려받기">${V39_XLS}</button></div></div>
+ return `<section class="glass section v39-card"><div class="v39-ch"><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2>
+  <div class="v39-icons">${v39Years()}<button type="button" class="v39-ic" data-v39-png title="이미지로 저장(1월~12월 전체)" aria-label="이미지로 저장">${V39_IMG}</button><button type="button" class="v39-ic" data-v39-xls title="엑셀 원본 내려받기" aria-label="엑셀 원본 내려받기">${V39_XLS}</button></div></div>
   <div class="v39-vp"><div class="v39-sc" id="v39-sc"><svg id="v39-svg" width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}">${b.svg}</svg></div>
-  <svg class="v39-stick" width="330" height="${b.H}"><defs><linearGradient id="v39eg" x1="0" x2="1"><stop offset="0" stop-color="#f6f9fb" stop-opacity=".98"/><stop offset=".7" stop-color="#f6f9fb" stop-opacity=".92"/><stop offset="1" stop-color="#f6f9fb" stop-opacity="0"/></linearGradient></defs><rect width="70" height="${b.H}" fill="url(#v39eg)"/>${b.stick}</svg>
+  <svg class="v39-stick" width="360" height="${b.H}">${b.stick}</svg>
   <button type="button" class="v39-arr l" data-v39-scroll="-1" aria-label="이전">‹</button><button type="button" class="v39-arr r" data-v39-scroll="1" aria-label="다음">›</button><div class="v39-tip" id="v39-tip" hidden></div></div>
-  <p class="footnote">${esc(d.note||'')}${v39Adv?'':' · 업종 전체는 같은 품목 경쟁사(인덱스 경쟁사=O)와 코웨이의 합계'} · 좌우로 넘겨 1월~12월</p></section>`}
+  <div class="v39-below">${v39Legend()}<p class="footnote">칸 = 하루 · 색 = 네이버 검색수 순위(그해 기준) · 높이 = 그날 광고비 · 풍선 = 캠페인 시작·신규 소재·주요 기사(누르면 자세히) · 좌우로 넘겨 1월~12월</p>
+  <p class="footnote">${esc(d.note||'')}${v39Adv?'':' · 업종 전체는 같은 품목 경쟁사(인덱스 경쟁사=O)와 코웨이의 합계'}</p></div></section>`}
 function v39Animate(full){const b=v39Last;if(!b)return;const els=[...document.querySelectorAll('#v39-svg .v39-c')];const id=++v39Anim;const N=b.cells.length;
  const ncol=Math.max(...b.cells.map(c=>c.x));const t0=performance.now(),D0=650,DUR=750;
  const ease=t=>1-Math.pow(1-t,3);
- const frame=now=>{if(id!==v39Anim)return;let done=true;for(let k=0;k<N;k++){const c=b.cells[k];const delay=(c.x/ncol)*D0+(c.band?120:0);let p=full?1:Math.max(0,Math.min(1,(now-t0-delay)/DUR));if(p<1)done=false;v39Paint(els[k],c,ease(p))}
+ const frame=now=>{if(id!==v39Anim)return;let done=true;for(let k=0;k<N;k++){const c=b.cells[k];const delay=(c.x/ncol)*D0;let p=full?1:Math.max(0,Math.min(1,(now-t0-delay)/DUR));if(p<1)done=false;v39Paint(els[k],c,ease(p))}
   if(!done)requestAnimationFrame(frame);else{const t=document.getElementById('v39-today');if(t)t.innerHTML=v39Today()}};
  const sv=document.getElementById('v39-svg');if(sv){sv.classList.remove('v39-on');if(full)sv.classList.add('v39-on','v39-now');else setTimeout(()=>{if(id===v39Anim)sv.classList.add('v39-on')},D0*.6)}
  if(full){frame(performance.now()+1e6)}else{b.cells.forEach((c,k)=>v39Paint(els[k],c,0));requestAnimationFrame(frame)}}
-function v39Scroll0(){const sc=document.getElementById('v39-sc'),b=v39Last;if(!sc||!b)return;const c=b.cells.find(z=>z.band===0&&z.d===b.today);
+function v39Scroll0(){const sc=document.getElementById('v39-sc'),b=v39Last;if(!sc||!b)return;const c=b.cells.find(z=>z.d===b.today);
  sc.scrollLeft=c?Math.max(0,c.x-sc.clientWidth*.72):(b.m.Y<new Date().getFullYear()?0:sc.scrollWidth);v39Arrows()}
 function v39Arrows(){const sc=document.getElementById('v39-sc');if(!sc)return;document.querySelectorAll('[data-v39-scroll]').forEach(btn=>{const dir=+btn.dataset.v39Scroll;btn.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
 function v39Draw(anim){$('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';v39Controls(true);$('#content').innerHTML=v39View();v39Scroll0();v39Animate(!anim);
@@ -181,10 +188,18 @@ function v39XlsDown(){if(!v39Last||typeof v38Xlsx!=='function')return;const m=v3
 if(v39FromHash()&&typeof listing!=='undefined'&&listing){render()}
 
 // 풍선 누르면 자세히
-document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('[data-v39-ev]');if(!g||!v39Last)return;const z=v39Last.m.ev[+g.dataset.v39Ev];if(!z)return;
- const [lab,color]=V39_EVT[z.type]||['이슈','#7d8a96'],dl=$('#detail');dl.className='v39-evdialog';const d=z.d.replaceAll('-','.');
+const V39_MED={terrestrial:'지상파',general:'종편',cable:'케이블',radio:'라디오',print:'인쇄',digital_video:'디지털 동영상',digital_banner:'디지털 배너'};
+function v39MediaBars(media){const e=Object.entries(media||{}).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);const t=e.reduce((a,[,v])=>a+v,0);if(!t)return '';
+ return `<div class="v39-med">${e.map(([k,v])=>`<div class="r"><span>${V39_MED[k]||k}</span><i><b style="width:${Math.max(3,v/t*100).toFixed(1)}%"></b></i><em>${v38Money(v)}</em></div>`).join('')}</div>`}
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('#v39-svg [data-v39-ev]');if(!g||!v39Last)return;const z=v39Last.m.ev[+g.dataset.v39Ev];if(!z)return;
+ const [lab,color]=V39_EVT[z.type]||['이슈','#7d8a96'],dl=$('#detail');dl.className='v39-evdialog';const d=z.d.replaceAll('-','.'),dd=x=>String(x||'').replaceAll('-','.');
+ const img=u=>u?`<img class="v39-evimg" src="${esc(safeUrl(u))}" alt="" onerror="this.remove()">`:'';
  let body='';
- if(z.type==='camp')body=`${z.thumb?`<img class="v39-evimg" src="${esc(safeUrl(z.thumb))}" alt="" onerror="this.remove()">`:''}<h2>${esc(z.title)}</h2><p class="v39-evmeta">${esc(z.adv)} · ${d} 시작${z.e?` ~ ${z.e.replaceAll('-','.')}`:''} · 광고비 ${v38Money(z.amount)}</p>${z.id?`<button type="button" class="primary" data-campaign="${esc(z.id)}">캠페인 분석 보기</button>`:''}`;
- else if(z.type==='creative')body=`<h2>${esc(z.title)}</h2><p class="v39-evmeta">${esc(z.adv)}${z.product?` · ${esc(z.product)}`:''} · ${d} TV 첫 방송${z.scene?` · ${esc(z.scene)}`:''}</p><p class="v39-evmeta">이 소재 TV 광고비(아덱스 원금액 누적) ${v38Money(z.amount)}</p>${z.id?`<button type="button" class="primary" data-campaign="${esc(z.id)}">이 소재가 든 캠페인 보기</button>`:''}`;
- else body=`${z.thumb?`<img class="v39-evimg" src="${esc(safeUrl(z.thumb))}" alt="" onerror="this.remove()">`:''}<h2>${esc(z.title)}</h2><p class="v39-evmeta">${esc(z.adv)} · ${esc(z.publisher||'')} · ${d}${z.n>1?` · 같은 소식 ${z.n}건`:''}</p>${z.summary?`<p class="v39-evsum">${esc(z.summary)}…</p>`:''}${z.url?`<a class="primary" href="${esc(safeUrl(z.url))}" target="_blank" rel="noopener">원문 보기 ↗</a>`:''}`;
+ if(z.type==='camp')body=`${img(z.thumb)}<h2>${esc(z.title)}</h2>
+  <div class="v39-kv"><span>광고주</span><b>${esc(z.adv)}</b><span>기간</span><b>${d} ~ ${dd(z.e)}${z.ongoing?' · 진행 중':''}</b><span>광고비</span><b>${v38Money(z.amount)}</b>${(z.products||[]).length?`<span>상품</span><b>${z.products.map(esc).join(', ')}</b>`:''}${z.ncre?`<span>소재</span><b>${z.ncre}개</b>`:''}</div>
+  ${v39MediaBars(z.media)}${z.why?`<p class="v39-evsum">${esc(z.why)}</p>`:''}${z.id?`<button type="button" class="primary" data-campaign="${esc(z.id)}">캠페인 분석 보기</button>`:''}`;
+ else if(z.type==='creative')body=`${z.storyboard?`<img class="v39-evimg sb" src="${esc(safeUrl(z.storyboard))}" alt="" onerror="this.remove()">`:img(z.thumb)}<h2>${esc(z.title)}</h2>
+  <div class="v39-kv"><span>광고주</span><b>${esc(z.adv)}</b>${z.product?`<span>상품</span><b>${esc(z.product)}</b>`:''}${z.scene?`<span>장면</span><b>${esc(z.scene)}</b>`:''}<span>TV 방송</span><b>${d} 첫 방송 ~ ${dd(z.e)}</b>${z.spots?`<span>집행</span><b>${Number(z.spots).toLocaleString()}회 · 채널 ${z.channels||0}곳</b>`:''}<span>TV 광고비</span><b>${v38Money(z.amount)} <small>(아덱스 원금액)</small></b></div>
+  ${z.id?`<button type="button" class="primary" data-campaign="${esc(z.id)}">이 소재가 든 캠페인 보기</button>`:''}`;
+ else body=`${img(z.thumb)}<h2>${esc(z.title)}</h2><div class="v39-kv"><span>광고주</span><b>${esc(z.adv)}</b><span>매체</span><b>${esc(z.publisher||'')}</b><span>날짜</span><b>${d}</b>${z.n>1?`<span>같은 소식</span><b>${z.n}건</b>`:''}</div>${z.summary?`<p class="v39-evsum">${esc(z.summary)}…</p>`:''}${z.url?`<a class="primary" href="${esc(safeUrl(z.url))}" target="_blank" rel="noopener">원문 보기 ↗</a>`:''}`;
  $('#detail-body').innerHTML=`<div class="v39-ev-pop"><span class="v39-evtag" style="background:${color}">${lab}</span>${body}</div>`;if(!dl.open)dl.showModal()});

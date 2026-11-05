@@ -265,3 +265,36 @@ if(typeof v34DaySection==='function'){
    ${out.join('')}
    <p class="footnote v32-foot">매체(채널)·길이·메시지/스타일은 AdCreative 표기 그대로 · 한 소재에 길이가 다른 영상이 있으면 따로 표시 · 아덱스 집행액·캠페인과는 연결하지 않음 · YouTube 카드는 경쟁사 공식 채널에 그날 올라온 조회수 ${v32Num(d.config.yt_min_views)}회 이상 영상(TV 소재와 따로) · 카드에 마우스를 올리면 영상이 재생돼요.</p>`};
 }
+
+// ---------- 페이지 주소(#/페이지) — 뒤로가기·앞으로가기·새로고침·주소 공유 (11-05 15:08) ----------
+// #/timeline · #/analysis/<캠페인ID> · #/daily · #/news · #/monthly?adv=코웨이&cat=정수기 · #/settings  (기사 공유 #news=ID 는 그대로)
+var V38_ROUTES=['timeline','analysis','daily','news','monthly','settings'],v38Hist={pop:false,ready:false};
+(function(){// 예전 코드(v12·v20)가 주소 없이 남기던 기록은 막고, 기록은 아래에서 주소로만 남김
+ const P=history.pushState.bind(history),R=history.replaceState.bind(history);
+ history.pushState=function(s,t,u){if(u==null||u==='')return;return P(null,t,u)};
+ history.replaceState=function(s,t,u){if(u==null||u==='')return;if(!String(u).includes('#')){const h=v38HashOf(true);if(h)u=String(u)+h}return R(null,t,u)};
+ window.v38PushRaw=P;window.v38ReplaceRaw=R})();
+function v38HashOf(any){if(!any&&/news=/.test(location.hash))return null;const r=V38_ROUTES.includes(route)?route:'timeline';let h='#/'+r;
+ if(r==='analysis'&&activeId)h+='/'+encodeURIComponent(activeId);
+ if(r==='monthly'){const q=new URLSearchParams();if(v38Adv)q.set('adv',v38Adv);if(v38Cat)q.set('cat',v38Cat);const s=q.toString();if(s)h+='?'+s}
+ return h}
+function v38ApplyHash(){const h=decodeURI(location.hash||'');if(!h.startsWith('#/'))return false;
+ const [p,qs]=h.slice(2).split('?'),[r,...rest]=p.split('/');if(!V38_ROUTES.includes(r))return false;
+ route=r;if(r==='analysis'&&rest.length)activeId=decodeURIComponent(rest.join('/'));
+ if(r==='monthly'){const q=new URLSearchParams(qs||'');if(q.get('adv')&&(q.get('adv')!==v38Adv||(q.get('cat')||'')!==v38Cat)){v38Adv=q.get('adv');v38Cat=q.get('cat')||'';v38D=null}}
+ return true}
+function v38Sync(replace){const h=v38HashOf();if(!h||h===decodeURI(location.hash||''))return;
+ const u=location.pathname+location.search.replace(/([?&])m=[^&]*&?/,'$1').replace(/[?&]$/,'')+h;
+ try{(replace?v38ReplaceRaw:v38PushRaw)(null,'',u)}catch(e){}}
+var v38RouteBase=render;
+render=async function(...a){
+ if(typeof v12Pop!=='undefined')v12Pop=true;
+ const pop=v38Hist.pop;v38Hist.pop=false;v38Sync(pop||!v38Hist.ready);v38Hist.ready=true;
+ const out=await v38RouteBase.apply(this,a);v38Sync(true);return out};  // 기본 캠페인처럼 그리는 중에 정해진 값도 주소에
+window.addEventListener('change',e=>{if(e.target&&(e.target.id==='v38-adv'||e.target.id==='v38-cat'))setTimeout(()=>v38Sync(false),0)},true);
+addEventListener('popstate',async()=>{if(/news=/.test(location.hash))return;if(!v38ApplyHash())route='timeline';
+ v38Hist.pop=true;if(route==='timeline'&&typeof v6Saved!=='undefined'&&v6Saved)v6Saved.restore=true;
+ try{const dl=$('#detail');if(dl&&dl.open)dl.close()}catch(e){}
+ if(typeof listing!=='undefined'&&listing){await render();if(route!=='timeline')window.scrollTo({top:0,behavior:'instant'})}});
+// 처음 열 때·새로고침: 주소의 페이지로
+if(v38ApplyHash()&&typeof listing!=='undefined'&&listing){v38Hist.pop=true;render()}

@@ -1,0 +1,52 @@
+/* v39 — 2026-11-05 연간 히트맵 */
+main>header.v39-head,html.nd main>header.v39-head{position:relative!important;padding-bottom:60px!important}
+.v39-years{position:absolute;right:28px;bottom:14px;display:flex;align-items:center;gap:3px;background:rgba(255,255,255,.85);border:1px solid #dbe6ee;border-radius:999px;padding:3px}
+.v39-years button{border:0;background:none;cursor:pointer;font:inherit}
+.v39-years .y{font-size:12px;font-weight:800;color:#6b7c88;padding:5px 14px;border-radius:999px}
+.v39-years .y.on{background:#102b45;color:#fff}
+.v39-years .yb{width:26px;height:26px;border-radius:50%;font-size:16px;font-weight:900;color:#3c5566;display:flex;align-items:center;justify-content:center}
+.v39-years .yb:disabled{color:#c3cdd5;cursor:default}
+.v39-years .yb:not(:disabled):hover,.v39-years .y:not(.on):hover{background:#eef4f8}
+.v39-card{position:relative;padding:22px 26px 16px!important}
+.v39-card.loading{opacity:.6;transition:opacity .2s}
+.v39-ch{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.v39-ch h2{margin:0;font-size:17px;font-weight:900;color:#102b45}
+.v39-ch p{margin:4px 0 0;font-size:12px;color:#6b7c88}
+.v39-legend{display:flex;gap:24px;align-items:center;font-size:11.5px;color:#55697a;margin-top:6px;flex-wrap:wrap}
+.v39-legend span{display:flex;align-items:center;gap:8px}
+.v39-legend .grad{display:inline-block;width:160px;height:10px;border-radius:6px}
+.v39-icons{display:flex;gap:6px;flex:none}
+.v39-ic{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid #dfe8ee;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#3c5566;padding:0}
+.v39-ic:hover{border-color:#b8d3e3;box-shadow:0 2px 8px rgba(20,60,90,.1)}
+.v39-vp{position:relative;margin-top:4px}
+.v39-sc{overflow-x:auto;overflow-y:hidden;border-radius:12px;scrollbar-width:thin;scrollbar-color:rgba(80,110,130,.45) rgba(160,180,195,.2);padding-bottom:6px}
+.v39-sc::-webkit-scrollbar{height:7px}.v39-sc::-webkit-scrollbar-track{background:rgba(160,180,195,.2);border-radius:6px}.v39-sc::-webkit-scrollbar-thumb{background:rgba(80,110,130,.45);border-radius:6px}
+.v39-sc svg{display:block}
+.v39-stick{position:absolute;left:0;top:0;pointer-events:none}
+.v39-arr{position:absolute;top:calc(100% - 150px);width:38px;height:38px;border-radius:50%;background:#fff;border:0;box-shadow:0 3px 10px rgba(20,60,90,.14);font-size:15px;font-weight:900;color:#3c5566;cursor:pointer;z-index:2}
+.v39-arr.l{left:-14px}.v39-arr.r{right:-14px}.v39-arr.off{opacity:.35;pointer-events:none}
+.v39-tip{position:absolute;z-index:5;background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(15,45,70,.16);padding:11px 13px;font-size:12px;color:#3c5566;width:220px;border:1px solid #e6eef4;pointer-events:none}
+.v39-tip b{display:block;font-size:13px;color:#102b45;margin-bottom:5px}
+.v39-tip .r{display:flex;justify-content:space-between;margin-top:3px}.v39-tip .r i{font-style:normal;font-weight:800;color:#1d3447}
+.v39-tip .e{margin-top:6px;padding-top:6px;border-top:1px solid #eef3f6;font-size:11px;color:#55697a}.v39-tip .e em{font-style:normal;font-weight:800;margin-right:5px}
+#v39-svg .v39-c{cursor:default}
+/* 이슈 풍선: 막대가 다 올라온 뒤 선이 뻗고 풍선이 떠오름 */
+#v39-svg .v39-ev{cursor:pointer;opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s ease}
+#v39-svg.v39-on .v39-ev{opacity:1;transform:none}
+#v39-svg .v39-evl{transition:stroke-dashoffset .6s ease}
+#v39-svg.v39-on .v39-evl{stroke-dashoffset:0!important}
+#v39-svg.v39-now .v39-ev,#v39-svg.v39-now .v39-evl{transition:none!important}
+#v39-svg .v39-ev:hover .v39-evl{stroke-opacity:.7;stroke-width:1.6}
+#v39-svg .v39-ev:hover .v39-bal rect{stroke:#b8d3e3;stroke-width:1}
+/* 풍선 자세히 */
+dialog.v39-evdialog{width:min(460px,92vw)}
+.v39-ev-pop{padding:6px 4px 4px}
+.v39-ev-pop h2{font-size:17px;margin:10px 0 6px;color:#102b45;line-height:1.4}
+.v39-evtag{display:inline-block;color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:3px 10px}
+.v39-evmeta{font-size:12px;color:#6b7c88;margin:4px 0}
+.v39-evsum{font-size:12.5px;color:#3c5566;line-height:1.6;margin:8px 0 12px}
+.v39-evimg{display:block;width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin:10px 0 2px}
+.v39-ev-pop .primary{display:inline-flex;align-items:center;gap:4px;margin-top:10px;text-decoration:none}
+/* 기본 svg 규칙(20px·외곽선) 무시 */
+.v39-card svg{width:auto;height:auto;stroke:none}
+.v39-card .v39-ic svg{width:16px;height:16px;stroke:currentColor}.v39-card .v39-ic svg[width="18"]{width:18px;height:18px}

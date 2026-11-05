@@ -58,8 +58,8 @@ function v38View(d){
  M.forEach((m,i)=>{if(i&&m.endsWith('-01'))s+=`<line x1="${slot*i}" x2="${slot*i}" y1="${CT}" y2="${BASE}" stroke="#7f98ad" stroke-opacity=".09" stroke-width="5"/>`});
  // 캠페인
  camps.forEach((c,i)=>{const y=CT+c.k*(CH+CG),w=c.x1-c.x0;
-  s+=`<g class="v38-camp" data-v38-camp="${esc(c.id)}"><line class="gd" x1="${c.x0+.5}" x2="${c.x0+.5}" y1="${y+CH/2}" y2="${BASE}" stroke="#3b4450"/><rect class="cap" x="${c.x0}" y="${y}" width="${w}" height="${CH}" rx="${CH/2}" fill="#dde3e8"/>
-  <circle cx="${c.x0+CH/2}" cy="${y+CH/2}" r="${CH/2-2.5}" fill="#dbe7ee"/>${c.thumb?`<image href="${esc(safeUrl(c.thumb))}" x="${c.x0+3}" y="${y+3}" width="${CH-6}" height="${CH-6}" preserveAspectRatio="xMidYMid slice" clip-path="url(#v38-cl${i})"/>`:''}
+  s+=`<g class="v38-camp" data-v38-camp="${esc(c.id)}"><line class="gd" x1="${c.x0+.5}" x2="${c.x0+.5}" y1="${y+CH/2}" y2="${BASE}" stroke="#3b4450"/><rect class="cap" x="${c.x0}" y="${y}" width="${w}" height="${CH}" rx="${CH/2}" fill="#fff" fill-opacity=".92"/>
+  <circle cx="${c.x0+CH/2}" cy="${y+CH/2}" r="${CH/2-2.5}" fill="#dbe7ee"/>${c.thumb?`<image href="${esc(safeUrl(c.thumb))}" x="${c.x0+3}" y="${y+3}" width="${CH-6}" height="${CH-6}" preserveAspectRatio="xMidYMid slice" clip-path="url(#v38-cl${i})" onerror="this.remove()"/>`:''}
   <text x="${c.x0+CH+4}" y="${y+CH/2+4}" font-size="11.5" font-weight="600" fill="#6b7782">${esc(c.txt.replace(/ · \d\d\.\d\d–\d\d\.\d\d$/,''))} <tspan font-weight="500" fill="#98a3ad">· ${md(c.s)}–${md(c.e)}</tspan></text></g>`});
  // 기사(점·글자, x축 연결선)
  news.forEach(n=>{const y=CT+n.k*(CH+CG)+CH/2,t=n.short||n.txt;s+=`<g class="v38-news" data-v38-news="${esc(n.u)}"><line class="gd" x1="${n.x0+13}" x2="${n.x0+13}" y1="${y+7}" y2="${BASE}" stroke="#8d98a3"/><rect x="${n.x0}" y="${y-7}" width="26" height="14" rx="7" fill="rgba(125,138,150,.13)"/><text x="${n.x0+13}" y="${y+3.2}" text-anchor="middle" font-size="9" font-weight="700" fill="#7d8a96">기사</text><text x="${n.x0+31}" y="${y+3.8}" font-size="11" fill="#5f6b77"><tspan font-weight="700" fill="#8d98a3">${esc(t.slice(0,5))}</tspan>${esc(t.slice(5))}</text><title>${esc(n.p?n.p+' · ':'')}${esc(n.t)}</title></g>`});
@@ -306,3 +306,8 @@ if(v38ApplyHash()&&typeof listing!=='undefined'&&listing){v38Hist.pop=true;rende
 
 // ---------- 뉴스 클리핑 링크 복사: 공유용 기사 페이지(n/<ID>.html) — 메신저 미리보기에 우리 사이트 썸네일·기사 설명 (11-05 15:24) ----------
 if(typeof v37Link==='function')v37Link=function(id){const base=v32Static()?location.origin+location.pathname.replace(/[^/]*$/,''):V37_PUBLIC;return base+'n/'+encodeURIComponent(id)+'.html'};
+
+// ---------- 캠페인 분석 '경쟁사 광고비 비교': 디지털 기준 안내 (11-05 16:41) ----------
+if(typeof annualPanel==='function'){var v38BaseAnnual=annualPanel;annualPanel=function(d){const h=v38BaseAnnual(d);if(!h)return h;
+ const note=`<p class="footnote v38-annote">TV·라디오·인쇄는 아덱스(TV는 SM C&C 실집행 추정 요율 반영), 디지털은 월별 통합 분석과 같은 ${v32Static()?'디지털 집행 자료':'디지털 자료'} 기준(포함=O) · 자료가 없는 달의 디지털은 비워 둠</p>`;
+ return h.replace(/<\/section>\s*$/,note+'</section>')}}

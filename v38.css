@@ -162,3 +162,7 @@ html.nd .glass.v38-card,.glass.v38-card{background:none!important;background-ima
 /* 캠페인 분석 하단 월별 매체 광고비: '월 합계' 행 배경 조금 더 진하게, 첫 열·12개월 합계 열까지 모든 열 같은 색 (11-05 15:05) */
 .v38-amp tfoot{background:none!important}
 .v38-amp tfoot th,.v38-amp tfoot td,.v38-amp tfoot .v4-total-col{background:#d6e6ef!important;color:#1f4a62!important;font-weight:700}
+/* 월별 통합 분석 캠페인 캡슐: 흰 바탕 (11-05 16:41) */
+.v38-camp:hover .cap{fill:#eef3f7!important;fill-opacity:1}
+/* 왼쪽 메뉴: 로고와 간격을 벌려 오른쪽 본문(첫 카드) 시작 높이에 맞춤 (11-05 16:41) */
+.sidebar nav{margin-top:60px!important}

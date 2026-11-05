@@ -147,3 +147,8 @@ html.nd .filter-label select,html.nd .filter-label select.chip{height:37px;min-w
 .v38-glass,.v38-tglass{background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:6px 4px!important}
 .v38-tglass{margin-top:10px;padding-top:12px!important;border-top:1px solid rgba(16,43,69,.07)!important}
 html.nd .glass.v38-card,.glass.v38-card{background-image:linear-gradient(155deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.14) 48%,rgba(250,252,255,.17) 100%)!important}
+/* 2026-11-05 14:26 — 그래프·표를 각각 따로 글래스 상자로(흰색 조금 더 짙게), 바깥 상자는 투명 */
+html.nd .glass.v38-card,.glass.v38-card{background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:0!important}
+.v38-glass,.v38-tglass{background:linear-gradient(155deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.32) 48%,rgba(250,252,255,.38) 100%)!important;border:1px solid rgba(255,255,255,.92)!important;border-radius:16px!important;box-shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.03)!important;backdrop-filter:blur(1.5px) saturate(1.6)!important;-webkit-backdrop-filter:blur(1.5px) saturate(1.6)!important;padding:18px 20px!important}
+.v38-tglass{margin-top:14px!important;border-top:1px solid rgba(255,255,255,.92)!important;padding:12px 20px!important}
+.v38-card .v38-legend{border-top:0;margin-top:14px}

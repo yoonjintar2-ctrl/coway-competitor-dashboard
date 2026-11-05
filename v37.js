@@ -26,7 +26,7 @@ function v37Row(x,k,list){const w=v37When(x.published_at),same=k>0&&v37When(list
   <div class="v37-when">${same?'':`<b>${esc(w.date)}</b>`}<span>${esc(w.time)}</span></div>
   <div class="v37-main"><div class="v37-tags"><span class="v37-chip">${esc(x.category_label)}</span><span class="v37-chip adv" style="--c:${v37Color(x.advertiser)}">${esc(x.advertiser)}</span><em>${esc(x.publisher||'')}</em>${(x.related||[]).length?`<span class="v37-more" title="같은 소식을 다룬 기사 ${x.related.length+1}건 · 누르면 모두 보기">외 ${x.related.length}곳</span>`:''}</div>
    <div class="v37-title">${esc(x.title)}</div><div class="v37-sum">${esc(x.summary||'')}</div></div>
-  <button type="button" class="v37-share" data-v37-share="${esc(x.id)}" title="원문 링크 복사" aria-label="원문 링크 복사">${V37_SHARE}</button>
+  <button type="button" class="v37-share" data-v37-share="${esc(x.id)}" title="링크 복사" aria-label="링크 복사">${V37_SHARE}</button>
   <div class="v37-thumb">${x.image?`<img src="${esc(safeUrl(x.image))}" alt="" loading="lazy" onerror="this.remove()">`:''}</div></div>`}
 function v37Controls(show){let box=document.querySelector('main>header .v37-ctrl');if(!show){if(box)box.remove();return}
  const head=document.querySelector('main>header');if(!head)return;if(!box){box=document.createElement('div');box.className='v32-ctrl v37-ctrl';head.appendChild(box)}
@@ -34,7 +34,7 @@ function v37Controls(show){let box=document.querySelector('main>header .v37-ctrl
  box.innerHTML=`<label>품목<select id="v37-cat" class="chip">${cats.map(c=>`<option value="${esc(c)}" ${c===v37Cat?'selected':''}>${c?esc(c):'전체 품목'}</option>`).join('')}</select></label><label>광고주<select id="v37-adv" class="chip">${advs.map(a=>`<option value="${esc(a)}" ${a===v37Adv?'selected':''}>${a?esc(a):'코웨이 + 경쟁사'}</option>`).join('')}</select></label>`}
 function v37Draw(){const items=v37Items();$('#subtitle').textContent='';v37Controls(true);
  const up=v37Data.updated_at?v37When(v37Data.updated_at):null;
- $('#content').innerHTML=`<p class="v32-note v37-note">코웨이와 경쟁 광고주 뉴스를 발행 시각 순으로 보여 줘요(최근 ${v37Data.days}일 · 소식 ${items.length}건${v37Data.articles&&v37Data.articles>(v37Data.items||[]).length&&!v37Cat&&!v37Adv?` · 기사 ${v37Data.articles}건`:''}). 기사를 누르면 크게 보고, 공유 버튼으로 원문 링크를 복사해요.${up?` · ${up.date} ${up.time} 업데이트${v32Static()?'':` · PC 대시보드가 켜져 있으면 ${v37Data.interval_minutes}분마다 새 기사를 모아요`}`:''}</p>
+ $('#content').innerHTML=`<p class="v32-note v37-note">코웨이와 경쟁 광고주 뉴스를 발행 시각 순으로 보여 줘요(최근 ${v37Data.days}일 · 소식 ${items.length}건${v37Data.articles&&v37Data.articles>(v37Data.items||[]).length&&!v37Cat&&!v37Adv?` · 기사 ${v37Data.articles}건`:''}). 기사를 누르면 크게 보고, 링크 복사 버튼으로 이 사이트에서 그 기사가 열리는 주소를 복사해요.${up?` · ${up.date} ${up.time} 업데이트${v32Static()?'':` · PC 대시보드가 켜져 있으면 ${v37Data.interval_minutes}분마다 새 기사를 모아요`}`:''}</p>
   <section class="glass section v37-list">${items.length?items.map((x,k,l)=>v37Row(x,k,l)).join(''):empty('조건에 맞는 뉴스가 없어요.',v37Data.items.length?'품목·광고주 선택을 바꿔 보세요.':'아직 모은 뉴스가 없어요. PC 대시보드가 켜져 있으면 곧 채워져요.')}</section>
   <p class="footnote">네이버 뉴스 검색에서 제목에 광고주(브랜드) 이름이 들어간 기사만 모아요 · 같은 소식을 여러 매체가 쓴 기사는 한 줄로 묶어요(같은 광고주·48시간 이내·제목이나 첫 문장이 비슷한 기사, 맨 위는 가장 최근 기사) · 요약은 기사 원문의 대표 설명(AI 요약 아님) · 품목은 제목·요약의 품목 단어로 정해요(품목 단어가 없는 브랜드 소식은 '기타').</p>`}
 var v37BaseRender=render;
@@ -57,14 +57,14 @@ function v37Find(id){for(const i of (v37Data&&v37Data.items||[])){if(i.id===id)r
 async function v37Copy(text){try{await navigator.clipboard.writeText(text);return true}catch(e){const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}t.remove();return ok}}
 window.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-v37-share]');if(!b)return;e.preventDefault();e.stopPropagation();
  const x=v37Find(b.dataset.v37Share);if(!x)return;
- const ok=await v37Copy(`${x.title}\n${x.url}`);toast(ok?'원문 링크를 복사했어요.':'복사하지 못했어요. 팝업의 원문 주소를 직접 복사해 주세요.');b.classList.add('done');setTimeout(()=>b.classList.remove('done'),1200)},true);
+ const ok=await v37Copy(`${x.title}\n${v37Link(x.id)}`);toast(ok?'링크를 복사했어요. 받은 사람이 열면 이 기사가 팝업으로 떠요.':'복사하지 못했어요.');b.classList.add('done');setTimeout(()=>b.classList.remove('done'),1200)},true);
 // 기사 팝업
 function v37Open(x){if(!x)return;const w=v37When(x.published_at),dialog=$('#detail');dialog.className='v37-dialog';
  $('#detail-body').innerHTML=`<div class="v37-pop">${x.image?`<img class="v37-pop-img" src="${esc(safeUrl(x.image))}" alt="">`:''}
   <div class="v37-pop-body"><div class="v37-tags"><span class="v37-chip">${esc(x.category_label)}</span><span class="v37-chip adv" style="--c:${v37Color(x.advertiser)}">${esc(x.advertiser)}</span><em>${esc(x.publisher||'')} · ${esc(w.date)} ${esc(w.time)}</em></div>
   <h2>${esc(x.title)}</h2><p class="v37-pop-sum">${esc(x.summary||'원문 요약을 가져오지 못했어요.')}</p>
-  <div class="v37-pop-actions"><a class="primary" href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener">원문 보기 ↗</a><button type="button" class="v37-share wide" data-v37-share="${esc(x.id)}">${V37_SHARE}<span>원문 링크 복사</span></button></div>
-  ${(x.related||[]).length?`<div class="v37-rel"><b>같은 소식을 다룬 기사 ${x.related.length+1}건</b>${[{id:x.id,title:x.title,publisher:x.publisher,published_at:x.published_at,url:x.url,main:true},...x.related].map(r=>{const t=v37When(r.published_at);return `<div class="v37-rel-row${r.main?' main':''}"><span class="v37-rel-when">${esc(t.date)} ${esc(t.time)}</span><a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener"><em>${esc(r.publisher||'')}</em>${esc(r.title)}</a><button type="button" class="v37-share" data-v37-share="${esc(r.id)}" title="원문 링크 복사" aria-label="원문 링크 복사">${V37_SHARE}</button></div>`}).join('')}</div>`:''}
+  <div class="v37-pop-actions"><a class="primary" href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener">원문 보기 ↗</a><button type="button" class="v37-share wide" data-v37-share="${esc(x.id)}">${V37_SHARE}<span>링크 복사</span></button></div>
+  ${(x.related||[]).length?`<div class="v37-rel"><b>같은 소식을 다룬 기사 ${x.related.length+1}건</b>${[{id:x.id,title:x.title,publisher:x.publisher,published_at:x.published_at,url:x.url,main:true},...x.related].map(r=>{const t=v37When(r.published_at);return `<div class="v37-rel-row${r.main?' main':''}"><span class="v37-rel-when">${esc(t.date)} ${esc(t.time)}</span><a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener"><em>${esc(r.publisher||'')}</em>${esc(r.title)}</a><button type="button" class="v37-share" data-v37-share="${esc(r.id)}" title="링크 복사" aria-label="링크 복사">${V37_SHARE}</button></div>`}).join('')}</div>`:''}
   <p class="footnote">요약은 기사 원문의 대표 설명이에요. 자세한 내용은 원문에서 확인해 주세요.</p></div></div>`;
  if(!dialog.open)dialog.showModal()}
 document.addEventListener('click',e=>{const r=e.target.closest('[data-v37-news]');if(!r||e.target.closest('[data-v37-share]'))return;v37Open((v37Data&&v37Data.items||[]).find(i=>i.id===r.dataset.v37News))});
@@ -75,3 +75,15 @@ function v37HideHover(){const a=document.getElementById('campaign-hover');if(a){
 var v37RenderBase2=render;render=async function(...a){if(route!=='timeline')v37HideHover();return v37RenderBase2.apply(this,a)};
 var v37ShowBase=v5Show;v5Show=function(id,target){if(target&&(!document.body.contains(target)||(route!=='timeline'&&target.closest&&target.closest('#gantt-scroll'))))return v37HideHover();return v37ShowBase.apply(this,arguments)};
 window.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#gantt-scroll [data-gantt],.sidebar [data-route]'))setTimeout(()=>{if(route!=='timeline')v37HideHover()},0)},true);
+
+// ---------- 4) 링크 복사: 우리 사이트에서 그 기사 팝업이 뜨는 주소 (11-05 11:20) ----------
+// 공유받는 사람은 공개 사이트(GitHub Pages)로 열고, PC 대시보드에서 복사해도 공개 사이트 주소를 준다.
+var V37_PUBLIC='https://yoonjintar2-ctrl.github.io/coway-competitor-dashboard/';
+function v37Link(id){const base=v32Static()?location.origin+location.pathname:V37_PUBLIC;return base+'#news='+encodeURIComponent(id)}
+function v37Main(id){for(const i of (v37Data&&v37Data.items||[])){if(i.id===id||(i.related||[]).some(z=>z.id===id))return i}return null}
+async function v37FromHash(){const m=/(?:^|[#&])news=([^&]+)/.exec(location.hash||'');if(!m)return;const id=decodeURIComponent(m[1]);
+ const nav=document.querySelector('.sidebar [data-route="news"]');if(route!=='news'&&nav)nav.click();
+ for(let k=0;k<80&&!(v37Data&&route==='news'&&document.querySelector('.v37-list'));k++)await new Promise(r=>setTimeout(r,150));
+ const x=v37Main(id);if(x){v37Open(x);const dl=$('#detail');const clear=()=>{if(/news=/.test(location.hash))history.replaceState(null,'',location.pathname+location.search);dl.removeEventListener('close',clear)};dl.addEventListener('close',clear)}
+ else toast('공유된 기사를 찾지 못했어요. 최근 기사 목록을 보여 드려요.')}
+window.addEventListener('load',()=>setTimeout(v37FromHash,400));window.addEventListener('hashchange',v37FromHash);

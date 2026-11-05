@@ -86,3 +86,16 @@ table.mt.v38-t,table.mt.v38-names{font-size:12.5px}
 .v38-box.sl .v38-edge.l,.v38-box.sr .v38-edge.r{opacity:1}
 .v38-legend{font-size:12.5px;gap:10px 26px;margin-top:18px;padding-top:16px}
 .v38-note{font-size:11.5px;margin-top:12px}
+/* 2026-11-05 11:30 — 다른 화면과 글자 크기 맞춤(왼쪽 메뉴 12px 이하) · 그래프 영역만 흰 글래스 */
+.v38-card{padding:18px 20px 14px!important}
+.v38-glass{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.8));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.95);border-radius:18px;box-shadow:0 8px 24px rgba(20,60,90,.05),inset 0 1px 0 #fff;padding:12px 14px 12px}
+table.mt.v38-t,table.mt.v38-names{font-size:11.5px}
+.v38-t td,.v38-names td{height:27px;background:rgba(240,244,247,.8)}
+.v38-names td.h{font-size:11px;padding-left:10px}
+.v38-t tr.post td,.v38-names tr.post td{height:50px}
+.v38-pill{font-size:10.5px;padding:1px 8px 1px 2px;margin:2px auto}.v38-pill i{width:15px;height:15px;font-size:8px}
+.v38-t{margin-top:10px}
+.v38-legend{font-size:11px;gap:8px 20px;margin-top:12px;padding-top:12px}
+.v38-legend .sw{width:18px;height:8px}.v38-legend .ln{width:20px;height:3px}
+.v38-note{font-size:10.5px;margin-top:8px}
+.v38-fbtn{width:36px;height:36px}.v38-fbtn svg{width:16px!important;height:16px!important}

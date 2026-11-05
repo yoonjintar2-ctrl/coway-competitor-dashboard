@@ -57,7 +57,7 @@ function v37Find(id){for(const i of (v37Data&&v37Data.items||[])){if(i.id===id)r
 async function v37Copy(text){try{await navigator.clipboard.writeText(text);return true}catch(e){const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}t.remove();return ok}}
 window.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-v37-share]');if(!b)return;e.preventDefault();e.stopPropagation();
  const x=v37Find(b.dataset.v37Share);if(!x)return;
- const ok=await v37Copy(`${x.title}\n${v37Link(x.id)}`);toast(ok?'링크를 복사했어요. 받은 사람이 열면 이 기사가 팝업으로 떠요.':'복사하지 못했어요.');b.classList.add('done');setTimeout(()=>b.classList.remove('done'),1200)},true);
+ const ok=await v37Copy(v37Link(x.id));toast(ok?'링크를 복사했어요. 받은 사람이 열면 이 기사가 팝업으로 떠요.':'복사하지 못했어요.');b.classList.add('done');setTimeout(()=>b.classList.remove('done'),1200)},true);
 // 기사 팝업
 function v37Open(x){if(!x)return;const w=v37When(x.published_at),dialog=$('#detail');dialog.className='v37-dialog';
  $('#detail-body').innerHTML=`<div class="v37-pop">${x.image?`<img class="v37-pop-img" src="${esc(safeUrl(x.image))}" alt="">`:''}

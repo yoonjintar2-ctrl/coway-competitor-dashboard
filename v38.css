@@ -99,3 +99,15 @@ table.mt.v38-t,table.mt.v38-names{font-size:11.5px}
 .v38-legend .sw{width:18px;height:8px}.v38-legend .ln{width:20px;height:3px}
 .v38-note{font-size:10.5px;margin-top:8px}
 .v38-fbtn{width:36px;height:36px}.v38-fbtn svg{width:16px!important;height:16px!important}
+/* 2026-11-05 11:50 — 표 합계 덜 진하게, 상단 드롭다운 이름·항목 글자 크기 통일(작은 쪽 12px) */
+.v38-t tr.sum td,.v38-names tr.sum td{font-weight:600;color:#5b6874}
+.v32-ctrl label{font-size:12px;gap:5px}
+.v32-ctrl select,html.nd .v32-ctrl select.chip{font-size:12px!important;font-weight:600;padding:9px 32px 9px 13px}
+.v32-ctrl select option{font-size:12px}
+/* 캠페인 분석 하단 월별 매체 광고비: 소계 행 */
+.v38-amp tr.v38-item th .v38-sub-n{padding-left:12px;font-weight:500;color:#5b6874}
+.v38-amp tr.v38-item td{color:#6b7782}
+.v38-amp tr.v38-subtot th,.v38-amp tr.v38-subtot td{font-weight:700;color:#34414d;background:rgba(236,242,246,.65)}
+/* 캠페인 타임라인·분석 상단 드롭다운도 같은 크기(12px) */
+html.nd .filter-label select,html.nd .filter-label select.chip{font-size:12px!important;font-weight:600;padding:9px 30px 9px 12px!important}
+html.nd .filter-label{font-size:12px}

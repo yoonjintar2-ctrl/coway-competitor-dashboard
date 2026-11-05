@@ -24,7 +24,7 @@ function v38Controls(show){let box=document.querySelector('main>header .v38-ctrl
  box.innerHTML=`<label>광고주<select id="v38-adv" class="chip">${(v38Opt||[]).map(x=>`<option value="${esc(x.advertiser)}" ${x.advertiser===v38Adv?'selected':''}>${esc(x.advertiser)}</option>`).join('')}</select></label><label>세부 품목<select id="v38-cat" class="chip"><option value="">전체</option>${(o?o.categories:[]).map(c=>`<option value="${esc(c)}" ${c===v38Cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label>`}
 function v38Sum(s){return Object.values(s||{}).reduce((a,b)=>a+(b||0),0)}
 function v38Cv(s){return Object.fromEntries(V38_CATS.map(([k,,,subs])=>[k,subs.reduce((a,[sk])=>a+(s[sk]||0),0)]))}
-var V38_TG=14,V38_ADJ=0,V38_FIX=0;
+var V38_TG=10,V38_ADJ=0,V38_FIX=0;
 function v38View(d){
  const M=d.months,N=M.length,CUR=d.current,VIEW=Math.min(12,N),VIS0=N-VIEW;
  const host=$('#content');const VW=Math.max(900,(host.clientWidth||1200)-72-V38_ADJ),GUT=56,TW=66,slot=(VW-GUT-TW)/VIEW,CW=N*slot+TW,PW=N*slot,bw=slot*.6,ybw=bw*.86;
@@ -39,24 +39,26 @@ function v38View(d){
  let CL=d.camps;if(!d.category){const big=CL.filter(c=>(c.amount||0)>=5e8);CL=big.length?big:[...CL].sort((a,b)=>(b.amount||0)-(a.amount||0)).slice(0,5)}
  const camps=[];for(const c of [...CL].sort((a,b)=>(b.amount||0)-(a.amount||0))){const nm=c.name.replace(new RegExp('^'+d.advertiser.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'),'').replace(/^·\s*/,'')||c.name;const txt=`${nm} · ${md(c.s)}–${md(c.e)}`;const x0=xd(c.s),x1=Math.max(xd(c.e),x0+ctx.measureText(txt).width+CH+16);const k=fit(x0,x1);if(k<0)continue;camps.push({...c,txt,x0,x1,k})}
  ctx.font='500 11px Pretendard, "Noto Sans KR", sans-serif';
- const news=[];for(const n of [...d.news].sort((a,b)=>a.d.localeCompare(b.d))){const txt=`${md(n.d)} ${n.t}${n.n>1?` 외 ${n.n-1}건`:''}`;let x0=xd(n.d),x1=x0+16+Math.min(240,ctx.measureText(txt).width);if(x1>PW-6){x0-=x1-(PW-6);x1=PW-6}const k=fit(x0,x1);if(k<0)continue;news.push({...n,txt,x0,x1,k})}
+ const news=[];for(const n of [...d.news].sort((a,b)=>a.d.localeCompare(b.d))){const txt=`${md(n.d)} ${n.t}${n.n>1?` 외 ${n.n-1}건`:''}`;let x0=xd(n.d),x1=x0+36+Math.min(240,ctx.measureText(txt).width);if(x1>PW-6){x0-=x1-(PW-6);x1=PW-6}const k=fit(x0,x1);if(k<0)continue;news.push({...n,txt,x0,x1,k})}
  const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=108,BAR_TOP=LINE_TOP+LINE_H+2,BAR_H=188,BASE=BAR_TOP+BAR_H;
  const RAW=Math.max(1e7,Math.max(...TOT,...AVG,...YOY.map(v=>v||0))*1.1),YST=[5e9,2e9,1e9,5e8,2e8,1e8,5e7,2e7,1e7].find(k=>RAW/k>=3)||1e7,mx=RAW,sy=v=>BASE-v/mx*BAR_H;
  const top=(x,w,y)=>`M${x},${BASE} V${y} H${x+w} V${BASE} Z`;
  let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8aa3b8" stop-opacity=".17"/><stop offset="1" stop-color="#8aa3b8" stop-opacity=".07"/></linearGradient>
   <linearGradient id="v38-yoy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3bcc4" stop-opacity=".36"/><stop offset="1" stop-color="#d9dfe3" stop-opacity=".26"/></linearGradient>
-  <pattern id="v38-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#25a4dc" stroke-width="2" stroke-opacity=".14"/></pattern>
+  <pattern id="v38-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#25a4dc" stroke-width="1.4" stroke-opacity=".06"/></pattern>
+  <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".34"/></pattern>
   <filter id="v38-soft" x="-20%" y="-60%" width="140%" height="220%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#14405a" flood-opacity=".09"/></filter>
   ${camps.map((c,i)=>`<clipPath id="v38-cl${i}"><circle cx="${c.x0+CH/2}" cy="${CT+c.k*(CH+CG)+CH/2}" r="${CH/2-3}"/></clipPath>`).join('')}
   ${M.map((m,i)=>TOT[i]?`<clipPath id="v38-bar${i}"><path d="${top(BX(i)-bw/2,bw,sy(TOT[i]))}"/></clipPath>`:'').join('')}</defs>`;
  const ci=M.indexOf(CUR);if(ci>=0)s+=`<rect x="${slot*ci+4}" y="${LINE_TOP-8}" width="${slot-8}" height="${BASE-LINE_TOP+8}" rx="14" fill="url(#v38-hatch)"/>`;
+ M.forEach((m,i)=>{if(i&&m.endsWith('-01'))s+=`<line x1="${slot*i}" x2="${slot*i}" y1="${CT}" y2="${BASE}" stroke="#7f98ad" stroke-opacity=".09" stroke-width="5"/>`});
  // 캠페인
  camps.forEach((c,i)=>{const y=CT+c.k*(CH+CG),w=c.x1-c.x0;
   s+=`<g class="v38-camp" data-v38-camp="${esc(c.id)}"><line class="gd" x1="${c.x0+.5}" x2="${c.x0+.5}" y1="${y+CH/2}" y2="${BASE}" stroke="#3b4450"/><g filter="url(#v38-soft)"><rect class="cap" x="${c.x0}" y="${y}" width="${w}" height="${CH}" rx="${CH/2}" fill="rgba(255,255,255,.94)" stroke="rgba(59,68,80,.16)"/></g>
   <circle cx="${c.x0+CH/2}" cy="${y+CH/2}" r="${CH/2-2.5}" fill="#dbe7ee"/>${c.thumb?`<image href="${esc(safeUrl(c.thumb))}" x="${c.x0+3}" y="${y+3}" width="${CH-6}" height="${CH-6}" preserveAspectRatio="xMidYMid slice" clip-path="url(#v38-cl${i})"/>`:''}
   <text x="${c.x0+CH+4}" y="${y+CH/2+4}" font-size="11.5" font-weight="700" fill="#2b3540">${esc(c.txt.replace(/ · \d\d\.\d\d–\d\d\.\d\d$/,''))} <tspan font-weight="500" fill="#5c6873">· ${md(c.s)}–${md(c.e)}</tspan></text></g>`});
  // 기사(점·글자, x축 연결선)
- news.forEach(n=>{const y=CT+n.k*(CH+CG)+CH/2,t=n.txt.length>40?n.txt.slice(0,39)+'…':n.txt;s+=`<g class="v38-news" data-v38-news="${esc(n.u)}"><line class="gd" x1="${n.x0+5}" x2="${n.x0+5}" y1="${y+4}" y2="${BASE}" stroke="#8d98a3"/><circle cx="${n.x0+5}" cy="${y}" r="3.2" fill="#8d98a3"/><text x="${n.x0+13}" y="${y+3.8}" font-size="11" fill="#5f6b77"><tspan font-weight="700" fill="#8d98a3">${esc(t.slice(0,5))}</tspan>${esc(t.slice(5))}</text><title>${esc(n.p?n.p+' · ':'')}${esc(n.t)}</title></g>`});
+ news.forEach(n=>{const y=CT+n.k*(CH+CG)+CH/2,t=n.txt.length>40?n.txt.slice(0,39)+'…':n.txt;s+=`<g class="v38-news" data-v38-news="${esc(n.u)}"><line class="gd" x1="${n.x0+13}" x2="${n.x0+13}" y1="${y+7}" y2="${BASE}" stroke="#8d98a3"/><rect x="${n.x0}" y="${y-7}" width="26" height="14" rx="7" fill="rgba(125,138,150,.13)"/><text x="${n.x0+13}" y="${y+3.2}" text-anchor="middle" font-size="9" font-weight="700" fill="#7d8a96">기사</text><text x="${n.x0+31}" y="${y+3.8}" font-size="11" fill="#5f6b77"><tspan font-weight="700" fill="#8d98a3">${esc(t.slice(0,5))}</tspan>${esc(t.slice(5))}</text><title>${esc(n.p?n.p+' · ':'')}${esc(n.t)}</title></g>`});
  // 네이버 쿼리(올해 + 전년 같은 달)
  const qv=[...Q.slice(0,-1),...QY.slice(0,-1)].filter(v=>v!=null);let CAP=null;const QP=M.map(()=>null);
  if(qv.length){const lo=Math.min(...qv)*.85,hi=Math.max(...qv,...Q.filter(v=>v!=null)),qt=LINE_TOP+17,qh=LINE_H-34,qy=v=>qt+qh-(v-lo)/((hi-lo)||1)*qh;
@@ -69,7 +71,7 @@ function v38View(d){
  // 경쟁사 평균(영역)
  const ap=M.map((m,i)=>[X(i),sy(AVG[i])]);if(AVG.some(v=>v)){const ext=[[0,ap[0][1]],...ap,[PW,ap.at(-1)[1]]];s+=`<path d="${v38Smooth(ext)} L${PW},${BASE} L0,${BASE} Z" fill="url(#v38-avg)"/>`}
  // 전년 막대(회색 한 톤) + 올해 막대 위 모서리와 잇는 옅은 선
- M.forEach((m,i)=>{const yv=YOY[i];if(!yv)return;const x=YX(i)-ybw/2,y=sy(yv);s+=`<path d="${top(x,ybw,y)}" fill="url(#v38-yoy)"/>`;
+ M.forEach((m,i)=>{const yv=YOY[i];if(!yv)return;const x=YX(i)-ybw/2,y=sy(yv);s+=`<path d="${top(x,ybw,y)}" fill="url(#v38-yoyh)"/>`;
   if(TOT[i]){const bx=BX(i)-bw/2,by=sy(TOT[i]);s+=`<line x1="${x}" y1="${y}" x2="${bx}" y2="${by}" stroke="#3b4450" stroke-opacity=".14" stroke-width=".8"/><line x1="${x+ybw}" y1="${y}" x2="${bx+bw}" y2="${by}" stroke="#3b4450" stroke-opacity=".14" stroke-width=".8"/>`}});
  // 올해 막대(대분류만, 사이 간격)
  M.forEach((m,i)=>{if(!TOT[i])return;let run=0;const op=m===CUR?.38:.8;let g=`<g clip-path="url(#v38-bar${i})">`;
@@ -163,3 +165,15 @@ var V38_COLS={advertisers:['ra_name','nielsen','display','competitor','note'],in
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-v38-save]');if(!b)return;const k=b.dataset.v38Save,ta=document.querySelector(`[data-v38-paste="${k}"]`);const lines=(ta.value||'').split(/\r?\n/).filter(l=>l.trim());
  if(!lines.length)return toast('붙여넣은 내용이 없어요.');const cols=V38_COLS[k];const rows=lines.map(l=>{const c=l.split('\t');const o={};cols.forEach((n,i)=>o[n]=(c[i]||'').trim());if(k==='advertisers')o.primary=true;return o});
  if(!confirm(`${rows.length}줄로 이 표를 바꿀까요?`))return;try{await api('/api/ra/rules',{kind:k,rows});v38Rules=null;v7Draw();toast('저장했어요. 월별 통합 분석에 바로 반영돼요.')}catch(err){toast('저장하지 못했어요: '+err.message)}});
+
+// ---------- 캠페인 분석 하단 '최근 12개월 월별 매체 광고비': 매체 묶음 소계 · 디지털은 월별 통합 분석 기준 (11-05 11:45) ----------
+var V38_BK={terrestrial:'지상파',general:'종편',cable:'케이블',dg_video:'동영상',dg_pc:'PC',dg_mo:'MO',digital_video:'디지털 영상',digital_banner:'디지털 배너',newspaper:'신문',magazine:'잡지',radio:'라디오',print:'신문·잡지'};
+if(typeof advertiserMonthlyPanel==='function'){var v38BaseAMP=advertiserMonthlyPanel;advertiserMonthlyPanel=function(d){
+ const data=d.advertiser_monthly;if(!data||!data.groups)return v38BaseAMP(d);const months=data.rows,lastMonth=data.end.slice(0,7);
+ const sum=(keys,r)=>keys.reduce((a,k)=>a+(r.media[k]||0),0),raws=(keys,r)=>keys.reduce((a,k)=>a+(r.raw_media[k]||0),0),grand=months.reduce((s,r)=>s+r.total,0);
+ const M=v=>v?v4Million(v):'—';
+ const row=(label,keys,cls)=>{const tot=months.reduce((a,r)=>a+sum(keys,r),0),rt=months.reduce((a,r)=>a+raws(keys,r),0);
+  return `<tr class="${cls}"><th scope="row">${label}</th>${months.map(r=>`<td title="원본 ${number(raws(keys,r))}원 · 표시 ${number(sum(keys,r))}원">${M(sum(keys,r))}</td>`).join('')}<td class="v4-total-col" title="원본 ${number(rt)}원 · 표시 ${number(tot)}원">${M(tot)}</td></tr>`};
+ const body=data.groups.map(g=>g.keys.length>1?g.keys.map(k=>row(`<span class="v38-sub-n">${V38_BK[k]||k}</span>`,[k],'v38-item')).join('')+row(`${g.label} 소계`,g.keys,'v38-subtot'):row(g.label,g.keys,'v38-subtot')).join('');
+ const src=data.digital_source==='ra'?(v32Static()?' · 디지털은 월별 통합 분석과 같은 디지털 집행 자료 기준':' · 디지털은 월별 통합 분석과 같은 디지털 자료 기준(포함=O)'):'';
+ return `<section class="glass section advertiser-monthly">${header(`${esc(d.campaign.advertiser)} · 최근 12개월 월별 매체 광고비`,`${data.start} — ${data.end} · ${esc(data.scope)} 합산 · 단위 백만원${adjusted()?' · 보정 추정액':''}${src}`)}<div class="monthly-table-scroll"><table class="data-table monthly-spend-table v4-monthly v38-amp"><thead><tr><th scope="col">매체</th>${months.map(r=>`<th scope="col">${r.month.slice(2).replace('-','.')}${r.month===lastMonth?'*':''}</th>`).join('')}<th scope="col" class="v4-total-col">12개월 합계</th></tr></thead><tbody>${body}</tbody><tfoot><tr><th scope="row">월 합계</th>${months.map(r=>`<td title="${number(r.total)}원">${M(r.total)}</td>`).join('')}<td class="v4-total-col" title="${number(grand)}원">${v4Million(grand)}</td></tr></tfoot></table></div><p class="footnote">* 마지막 월은 선택 종료일(${dateLabel(data.end)})까지의 부분월입니다. —는 확보된 원본에서 집행액이 관측되지 않은 항목입니다. 셀에 마우스를 올리면 원 단위 금액을 확인합니다.</p></section>`}}

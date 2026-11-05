@@ -50,3 +50,9 @@ dialog.v37-dialog{width:min(860px,94vw);max-width:860px}
 .v37-pop-body{max-height:72vh;overflow:auto}
 /* 11-04 17:10 타임라인 팝업 모서리 마름모(말풍선 꼬리) 없앰 */
 #campaign-hover.v34-dock::after,#campaign-hover.v34-dock.v34-below::after{content:none!important;display:none!important}
+
+/* 2026-11-05 11:50 — 팝업: 버튼 높이 맞춤, 스크롤 막대가 닫기 버튼과 겹치지 않게 */
+dialog.v37-dialog{overflow:hidden;padding:30px 12px 24px 30px}
+dialog.v37-dialog #detail-body{max-height:calc(88vh - 54px);overflow:auto;padding-right:18px;margin-top:14px;scrollbar-gutter:stable}
+dialog.v37-dialog .close{top:8px;right:14px;z-index:2}
+.v37-pop-actions a.primary,.v37-pop-actions .v37-share.wide{height:38px;box-sizing:border-box;padding:0 16px;display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:1;border-radius:10px}

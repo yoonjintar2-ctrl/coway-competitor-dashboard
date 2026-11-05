@@ -54,7 +54,7 @@ function v38View(d){
   <filter id="v38-soft" x="-20%" y="-60%" width="140%" height="220%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#14405a" flood-opacity=".09"/></filter>
   ${camps.map((c,i)=>`<clipPath id="v38-cl${i}"><circle cx="${c.x0+CH/2}" cy="${CT+c.k*(CH+CG)+CH/2}" r="${CH/2-3}"/></clipPath>`).join('')}
   ${M.map((m,i)=>TOT[i]?`<clipPath id="v38-bar${i}"><path d="${top(BX(i)-bw/2,bw,sy(TOT[i]))}"/></clipPath>`:'').join('')}</defs>`;
- const ci=M.indexOf(CUR);if(ci>=0)s+=`<rect x="${slot*ci+4}" y="${LINE_TOP-8}" width="${slot-8}" height="${BASE-LINE_TOP+8}" rx="14" fill="url(#v38-hatch)"/>`;
+ 
  M.forEach((m,i)=>{if(i&&m.endsWith('-01'))s+=`<line x1="${slot*i}" x2="${slot*i}" y1="${CT}" y2="${BASE}" stroke="#7f98ad" stroke-opacity=".09" stroke-width="5"/>`});
  // 캠페인
  camps.forEach((c,i)=>{const y=CT+c.k*(CH+CG),w=c.x1-c.x0;

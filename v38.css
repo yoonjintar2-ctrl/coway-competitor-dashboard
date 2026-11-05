@@ -143,3 +143,7 @@ html.nd .filter-label select,html.nd .filter-label select.chip{height:37px;min-w
 .v38-tbox .v38-t{margin-top:0}
 .v38-tbox .v38-names{top:0}
 .v32-ctrl select,html.nd .v32-ctrl select.chip,html.nd .filter-label select,html.nd .filter-label select.chip{width:170px!important;min-width:170px!important}
+/* 2026-11-05 14:21 — 흰 상자 이중 배경 없애고, 바깥 글래스만 다른 메뉴보다 살짝 더 희게 */
+.v38-glass,.v38-tglass{background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:6px 4px!important}
+.v38-tglass{margin-top:10px;padding-top:12px!important;border-top:1px solid rgba(16,43,69,.07)!important}
+html.nd .glass.v38-card,.glass.v38-card{background-image:linear-gradient(155deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.14) 48%,rgba(250,252,255,.17) 100%)!important}

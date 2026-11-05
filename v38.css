@@ -111,3 +111,25 @@ table.mt.v38-t,table.mt.v38-names{font-size:11.5px}
 /* 캠페인 타임라인·분석 상단 드롭다운도 같은 크기(12px) */
 html.nd .filter-label select,html.nd .filter-label select.chip{font-size:12px!important;font-weight:600;padding:9px 30px 9px 12px!important}
 html.nd .filter-label{font-size:12px}
+/* 2026-11-05 12:15 — 쿼리 키워드 연필 · 엑셀 다운로드 · 캠페인 캡슐 */
+.v38-camp .cap{stroke:none!important}.v38-camp:hover .cap{fill:#d2d9df}
+.v38-kwline{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;font-size:11px;color:#7d8a96;margin-top:8px}
+.v38-kwline b{font-weight:600;color:#5b6874}
+.v38-kwbtn{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:999px;border:1px solid #d6e3ea;background:#fff;color:#4d5964;font:600 11px inherit;font-family:inherit;cursor:pointer}
+.v38-kwbtn:hover{border-color:#25a4dc;color:#1a8cc2}
+.v35-chiprow .v38-kwbtn{margin-right:8px;height:28px}
+dialog.v38-kwdialog{width:min(620px,94vw)}
+.v38-kw h2{font-size:17px;margin:0 0 8px}
+.v38-kw .v38-help{font-size:12px;color:#6b7782;line-height:1.6;margin:0 0 14px}
+.v38-kwgrp{margin:0 0 12px}.v38-kwgrp>b{display:block;font-size:12px;color:#34414d;margin-bottom:6px}
+.v38-kwchip{display:inline-flex;align-items:center;gap:6px;margin:0 6px 6px 0;padding:5px 6px 5px 11px;border-radius:999px;background:#fff;border:1px solid #dfe7ed;font-size:12px;font-weight:600;color:#34414d}
+.v38-kwchip.new{border-color:#9fd3ec}
+.v38-kwchip em{font-style:normal;font-weight:500;font-size:10.5px;color:#8a96a3}
+.v38-kwchip button{width:20px;height:20px;border-radius:50%;border:0;background:#eef2f5;color:#6b7782;cursor:pointer;font-size:13px;line-height:1}
+.v38-kwchip button:hover{background:#fde3e3;color:#c0392b}
+.v38-kwadd{display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid #e6edf2}
+.v38-kwadd select,.v38-kwadd input{height:36px;border:1px solid #d6e3ea;border-radius:10px;padding:0 10px;font:12px inherit;font-family:inherit;background:#fff}
+.v38-kwadd input{flex:1}.v38-kwadd .primary{height:36px;padding:0 16px;border:0;border-radius:10px;background:#25a4dc;color:#fff;font:600 12px inherit;font-family:inherit;cursor:pointer}
+.v38-ampsec{position:relative}
+.v38-xlsbtn{position:absolute;top:18px;right:20px;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:9px;border:1px solid #cfe2d6;background:#f3faf5;color:#1f7a45;font:600 12px inherit;font-family:inherit;cursor:pointer}
+.v38-xlsbtn:hover{background:#e6f5ec}

@@ -152,7 +152,7 @@ document.addEventListener('mousemove',e=>{if(route!=='monthly'){return}const v=w
 var v38SyncLock=0;document.addEventListener('scroll',e=>{const id=e.target&&e.target.id;if(id!=='v38-scroller'&&id!=='v38-tscroller')return;if(!v38SyncLock){const o=document.getElementById(id==='v38-scroller'?'v38-tscroller':'v38-scroller');if(o&&Math.abs(o.scrollLeft-e.target.scrollLeft)>.5){v38SyncLock=1;o.scrollLeft=e.target.scrollLeft;setTimeout(()=>v38SyncLock=0,30)}}v38Btns()},true);
 
 // ---------- 설정 > 디지털 자료 규칙 ----------
-if(typeof v7Tabs!=='undefined')v7Tabs.push(['researchad','디지털 자료 규칙']);
+if(typeof v7Tabs!=='undefined')v7Tabs.push(['digitalrules','디지털 자료 규칙']);
 var v38Rules=null,v38RaStatus=null,v38RaFilter='';
 function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  const tbl=(cols,rows,lim=400)=>`<div class="v38-tw"><table class="v32-rn"><thead><tr>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rows.slice(0,lim).map(r=>`<tr>${cols.map(c=>`<td>${esc(String(r[c[0]]??''))}</td>`).join('')}</tr>`).join('')}</tbody></table>${rows.length>lim?`<small>앞 ${lim}줄만 보여요(전체 ${rows.length}줄)</small>`:''}</div>`;
@@ -166,9 +166,9 @@ function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  <section class="glass section">${header('index · 경쟁사 선별 규칙','업종(소)+브랜드 마다 포함 여부·품목(업종수정)·광고주명 수정·주요 경쟁을 정해요. 포함=O 인 브랜드만 디지털 광고비에 들어가요(품목이 없는 브랜드 광고는 \'브랜드\').')}
   <input type="search" id="v38-ra-filter" class="v38-filter" placeholder="광고주·브랜드·업종으로 찾기" value="${esc(v38RaFilter)}">${tbl([['industry_m','업종(중)'],['industry_s','업종(소)'],['advertiser','광고주'],['brand','브랜드'],['include','포함'],['category','업종수정(품목)'],['display','광고주명 수정'],['competitor','주요경쟁']],idx,300)}${paste('index')}</section>
  <section class="glass section">${header('매체 구분','유튜브·메타로 따로 보는 매체예요(나머지는 기타).')}${tbl([['media','매체'],['group','구분']],(R.media_groups||[]).filter(m=>m.group!=='기타'))}</section>`}
-if(typeof v7Draw==='function'){var v38BaseDraw=v7Draw;v7Draw=function(){if(v7Tab!=='researchad')return v38BaseDraw();
+if(typeof v7Draw==='function'){var v38BaseDraw=v7Draw;v7Draw=function(){if(v7Tab!=='digitalrules')return v38BaseDraw();
  $('#content').innerHTML=`<div class="v7-layout">${v7Menu()}<div class="v38-rules">${v38Rules?v38RulesView():empty('규칙을 불러오는 중이에요.')}</div></div>`;
- if(!v38Rules)Promise.all([api('/api/ra/rules'),api('/api/ra/status')]).then(([r,s])=>{v38Rules=r;v38RaStatus=s;if(v7Tab==='researchad'&&route==='settings')v7Draw()}).catch(e=>{const el=document.querySelector('.v38-rules');if(el)el.innerHTML=empty('디지털 자료 규칙을 불러오지 못했어요.',e.message)})}}
+ if(!v38Rules)Promise.all([api('/api/ra/rules'),api('/api/ra/status')]).then(([r,s])=>{v38Rules=r;v38RaStatus=s;if(v7Tab==='digitalrules'&&route==='settings')v7Draw()}).catch(e=>{const el=document.querySelector('.v38-rules');if(el)el.innerHTML=empty('디지털 자료 규칙을 불러오지 못했어요.',e.message)})}}
 document.addEventListener('input',e=>{if(e.target.id==='v38-ra-filter'){v38RaFilter=e.target.value;clearTimeout(window.__v38f);window.__v38f=setTimeout(()=>{const p=e.target.selectionStart;v7Draw();const i=document.getElementById('v38-ra-filter');if(i){i.focus();i.setSelectionRange(p,p)}},250)}});
 var V38_COLS={advertisers:['ra_name','nielsen','display','competitor','note'],industry_map:['industry_s','category','note'],index:['industry_m','industry_s','advertiser','brand','include','category','display','competitor']};
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-v38-save]');if(!b)return;const k=b.dataset.v38Save,ta=document.querySelector(`[data-v38-paste="${k}"]`);const lines=(ta.value||'').split(/\r?\n/).filter(l=>l.trim());

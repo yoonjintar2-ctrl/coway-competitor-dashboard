@@ -5,7 +5,7 @@ var V38_TITLE='월별 통합 분석',v38Opt=null,v38Adv='',v38Cat='',v38D=null,v
 var V38_CATS=[['tv','TV','#3b4450',[['tv_terr','지상파'],['tv_cable','종편·케이블']]],['dg','디지털','#6c7681',[['dg_video','동영상'],['dg_pc','PC'],['dg_mo','MO']]],['radio','라디오','#99a3ac',[['radio','라디오']]],['print','인쇄','#c3cad0',[['news','신문'],['mag','잡지']]]];
 var V38_G='#08a34f';
 function v38Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="monthly"]'))return;
- const b=document.createElement('button');b.className='nav';b.dataset.route='monthly';b.innerHTML=`${V38_TITLE}<span class="v38-test">test</span>`;
+ const b=document.createElement('button');b.className='nav';b.dataset.route='monthly';b.textContent=V38_TITLE;
  const after=nav.querySelector('[data-route="news"]')||nav.querySelector('[data-route="daily"]');if(after)after.after(b);else nav.appendChild(b)}
 v38Nav();document.addEventListener('DOMContentLoaded',v38Nav);
 function v38Money(v){if(!v)return '–';if(v>=1e8){const x=v/1e8;return (x>=100?Math.round(x):x.toFixed(1).replace(/\.0$/,''))+'억'}return Math.round(v/1e4)+'만'}
@@ -31,7 +31,7 @@ function v38View(d){
  const X=i=>slot*i+slot/2,BX=i=>X(i)+6,YX=i=>X(i)-bw*.2;
  const S=M.map(m=>d.spend[m]||{}),CV=S.map(v38Cv),TOT=S.map(v38Sum),YOY=M.map((m,i)=>i>=12?TOT[i-12]:null),AVG=M.map(m=>d.avg[m]||0);
  const Q=M.map(m=>d.query[m]),QY=M.map((m,i)=>i>=12?Q[i-12]:null),QD=M.map(m=>d.query_days[m]||0);
- const t0=new Date(M[0]+'-01'),t1=new Date(+CUR.slice(0,4),+CUR.slice(5,7),1),xd=s=>Math.max(0,Math.min(PW,(new Date(s)-t0)/(t1-t0)*PW)),md=s=>s.slice(5).replace('-','.');
+ const t0=new Date(M[0]+'-01'),t1=new Date(+CUR.slice(0,4),+CUR.slice(5,7),1),xd=s=>{s=String(s||'').slice(0,10);const i=M.indexOf(s.slice(0,7));if(i<0)return s<M[0]?0:PW;return slot*(i+(Math.max(1,+s.slice(8,10)||1)-.5)/v38Days(s.slice(0,7)))},md=s=>s.slice(5).replace('-','.');
  const ctx=document.createElement('canvas').getContext('2d');
  // 캠페인 캡슐 + 기사(점·글자)를 같은 띠에 — 높이는 5줄로 고정, 자리가 없으면 그달 '+N'
  const LANES=3,CH=22,CG=4,CT=6,lanes=Array.from({length:LANES},()=>[]);const fit=(x0,x1)=>{const k=lanes.findIndex(L=>L.every(([a,b])=>x1<a-10||x0>b+10));if(k<0)return -1;lanes[k].push([x0,x1]);return k};
@@ -39,14 +39,18 @@ function v38View(d){
  let CL=d.camps;if(!d.category){const big=CL.filter(c=>(c.amount||0)>=5e8);CL=big.length?big:[...CL].sort((a,b)=>(b.amount||0)-(a.amount||0)).slice(0,5)}
  const camps=[];for(const c of [...CL].sort((a,b)=>(b.amount||0)-(a.amount||0))){const nm=c.name.replace(new RegExp('^'+d.advertiser.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'),'').replace(/^·\s*/,'')||c.name;const txt=`${nm} · ${md(c.s)}–${md(c.e)}`;const x0=xd(c.s),x1=Math.max(xd(c.e),x0+ctx.measureText(txt).width+CH+16);const k=fit(x0,x1);if(k<0)continue;camps.push({...c,txt,x0,x1,k})}
  ctx.font='500 11px Pretendard, "Noto Sans KR", sans-serif';
- const news=[];for(const n of [...d.news].sort((a,b)=>a.d.localeCompare(b.d))){const txt=`${md(n.d)} ${n.t}${n.n>1?` 외 ${n.n-1}건`:''}`;let x0=xd(n.d),x1=x0+36+Math.min(240,ctx.measureText(txt).width);if(x1>PW-6){x0-=x1-(PW-6);x1=PW-6}const k=fit(x0,x1);if(k<0)continue;news.push({...n,txt,x0,x1,k})}
- const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=108,BAR_TOP=LINE_TOP+LINE_H+2,BAR_H=188,BASE=BAR_TOP+BAR_H;
- const RAW=Math.max(1e7,Math.max(...TOT,...AVG,...YOY.map(v=>v||0))*1.1),YST=[5e9,2e9,1e9,5e8,2e8,1e8,5e7,2e7,1e7].find(k=>RAW/k>=3)||1e7,mx=RAW,sy=v=>BASE-v/mx*BAR_H;
+ const news=[];for(const n of [...d.news].sort((a,b)=>a.d.localeCompare(b.d))){const txt=`${md(n.d)} ${n.t}${n.n>1?` 외 ${n.n-1}건`:''}`;let x0=xd(n.d);const room=PW-6-x0-36;if(room<70)x0=Math.max(0,PW-6-36-70);let w=Math.min(240,ctx.measureText(txt).width,PW-6-x0-36),t=txt;while(t.length>6&&ctx.measureText(t+'…').width>w)t=t.slice(0,-1);if(t!==txt)t+='…';const x1=x0+36+w;const k=fit(x0,x1);if(k<0)continue;news.push({...n,txt,short:t,x0,x1,k})}
+ const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=108,BAR_TOP=LINE_TOP+LINE_H-34,BAR_H=210,BASE=BAR_TOP+BAR_H;
+ const QQ=[...Q.slice(0,-1),...QY.slice(0,-1)].filter(v=>v!=null),QLO=QQ.length?Math.min(...QQ)*.85:0,QHI=QQ.length?Math.max(...QQ,...Q.filter(v=>v!=null)):1,QT=LINE_TOP+17,QH=LINE_H-34,QYP=v=>QT+QH-(v-QLO)/((QHI-QLO)||1)*QH;
+ let RAW=Math.max(1e7,Math.max(...TOT,...AVG,...YOY.map(v=>v||0))*1.1);
+ // 막대 금액 글자(막대 위 20px)가 쿼리 표식(반지름 약 19px)과 겹치면 Y축 최대값을 키워 막대를 낮춤
+ Q.forEach((v,i)=>{if(v==null||!TOT[i])return;const lim=QYP(v)+19+21;if(lim>BAR_TOP)RAW=Math.max(RAW,TOT[i]*BAR_H/Math.max(8,BASE-lim))});
+ const YST=[5e9,2e9,1e9,5e8,2e8,1e8,5e7,2e7,1e7].find(k=>RAW/k>=3)||1e7,mx=RAW,sy=v=>BASE-v/mx*BAR_H;
  const top=(x,w,y)=>`M${x},${BASE} V${y} H${x+w} V${BASE} Z`;
  let s=`<defs><linearGradient id="v38-avg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8aa3b8" stop-opacity=".17"/><stop offset="1" stop-color="#8aa3b8" stop-opacity=".07"/></linearGradient>
   <linearGradient id="v38-yoy" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3bcc4" stop-opacity=".36"/><stop offset="1" stop-color="#d9dfe3" stop-opacity=".26"/></linearGradient>
   <pattern id="v38-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#25a4dc" stroke-width="1.4" stroke-opacity=".06"/></pattern>
-  <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".34"/></pattern>
+  <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".2"/></pattern>
   <filter id="v38-soft" x="-20%" y="-60%" width="140%" height="220%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#14405a" flood-opacity=".09"/></filter>
   ${camps.map((c,i)=>`<clipPath id="v38-cl${i}"><circle cx="${c.x0+CH/2}" cy="${CT+c.k*(CH+CG)+CH/2}" r="${CH/2-3}"/></clipPath>`).join('')}
   ${M.map((m,i)=>TOT[i]?`<clipPath id="v38-bar${i}"><path d="${top(BX(i)-bw/2,bw,sy(TOT[i]))}"/></clipPath>`:'').join('')}</defs>`;
@@ -58,13 +62,13 @@ function v38View(d){
   <circle cx="${c.x0+CH/2}" cy="${y+CH/2}" r="${CH/2-2.5}" fill="#dbe7ee"/>${c.thumb?`<image href="${esc(safeUrl(c.thumb))}" x="${c.x0+3}" y="${y+3}" width="${CH-6}" height="${CH-6}" preserveAspectRatio="xMidYMid slice" clip-path="url(#v38-cl${i})"/>`:''}
   <text x="${c.x0+CH+4}" y="${y+CH/2+4}" font-size="11.5" font-weight="600" fill="#6b7782">${esc(c.txt.replace(/ · \d\d\.\d\d–\d\d\.\d\d$/,''))} <tspan font-weight="500" fill="#98a3ad">· ${md(c.s)}–${md(c.e)}</tspan></text></g>`});
  // 기사(점·글자, x축 연결선)
- news.forEach(n=>{const y=CT+n.k*(CH+CG)+CH/2,t=n.txt.length>40?n.txt.slice(0,39)+'…':n.txt;s+=`<g class="v38-news" data-v38-news="${esc(n.u)}"><line class="gd" x1="${n.x0+13}" x2="${n.x0+13}" y1="${y+7}" y2="${BASE}" stroke="#8d98a3"/><rect x="${n.x0}" y="${y-7}" width="26" height="14" rx="7" fill="rgba(125,138,150,.13)"/><text x="${n.x0+13}" y="${y+3.2}" text-anchor="middle" font-size="9" font-weight="700" fill="#7d8a96">기사</text><text x="${n.x0+31}" y="${y+3.8}" font-size="11" fill="#5f6b77"><tspan font-weight="700" fill="#8d98a3">${esc(t.slice(0,5))}</tspan>${esc(t.slice(5))}</text><title>${esc(n.p?n.p+' · ':'')}${esc(n.t)}</title></g>`});
+ news.forEach(n=>{const y=CT+n.k*(CH+CG)+CH/2,t=n.short||n.txt;s+=`<g class="v38-news" data-v38-news="${esc(n.u)}"><line class="gd" x1="${n.x0+13}" x2="${n.x0+13}" y1="${y+7}" y2="${BASE}" stroke="#8d98a3"/><rect x="${n.x0}" y="${y-7}" width="26" height="14" rx="7" fill="rgba(125,138,150,.13)"/><text x="${n.x0+13}" y="${y+3.2}" text-anchor="middle" font-size="9" font-weight="700" fill="#7d8a96">기사</text><text x="${n.x0+31}" y="${y+3.8}" font-size="11" fill="#5f6b77"><tspan font-weight="700" fill="#8d98a3">${esc(t.slice(0,5))}</tspan>${esc(t.slice(5))}</text><title>${esc(n.p?n.p+' · ':'')}${esc(n.t)}</title></g>`});
  // 네이버 쿼리(올해 + 전년 같은 달)
  const qv=[...Q.slice(0,-1),...QY.slice(0,-1)].filter(v=>v!=null);let CAP=null;const QP=M.map(()=>null);
- if(qv.length){const lo=Math.min(...qv)*.85,hi=Math.max(...qv,...Q.filter(v=>v!=null)),qt=LINE_TOP+17,qh=LINE_H-34,qy=v=>qt+qh-(v-lo)/((hi-lo)||1)*qh;
+ if(qv.length){const qy=QYP;
   const seg=(vals,keep)=>{const parts=[];vals.forEach((v,i)=>{if(v==null||!keep(i))return;const l=parts.at(-1);const p=[X(i),qy(v),v,i];if(l&&l.at(-1)[3]===i-1)l.push(p);else parts.push([p])});return parts};
   const yp=seg(QY,i=>i<N-1);s+=`<path d="${yp.map(v38Smooth).join(' ')}" fill="none" stroke="${V38_G}" stroke-opacity=".22" stroke-width="4" stroke-linecap="round"/>`;
-  const fy=yp.flat().find(p=>p[3]>=VIS0+5);if(fy)s+=`<text x="${fy[0]}" y="${fy[1]+18}" text-anchor="middle" font-size="10" font-weight="700" fill="${V38_G}" fill-opacity=".6">전년 같은 달</text>`;
+  const okL=p=>{const ly=p[1]+18,i=p[3],cq=Q[i]!=null?qy(Q[i]):null;return !(TOT[i]&&ly>sy(TOT[i])-34)&&!(cq!=null&&Math.abs(cq-ly)<26)};const fy=yp.flat().find(p=>p[3]>=VIS0+3&&okL(p));const fyy=fy?fy[1]+18:0;if(fy)s+=`<text x="${fy[0]}" y="${fyy}" text-anchor="middle" font-size="10" font-weight="700" fill="${V38_G}" fill-opacity=".6">전년 같은 달</text>`;
   const cp=seg(Q,()=>true),fl=cp.flat(),lp=fl.at(-1),pp=fl.at(-2),fade=lp&&pp&&(M[lp[3]]===CUR||QD[lp[3]]<v38Days(M[lp[3]]));if(fade)s+=`<defs><linearGradient id="v38-qf" gradientUnits="userSpaceOnUse" x1="${pp[0]}" x2="${lp[0]}" y1="0" y2="0"><stop offset="0" stop-color="${V38_G}"/><stop offset="1" stop-color="${V38_G}" stop-opacity=".28"/></linearGradient></defs>`;s+=`<path d="${cp.map(v38Smooth).join(' ')}" fill="none" stroke="${fade?'url(#v38-qf)':V38_G}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
   cp.flat().forEach(([px,py,v,i])=>{const part=M[i]===CUR||QD[i]<v38Days(M[i]);const [n,u]=v38K(v);s+=`<g class="v38-q" data-v38-i="${i}"><circle cx="${px}" cy="${py}" r="15.5" fill="#fff" stroke="${V38_G}" stroke-width="5"${part?' stroke-opacity=".32"':''}/><text x="${px}" y="${py+3.6}" text-anchor="middle" fill="${V38_G}"${part?' fill-opacity=".55"':''}><tspan font-size="${n.length>=3?9.5:10.5}" font-weight="900">${n}</tspan><tspan font-size="8" font-weight="500" dx=".3">${u}</tspan></text></g>`});
   fl.forEach(p=>QP[p[3]]=p[1]);CAP=fl.find(p=>p[3]>=VIS0)||null}
@@ -75,7 +79,7 @@ function v38View(d){
   if(TOT[i]){const bx=BX(i)-bw/2,by=sy(TOT[i]);s+=`<line x1="${x}" y1="${y}" x2="${bx}" y2="${by}" stroke="#3b4450" stroke-opacity=".14" stroke-width=".8"/><line x1="${x+ybw}" y1="${y}" x2="${bx+bw}" y2="${by}" stroke="#3b4450" stroke-opacity=".14" stroke-width=".8"/>`}});
  // 올해 막대(대분류만, 사이 간격)
  M.forEach((m,i)=>{if(!TOT[i])return;let run=0;const op=m===CUR?.3:.62;let g=`<g clip-path="url(#v38-bar${i})">`;
-  V38_CATS.forEach(([k,,c])=>{const v=CV[i][k];if(!v)return;const y0=sy(run),y1=sy(run+v);run+=v;const last=Math.abs(run-TOT[i])<1;g+=`<rect x="${BX(i)-bw/2}" y="${y1}" width="${bw}" height="${Math.max(.8,y0-y1-(last?0:2.5))}" fill="${c}" fill-opacity="${op}"/>`});
+  V38_CATS.forEach(([k,,c])=>{const v=CV[i][k];if(!v)return;const y0=sy(run),y1=sy(run+v);run+=v;const last=Math.abs(run-TOT[i])<1;const gap=last?0:2.5;g+=`<rect x="${BX(i)-bw/2}" y="${y1+gap}" width="${bw}" height="${Math.max(.8,y0-y1-gap)}" fill="${c}" fill-opacity="${op}"/>`});
   s+=g+`</g><text x="${BX(i)}" y="${sy(TOT[i])-7}" text-anchor="middle" font-size="12" font-weight="600" fill="#8a96a3">${v38Money(TOT[i])}</text>`});
  // 마우스 올림용 칸
  M.forEach((m,i)=>{s+=`<rect class="v38-hit" data-v38-i="${i}" x="${slot*i}" y="${BAR_TOP-10}" width="${slot}" height="${BAR_H+10}" fill="transparent"/>`});
@@ -83,7 +87,7 @@ function v38View(d){
  M.forEach((m,i)=>{const cur=m===CUR,col=cur?'#1a8cc2':'#5d6a76';s+=`<text x="${X(i)}" y="${BASE+16}" text-anchor="middle" font-size="12" font-weight="${cur?800:700}" fill="${col}">${+m.slice(5)}월</text><text x="${X(i)}" y="${BASE+29}" text-anchor="middle" font-size="10" font-weight="500" fill="${cur?'#1a8cc2':'#9aa6b1'}">${m.slice(2,4)}년</text>`+(cur?`<rect x="${X(i)-28}" y="${BASE+35}" width="56" height="15" rx="7.5" fill="#e3f3fb"/><text x="${X(i)}" y="${BASE+45.5}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1a8cc2">수집 중 · ${d.current_day}일</text>`:'')});
  const H=BASE+54;
  // 고정 Y축(10억 단위)·이름 캡슐
- let yl='';for(let v=0;v<=mx+1;v+=YST){const y=sy(v);yl+=`<text x="${GUT-12}" y="${y+4}" text-anchor="end" font-size="10" fill="#a3b0ba">${v?(+(v/1e8).toFixed(1))+'억':'0'}</text>`}
+ let yl='';for(let v=0;v<=mx+1;v+=YST){const y=sy(v);if(y<BAR_TOP+38)continue;yl+=`<text x="${GUT-12}" y="${y+4}" text-anchor="end" font-size="10" fill="#a3b0ba">${v?(+(v/1e8).toFixed(1))+'억':'0'}</text>`}
  let cap='';if(CAP){const x1=GUT+slot/2-23,tw=Math.min(72,x1-4),x0=x1-tw;cap=`<g id="v38-cap" data-y="${CAP[1]}" style="transition:transform .28s ease"><rect x="${x0}" y="${CAP[1]-10}" width="${tw}" height="20" rx="10" fill="${V38_G}"/><text x="${x0+tw/2}" y="${CAP[1]+3.8}" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">네이버 쿼리</text></g>`}
  // 표(대분류) + 게시물(유튜브·인스타 세로)
  const vis=(arr)=>arr.slice(VIS0).reduce((a,b)=>a+(b||0),0);let names='',t='';
@@ -119,7 +123,7 @@ render=async function(...a){
  if(route!=='monthly'){v38Controls(false);v38Tip(null);return v38BaseRender.apply(this,a)}
  if(typeof v37Controls==='function')v37Controls(false);if(typeof v32Controls==='function')v32Controls(false);
  document.querySelectorAll('.sidebar [data-route]').forEach(n=>n.classList.toggle('active',n.dataset.route==='monthly'));
- $('#page-title').innerHTML=`${V38_TITLE}<span class="v38-test big">test</span>`;$('#subtitle').textContent='';
+ $('#page-title').textContent=V38_TITLE;$('#subtitle').textContent='';
  if(!v38D)$('#content').innerHTML=`<section class="glass section">${empty('월별 자료를 불러오는 중이에요.')}</section>`;
  try{const d=await v38Load();if(!d||route!=='monthly')return}catch(e){$('#content').innerHTML=`<section class="glass section">${empty('월별 자료를 불러오지 못했어요.',e.message)}</section>`;return}
  v38Draw()};

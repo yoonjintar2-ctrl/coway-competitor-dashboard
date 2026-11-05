@@ -28,7 +28,7 @@ async function v39Load(){const key=(v39Cat||'')+'|'+(v39Year||'');if(v39Cache[ke
 // ---------- 색·모양 ----------
 const V39_BG=[244,247,250];const V39_ORDER=['정수기','매트리스','공기청정기','안마의자','비데','음식물처리기','전기레인지'];
 // [백분위, 색상(h), 채도, 밝기, 불투명도] — 하위 약 30%는 무채색·투명, 중간(노랑) 넓게
-const V39_PS=[[0,52,62,87,1],[.3,50,78,77,1],[.5,48,90,62,1],[.78,30,88,57,1],[1,6,76,53,1]];  // 낮은 쪽은 노랑이 점점 연해져 연노랑으로(녹색·회색 안 씀)
+const V39_PS=[[0,52,62,87,1],[.3,50,78,77,1],[.5,47,90,62,1],[.78,37,90,56,1],[1,22,86,52,1]];  // 위쪽도 빨강 대신 진한 주황까지만(11-05 19:53)  // 낮은 쪽은 노랑이 점점 연해져 연노랑으로(녹색·회색 안 씀)
 const V39_NQ=[[214,220,226],[194,202,209],[181,190,198]];  // 검색 자료가 없는 날(광고비만): 윗면·앞면·옆면
 function v39Hsl(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return [f(0),f(8),f(4)].map(x=>x*255)}
 function v39ColP(p,f=1){p=Math.max(0,Math.min(1,p));let i=0;while(i<V39_PS.length-2&&p>V39_PS[i+1][0])i++;const A=V39_PS[i],B=V39_PS[i+1],u=(p-A[0])/(B[0]-A[0]);const [h,s,l,al]=[1,2,3,4].map(j=>A[j]+(B[j]-A[j])*u);
@@ -118,7 +118,7 @@ function v39Legend(){const g=[0,.15,.3,.4,.5,.6,.7,.78,.88,1].map(p=>v39Rgb(v39C
 function v39View(){const d=v39D,m=v39Model(d);
  if(!m.me)return `<section class="glass section">${empty(`${v39Adv} · ${v39Cat||'전체'} ${d.year}년 자료가 없어요.`,'다른 품목이나 연도를 골라 보세요.')}</section>`;
  const b=v39Build(m);v39Last={...b,today:m.today,m};
- return `<section class="glass section v39-card"><div class="v39-ch"><div><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2><p class="v39-kw">${v39Adv?'검색 키워드 · ':''}${esc(b.kw)}</p></div>
+ return `<section class="glass section v39-card"><div class="v39-ch"><div><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2><p class="v39-kw">${v39Adv?'검색 키워드 · ':''}${esc(b.kw)}<button type="button" class="v39-kwbtn" data-v39-kwopen>${v39Adv?'키워드 보기·수정 요청':'광고주별 키워드'}</button></p></div>
   <div class="v39-icons">${v39Years()}<button type="button" class="v39-ic" data-v39-png title="이미지로 저장(1월~12월 전체)" aria-label="이미지로 저장">${V39_IMG}</button><button type="button" class="v39-ic" data-v39-xls title="엑셀 원본 내려받기" aria-label="엑셀 원본 내려받기">${V39_XLS}</button></div></div>
   <div class="v39-vp"><div class="v39-sc" id="v39-sc"><svg id="v39-svg" width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}">${b.svg}</svg></div>
   <svg class="v39-stick" width="360" height="${b.H}">${b.stick}</svg>
@@ -231,3 +231,43 @@ document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest
   ${goCamp('이 소재가 든 캠페인의 매체·기간·다른 소재는 캠페인 분석에서 볼 수 있어요.')}`}
  else body=`${img(z.thumb)}<h2>${esc(z.title)}</h2><div class="v39-kv"><span>광고주</span><b>${esc(z.adv)}</b><span>매체</span><b>${esc(z.publisher||'')}</b><span>날짜</span><b>${d}</b>${z.n>1?`<span>같은 소식</span><b>${z.n}건</b>`:''}</div>${z.summary?`<p class="v39-evsum">${esc(z.summary)}…</p>`:''}${z.url?`<a class="primary" href="${esc(safeUrl(z.url))}" target="_blank" rel="noopener">원문 보기 ↗</a>`:''}`;
  $('#detail-body').innerHTML=`<div class="v39-ev-pop"><span class="v39-evtag" style="background:${color}">${lab}</span>${body}</div>`;if(!dl.open)dl.showModal()});
+
+// ---------- 네이버 쿼리 키워드: 보기(누구나) · 수정 요청(비밀번호, 다음 업데이트 때 반영) — 2026-11-05 ----------
+var v39KwPw=null;
+function v39KwStatus(k){const n=v=>{const x=String(v==null?'':v).replace(/,/g,'').trim();return /^\d+$/.test(x)?+x:null},p=n(k.monthly_pc),m=n(k.monthly_mo);
+ const vol=p!=null&&m!=null?`월 ${(p+m).toLocaleString()}회`:(k.monthly_pc||k.monthly_mo)?`월 PC ${esc(k.monthly_pc||'-')} · 모바일 ${esc(k.monthly_mo||'-')}`:'';
+ if(k.status==='ok')return [vol,k.first?`${k.first.slice(2,7).replace('-','.')}~ 추정`:'추정 중'].filter(Boolean).join(' · ');
+ if(k.status==='skipped')return `추정 불가${vol?' · '+vol:''}`;if(k.status==='pending')return '다음 업데이트 때 추정';return vol||esc(k.status||'')}
+v38KwOpen=async function(adv,cat){const dialog=$('#detail');dialog.className='v38-kwdialog';const st=v32Static();
+ const shell=inner=>{$('#detail-body').innerHTML=`<div class="v38-kw v39-kwq"><h2>네이버 쿼리 키워드 · ${esc(adv)}</h2>${inner}</div>`;if(!dialog.open)dialog.showModal()};
+ let d;
+ if(st){const hm=(typeof v39D!=='undefined'&&v39D)||{};const info=(hm.kwinfo||{})[adv]||((hm.keywords||{})[adv]||[]).map(k=>({keyword:k}))
+   .concat(!(hm.kwinfo||{})[adv]&&!(hm.keywords||{})[adv]&&typeof v38D!=='undefined'&&v38D&&v38D.advertiser===adv?(v38D.keywords||[]).map(k=>({keyword:k})):[]);
+  d={keywords:info.map(k=>Object.assign({label:k.label||''},k)),requests:[],categories:[]}}
+ else{shell('<p class="v38-help">불러오는 중이에요…</p>');try{d=await api('/api/keywords?advertiser='+encodeURIComponent(adv))}catch(e){shell(empty('키워드를 불러오지 못했어요.',e.message));return}}
+ const draw=()=>{const lab=x=>{const c=(d.categories||[]).find(c=>c.code===x.category);return (c&&c.label)||x.label||x.category||''};const by={};
+  d.keywords.forEach(k=>(by[lab(k)]=by[lab(k)]||[]).push(k));const pend=d.requests||[];const want=(c,k)=>pend.find(r=>r.category===c&&r.keyword===k);
+  const groups=Object.entries(by).sort((a,b)=>(a[0]===cat||(d.categories||[]).some(c=>c.code===cat&&c.label===a[0]))?-1:0).map(([l,list])=>`<div class="v38-kwgrp">${l?`<b>${esc(l)}</b>`:''}${list.map(k=>{const r=want(k.category,k.keyword);
+   return `<span class="v38-kwchip${r&&r.action==='remove'?' rm':''}">${esc(k.keyword)}<em>${r&&r.action==='remove'?'빼기 요청됨':v39KwStatus(k)}</em>${st?'':r?`<button type="button" class="t" data-v39-kwreq="cancel|${esc(k.category)}|${esc(k.keyword)}" title="요청 취소">취소</button>`:`<button type="button" data-v39-kwreq="remove|${esc(k.category)}|${esc(k.keyword)}" title="빼기 요청" aria-label="${esc(k.keyword)} 빼기 요청">−</button>`}</span>`}).join('')}</div>`).join('')||'<p class="v38-help">아직 키워드가 없어요.</p>';
+  const adds=pend.filter(r=>r.action==='add');
+  const pendBox=pend.length?`<div class="v39-kwpend"><b>다음 업데이트 때 반영</b>${pend.map(r=>`<span class="${r.action}">${r.action==='add'?'+':'−'} ${esc(r.keyword)} <small>${esc(r.label||'')}</small>${st?'':`<button type="button" data-v39-kwreq="cancel|${esc(r.category)}|${esc(r.keyword)}">취소</button>`}</span>`).join('')}</div>`:'';
+  const pw=v39KwPw?`<p class="v39-kwok">비밀번호 확인됨 · 이 창을 닫으면 다시 물어봐요</p>`:`<input type="password" name="pw" placeholder="비밀번호" autocomplete="current-password" class="v39-kwpw">`;
+  shell(`<p class="v38-help">검색수(쿼리)는 아래 키워드들의 네이버 추정 검색수를 더한 값이에요.${st?' 키워드 수정 요청은 PC 대시보드에서만 할 수 있어요.':' 키워드를 바꾸려면 수정 요청을 남기세요. 비밀번호를 확인한 뒤 저장되고, <b>다음 업데이트 때 반영</b>돼요(추가한 키워드는 그때 약 2년치를 추정).'}</p>${groups}${pendBox}
+   ${st?'':`<form class="v38-kwadd v39-kwform" data-v39-kwform><select name="cat">${(d.categories||[]).map(c=>`<option value="${esc(c.code)}" ${c.code===cat||c.label===cat?'selected':''}>${esc(c.label)}</option>`).join('')}</select><input name="kw" placeholder="추가할 키워드 (예: ${esc(adv)}정수기)" maxlength="40">${pw}<button type="submit" class="primary">추가 요청</button></form>`}`)};
+ draw();window.__v39kw={adv,cat,set:x=>{d=x;draw()}}};
+async function v39KwReq(action,category,keyword){const k=window.__v39kw;if(!k)return;const f=document.querySelector('[data-v39-kwform]');const pw=v39KwPw||(f&&f.pw&&f.pw.value);
+ if(!pw){toast('비밀번호를 먼저 입력하세요.');f&&f.pw&&f.pw.focus();return}
+ try{const r=await api('/api/keywords',{category,advertiser:k.adv,keyword,action,password:pw});v39KwPw=pw;k.set(r);
+  toast(action==='cancel'?'요청을 취소했어요.':'수정 요청을 저장했어요. 다음 업데이트 때 반영돼요.')}
+ catch(e){if(/비밀번호/.test(e.message||'')){v39KwPw=null;k.set&&window.__v39kw&&toast('비밀번호가 맞지 않아요.');const g=document.querySelector('[data-v39-kwform] [name=pw]');if(g){g.value='';g.focus()}}else toast('저장하지 못했어요: '+e.message)}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v39-kwreq]');if(!b)return;e.preventDefault();e.stopPropagation();const [a,c,kw]=b.dataset.v39Kwreq.split('|');v39KwReq(a,c,kw)},true);
+document.addEventListener('submit',e=>{const f=e.target.closest&&e.target.closest('[data-v39-kwform]');if(!f)return;e.preventDefault();e.stopPropagation();const kw=f.kw.value.trim();if(!kw){toast('추가할 키워드를 입력하세요.');f.kw.focus();return}v39KwReq('add',f.cat.value,kw)},true);
+document.addEventListener('close',e=>{if(e.target&&e.target.id==='detail')v39KwPw=null},true);
+// 히트맵 제목 아래 단추: 광고주면 그 광고주 키워드, 업종 전체면 광고주별 목록
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v39-kwopen]');if(!b||!v39D)return;e.preventDefault();
+ if(v39Adv)return v38KwOpen(v39Adv,v39Cat||'');
+ const info=v39D.kwinfo||{},kw=v39D.keywords||{},advs=Object.keys(v39D.advertisers||{}).sort((a,b)=>a==='코웨이'?-1:b==='코웨이'?1:a.localeCompare(b,'ko'));const dialog=$('#detail');dialog.className='v38-kwdialog';
+ $('#detail-body').innerHTML=`<div class="v38-kw v39-kwq"><h2>네이버 쿼리 키워드 · ${esc(v39Cat||'전체')} 광고주별</h2><p class="v38-help">업종 전체 검색수는 아래 광고주들 키워드의 추정 검색수 합계예요. 광고주 이름을 누르면 그 광고주 키워드를 보고 수정 요청할 수 있어요.</p>
+  ${advs.map(a=>{const L=info[a]||(kw[a]||[]).map(k=>({keyword:k}));return `<div class="v38-kwgrp"><b><button type="button" class="v39-kwadv" data-v39-kwadv="${esc(a)}">${esc(a)} ›</button></b>${L.length?L.map(k=>`<span class="v38-kwchip">${esc(k.keyword)}<em>${v39KwStatus(k)}</em></span>`).join(''):'<span class="v39-kwnone">키워드 없음 · 광고비만 표시</span>'}</div>`}).join('')}</div>`;
+ if(!dialog.open)dialog.showModal()});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v39-kwadv]');if(!b)return;e.preventDefault();v38KwOpen(b.dataset.v39Kwadv,v39Cat||'')});

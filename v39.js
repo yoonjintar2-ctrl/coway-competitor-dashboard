@@ -236,7 +236,7 @@ document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest
 var v39KwPw=null;
 function v39KwStatus(k){const n=v=>{const x=String(v==null?'':v).replace(/,/g,'').trim();return /^\d+$/.test(x)?+x:null},p=n(k.monthly_pc),m=n(k.monthly_mo);
  const vol=p!=null&&m!=null?`월 ${(p+m).toLocaleString()}회`:(k.monthly_pc||k.monthly_mo)?`월 PC ${esc(k.monthly_pc||'-')} · 모바일 ${esc(k.monthly_mo||'-')}`:'';
- if(k.status==='ok')return [vol,k.first?`${k.first.slice(2,7).replace('-','.')}~ 추정`:'추정 중'].filter(Boolean).join(' · ');
+ if(k.status==='ok')return [vol,k.first?`${k.first.slice(2,7).replace('-','.')}~ 추정`:''].filter(Boolean).join(' · ');
  if(k.status==='skipped')return `추정 불가${vol?' · '+vol:''}`;if(k.status==='pending')return '다음 업데이트 때 추정';return vol||esc(k.status||'')}
 v38KwOpen=async function(adv,cat){const dialog=$('#detail');dialog.className='v38-kwdialog';const st=v32Static();
  const shell=inner=>{$('#detail-body').innerHTML=`<div class="v38-kw v39-kwq"><h2>네이버 쿼리 키워드 · ${esc(adv)}</h2>${inner}</div>`;if(!dialog.open)dialog.showModal()};

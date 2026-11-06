@@ -39,3 +39,5 @@ table.v41-t{border-collapse:collapse;width:100%;font-size:12px;font-variant-nume
 .v41-card .go{position:absolute;right:8px;bottom:-13px;font-style:normal;font-size:10.5px;font-weight:800;color:#fff;background:#1a8cc2;border-radius:999px;padding:3px 9px;box-shadow:0 3px 10px rgba(26,140,194,.3);opacity:0;transform:translateY(-3px);transition:opacity .15s,transform .15s;pointer-events:none;white-space:nowrap}
 .v41-card.me .go{background:#4c66b2;box-shadow:0 3px 10px rgba(76,102,178,.3)}
 .v41-card:hover{z-index:5}.v41-card:hover .go{opacity:1;transform:none}
+/* 11-06 11:3x — 그래프 영역을 다른 화면(월별 통합 분석 등)과 같은 흰 유리판 위에 올림: 고정 배경(물방울 사진 아래쪽 푸른 기)이 비쳐 보이던 문제 */
+.v41-plot{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.8));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.95);border-radius:18px;box-shadow:0 8px 24px rgba(20,60,90,.05),inset 0 1px 0 #fff}

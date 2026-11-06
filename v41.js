@@ -56,7 +56,7 @@ function v41View(){const d=v41D,ALL=v41Cat==='전체';if(!ALL)v41Focus='';let pt
  const segRect=(a,b,c)=>{if(b[0]>=c.x&&b[0]<=c.x+c.w&&b[1]>=c.y&&b[1]<=c.y+c.h)return false;const E=[[[c.x,c.y],[c.x+c.w,c.y]],[[c.x+c.w,c.y],[c.x+c.w,c.y+c.h]],[[c.x,c.y+c.h],[c.x+c.w,c.y+c.h]],[[c.x,c.y],[c.x,c.y+c.h]]];return E.some(([u,v])=>segX(a,b,u,v))};
  const ANG=Array.from({length:ALL?36:24},(_,k)=>k*(ALL?10:15)*Math.PI/180),RAD=ALL?[16,34,58,86,120,160,210,270,340,420,510,610,720,840]:[16,34,58,86,120,160,210,270,340];
  // 카드 자리: 다른 카드·점과 안 겹치고, 선이 다른 점·카드·선을 지나지 않고, 카드가 자기 점에 가장 가깝게 — 몰린 곳은 멀리 빼서 선으로 (11-06 10:24)
- const FIX=ALL?pts.filter(p=>v41Focus?p.cat===v41Focus:p.a==='코웨이'):pts;
+ const FIX=ALL?pts.filter(p=>(v41Focus?p.cat===v41Focus:p.a==='코웨이')&&(p.a!=='코웨이'||v41ShowMe)):pts;  // 코웨이 칩으로 코웨이 카드 닫기·열기 (11-06 19:08)
  [...FIX].sort((a,b)=>(b.a==='코웨이')-(a.a==='코웨이')||b.eq-a.eq).forEach(p=>{let best=null,bs=1e12;
   for(const rd of RAD)for(const an of ANG){const cs=Math.cos(an),sn=Math.sin(an),qx=p.px+cs*rd,qy=p.py+sn*rd;
    const c={x:qx-(cs<-.35?cw:cs>.35?0:cw/2),y:qy-(sn<-.35?ch:sn>.35?0:ch/2),w:cw,h:ch};
@@ -68,6 +68,7 @@ function v41View(){const d=v41D,ALL=v41Cat==='전체';if(!ALL)v41Focus='';let pt
    pts.forEach(q=>{if(q===p)return;if(q.px>c.x-12&&q.px<c.x+cw+12&&q.py>c.y-12&&q.py<c.y+ch+12)sc+=3000;if(own>12&&segPt(A[0],A[1],B[0],B[1],q.px,q.py)<14)sc+=1500;if(rd2(c,q.px,q.py)<own+14)sc+=1200});
    if(sc<bs){bs=sc;best=c;best.ln=[A,B]}}
   if(!best)best={x:Math.min(L+PW-cw-2,Math.max(L+4,p.px+14)),y:Math.max(T+2,p.py-ch-14),w:cw,h:ch};best.p=p;cards.push(best)});
+ if(ALL)g=g.replace('<!--v41hulls-->','')+v41Hulls(pts);
  // 연결선(점 → 카드의 가장 가까운 테두리)
  cards.forEach(c=>{const p=c.p,nx=Math.max(c.x,Math.min(p.px,c.x+c.w)),ny=Math.max(c.y,Math.min(p.py,c.y+c.h)),dd=Math.hypot(nx-p.px,ny-p.py);
   if(dd>14)g+=`<line class="v41-ln" x1="${p.px}" y1="${p.py}" x2="${nx}" y2="${ny}" stroke="${p.a==='코웨이'?'#8fa0d4':'#b9c3ca'}" stroke-width="1.2"/>`});
@@ -77,7 +78,7 @@ function v41View(){const d=v41D,ALL=v41Cat==='전체';if(!ALL)v41Focus='';let pt
  const html=cards.map(c=>{const p=c.p,me=p.a==='코웨이',r3=p.r&&p.r.r3!=null?`R3+${Math.round(p.r.r3)}%`:'R3+ 준비 중';
   return `<button type="button" class="v41-card${me?' me':''}${ALL?' all':''}" data-v41-adv="${esc(p.a)}"${ALL?` data-v41-cat="${esc(p.cat)}" data-v41-i="${pts.indexOf(p)}"`:''} style="left:${c.x}px;top:${c.y}px;width:${c.w}px;animation-delay:${(.35+pts.indexOf(p)*(ALL?.035:.07)).toFixed(2)}s">${ALL?`<i class="cap" style="background:${v41CatCol(p.cat)}">${esc(p.cat)}</i>`:''}<b>${esc(p.a)} <em>(${v41Won(p.won)}원)</em></b><span>(${Math.round(p.eq).toLocaleString()} eq GRP, ${r3})</span><i class="go">자세히 보기 →</i></button>`}).join('');
  v41Pts=pts;v41Geo={L,T,PW,PH};const src=d.source||{};
- return `<section class="glass section v41-card-wrap"><div class="v41-head"><div><h2>${v41Year}년 누적 경쟁사 TV 노출량 · R3+ <small>${esc(v41Cat)}</small></h2><p>카드를 누르면 지상파·케이블 세부 운영 내역을 볼 수 있어요</p>${ALL?`<div class="v41-chips" role="group" aria-label="품목 카드 펼치기"><span class="hint">${V41_TAP}품목을 누르면 그 품목 카드만 펼쳐져요</span>${Object.keys(v41All).filter(c=>pts.some(p=>p.cat===c)).map(c=>{const n=pts.filter(p=>p.cat===c).length,on=v41Focus===c;return `<button type="button" class="chipc${on?' on':''}" data-v41-focus="${esc(c)}" aria-pressed="${on}" style="--c:${v41CatCol(c)}"><i></i>${esc(c)}<em>${n}</em>${on?'<b aria-hidden="true">✕</b>':''}</button>`}).join('')}<span class="melg"><i></i>코웨이</span></div>`:''}</div>
+ return `<section class="glass section v41-card-wrap"><div class="v41-head"><div><h2>${v41Year}년 누적 경쟁사 TV 노출량 · R3+ <small>${esc(v41Cat)}</small></h2><p>카드를 누르면 지상파·케이블 세부 운영 내역을 볼 수 있어요</p>${ALL?`<div class="v41-chips" role="group" aria-label="품목 카드 펼치기"><span class="hint">${V41_TAP}품목을 누르면 그 품목 카드만 펼쳐지고, 코웨이를 누르면 코웨이 카드를 닫거나 열어요</span>${Object.keys(v41All).filter(c=>pts.some(p=>p.cat===c)).map(c=>{const n=pts.filter(p=>p.cat===c).length,on=v41Focus===c;return `<button type="button" class="chipc${on?' on':''}" data-v41-focus="${esc(c)}" aria-pressed="${on}" style="--c:${v41CatCol(c)}"><i></i>${esc(c)}<em>${n}</em>${on?'<b aria-hidden="true">✕</b>':''}</button>`}).join('')}<button type="button" class="chipc mechip${v41ShowMe?' on':''}" data-v41-me aria-pressed="${v41ShowMe}" title="코웨이 카드 ${v41ShowMe?'닫기':'열기'}"><i></i>코웨이${v41ShowMe?'<b aria-hidden="true">✕</b>':''}</button></div>`:''}</div>
   <div class="v39-years v41-years">${d.years.map(y=>`<button type="button" class="y${y===v41Year?' on':''}" data-v41-year="${y}">${y}</button>`).join('')}</div></div>
   <div class="v41-plot${ALL?' all':''}${ALL&&v41Focus?' focus':''}" style="height:${H}px"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}${ALL?'<line class="v41-hovln" x1="0" y1="0" x2="0" y2="0" stroke="#b9c3ca" stroke-width="1.2" visibility="hidden"/>':''}</svg>${html}${ALL?'<button type="button" class="v41-card all v41-hov" hidden></button>':''}</div>
   ${ALL?`<p class="footnote v41-note">전체: 품목별 점을 한 그래프에 모았어요(같은 품목은 같은 색, 코웨이는 굵은 테두리) · 점에 마우스를 올리면 카드가 보이고, 누르면 세부 내역이 열려요 · ${v41Year}년 ${rep?`SM C&C 먼슬리 리포트(1~${Math.max(...rep.months)}월) 기준`:'아리아나 원본 기준'} · 품목을 고르면 품목별 설명과 함께 볼 수 있어요</p>`:rep?`<p class="footnote v41-note">${v41Year}년은 SM C&C 먼슬리 리포트(1~${Math.max(...rep.months)}월) 기준과 같게 맞췄어요 · 광고비: 코웨이는 실집행 금액(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사는 리포트 표기 금액 · Eq GRP·R3+: 닐슨, 타깃 F30-45 수도권, PR·SP·TJ·YG(시보 제외)${(v41Cat==='정수기')?' · 정수기는 리포트의 일반·얼음을 합친 값(광고비·Eq GRP는 합계, R3+는 정수기 전체로 다시 산출한 아리아나 도달률)':''}</p>`:`<p class="footnote v41-note">광고비: 아리아나 TV(지상파·케이블&종편) 모니터링 광고비에 SM C&C 실집행 추정 요율(설정 &gt; 광고비 보정)을 적용 · Eq GRP: 15초 환산 GRP, 타깃 ${esc(src.target||'')}(${esc(d.reach_target||'')}) · 자료 ${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(0,1)[0]||'')}~${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(-1)[0]||'')} · 포함=O·경쟁사=O 광고주 · ${hasR?'R3+: 아리아나 도달 분석':'R3+: 자료 준비 중'}${v41Year<2026?' · 이 해는 먼슬리 리포트가 없어 아리아나 원본 기준':''}</p>`}</section>`}
@@ -260,9 +261,9 @@ async function v41LoadAll(cats){const req=++v41Req;const out={};
 var v41Focus='',v41Pts=[],v41Geo=null,v41HovI=-1,v41Touch=false;
 var V41_TAP='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 10.5V9a1.5 1.5 0 0 1 3 0v2"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3l-1.6-2.8a1.5 1.5 0 0 1 2.6-1.5L9 15.5V11"/></svg>';
 function v41CardHtml(p){const me=p.a==='코웨이',r3=p.r&&p.r.r3!=null?`R3+${Math.round(p.r.r3)}%`:'R3+ 준비 중';return `<i class="cap" style="background:${v41CatCol(p.cat)}">${esc(p.cat)}</i><b>${esc(p.a)} <em>(${v41Won(p.won)}원)</em></b><span>(${Math.round(p.eq).toLocaleString()} eq GRP, ${r3})</span><i class="go">자세히 보기 →</i>`}
-function v41HovHide(){const plot=document.querySelector('#content .v41-plot.all');v41HovI=-1;if(!plot)return;const h=plot.querySelector('.v41-hov'),ln=plot.querySelector('.v41-hovln');if(h)h.hidden=true;if(ln)ln.setAttribute('visibility','hidden');plot.classList.remove('hovering');plot.querySelectorAll('.v41-dot.hot,.v41-dot.same,.v41-card.hot').forEach(e=>e.classList.remove('hot','same'))}
+function v41HovHide(){const plot=document.querySelector('#content .v41-plot.all');v41HovI=-1;if(!plot)return;plot.querySelectorAll('.v41-hull.same').forEach(e=>e.classList.remove('same'));const h=plot.querySelector('.v41-hov'),ln=plot.querySelector('.v41-hovln');if(h)h.hidden=true;if(ln)ln.setAttribute('visibility','hidden');plot.classList.remove('hovering');plot.querySelectorAll('.v41-dot.hot,.v41-dot.same,.v41-card.hot').forEach(e=>e.classList.remove('hot','same'))}
 function v41HovShow(i){const plot=document.querySelector('#content .v41-plot.all'),p=v41Pts[i];if(!plot||!p||!v41Geo)return;v41HovHide();v41HovI=i;
- plot.classList.add('hovering');plot.querySelectorAll('.v41-dot').forEach(e=>{if(e.dataset.v41Cat===p.cat)e.classList.add('same')});const dot=plot.querySelector(`.v41-dot[data-v41-i="${i}"]`);if(dot)dot.classList.add('hot');
+ plot.classList.add('hovering');plot.querySelectorAll('.v41-dot,.v41-hull').forEach(e=>{if(e.dataset.v41Cat===p.cat)e.classList.add('same')});const dot=plot.querySelector(`.v41-dot[data-v41-i="${i}"]`);if(dot)dot.classList.add('hot');
  const fixed=plot.querySelector(`.v41-card:not(.v41-hov)[data-v41-i="${i}"]`);if(fixed){fixed.classList.add('hot');return}  // 이미 카드가 있으면 그 카드만 강조
  const h=plot.querySelector('.v41-hov');h.innerHTML=v41CardHtml(p);h.className='v41-card all v41-hov'+(p.a==='코웨이'?' me':'');h.dataset.v41Adv=p.a;h.dataset.v41Cat=p.cat;h.dataset.v41I=i;h.style.width='156px';h.hidden=false;
  const cw=h.offsetWidth,ch=h.offsetHeight,G=v41Geo,rects=[...plot.querySelectorAll('.v41-card:not(.v41-hov)')].map(c=>({x:c.offsetLeft,y:c.offsetTop,w:c.offsetWidth,h:c.offsetHeight}));
@@ -280,6 +281,20 @@ document.addEventListener('mouseover',e=>{if(route!=='reach'||v41Touch)return;co
  if(e.target.closest&&e.target.closest('.v41-plot.all .v41-hov'))return;if(v41HovI>=0&&!(e.target.closest&&e.target.closest('.v41-plot.all .v41-card')))v41HovHide()});
 document.addEventListener('click',e=>{if(route!=='reach')return;
  const f=e.target.closest&&e.target.closest('[data-v41-focus]');if(f){v41Focus=v41Focus===f.dataset.v41Focus?'':f.dataset.v41Focus;v41HovI=-1;v41Draw();return}
+ if(e.target.closest&&e.target.closest('[data-v41-me]')){v41ShowMe=!v41ShowMe;v41HovI=-1;v41Draw();return}
  const d=e.target.closest&&e.target.closest('.v41-plot.all .v41-dot');if(!d)return;const i=+d.dataset.v41I,p=v41Pts[i];if(!p)return;
  if(v41Touch&&v41HovI!==i){v41HovShow(i);return}  // 휴대폰: 첫 탭은 카드, 두 번째 탭(또는 카드 탭)에 세부 내역
  v41Per='ytd';if(v41All[p.cat]){v41AllBack={d:v41D};v41Cat=p.cat;v41D=v41All[p.cat]}v41Open(p.a)});
+
+// 품목별 분포 배경 (11-06 19:08): 같은 품목 점들을 감싸는 영역을 품목 색으로 옅게 — 점이 하나면 동그라미, 둘이면 캡슐
+var v41ShowMe=true;
+function v41Hull(P){P=[...P].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);if(P.length<3)return P;const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);const lo=[],up=[];
+ for(const p of P){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}
+ for(const p of [...P].reverse()){while(up.length>=2&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
+ return lo.slice(0,-1).concat(up.slice(0,-1))}
+function v41Hulls(pts){const by={};pts.forEach(p=>{(by[p.cat]=by[p.cat]||[]).push([p.px,p.py])});let h='';
+ Object.entries(by).forEach(([c,P])=>{const H=v41Hull(P),col=v41CatCol(c),dim=v41Focus&&v41Focus!==c?' dim':v41Focus===c?' on':'';const pad=34;
+  let shape;if(H.length===1)shape=`<circle cx="${H[0][0]}" cy="${H[0][1]}" r="${pad/2}" fill="${col}"/>`;
+  else shape=`<path d="M${H.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' L')}${H.length>2?' Z':''}" fill="${col}" stroke="${col}" stroke-width="${pad}" stroke-linejoin="round" stroke-linecap="round"/>`;
+  h+=`<g class="v41-hull${dim}" data-v41-cat="${esc(c)}">${shape}</g>`});
+ return h}

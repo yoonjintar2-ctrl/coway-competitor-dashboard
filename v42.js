@@ -67,6 +67,6 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
  if(t.hasAttribute('data-v42-png')){kind==='monthly'?v42MonthlyPng():v42ReachPng();return}
  if(t.hasAttribute('data-v42-xls')){kind==='monthly'?v42MonthlyXls():v42ReachXls();return}
  if(document.fullscreenElement){document.exitFullscreen().catch(()=>{});return}if(document.body.classList.contains('v42-max')){v42Max(false);return}
- const c=document.getElementById('content');document.body.classList.add('v42-full');if(c&&c.requestFullscreen)c.requestFullscreen().catch(()=>v42Max(true));else v42Max(true)});
+ const c=document.querySelector('main')||document.getElementById('content');document.body.classList.add('v42-full');if(c&&c.requestFullscreen)c.requestFullscreen().catch(()=>v42Max(true));else v42Max(true)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('v42-max')&&!document.querySelector('dialog[open]'))v42Max(false)});
 document.addEventListener('fullscreenchange',()=>{const on=!!document.fullscreenElement&&document.body.classList.contains('v42-full');if(!document.fullscreenElement)document.body.classList.remove('v42-full');else if(!on)return;if(route==='monthly'||route==='reach')v42Redraw()});

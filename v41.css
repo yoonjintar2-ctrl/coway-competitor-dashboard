@@ -118,3 +118,12 @@ dialog.v41-dialog .v41-ph{align-items:stretch}
 .v41-plot.all .v41-hov{z-index:8;animation-duration:.16s!important;animation-delay:0s!important}
 .v41-plot.all .v41-hov .go{opacity:1;transform:none}
 .v41-plot .v41-hovln,.v41-plot .v41-ln{pointer-events:none}
+/* 19:08 — 코웨이 칩(누르면 코웨이 카드 닫기·열기), 품목별 분포 배경 */
+.v41-chips .chipc.mechip{--c:#14284d}
+.v41-chips .chipc.mechip i{background:#fff;border:3px solid #14284d;width:9px;height:9px;box-sizing:border-box}
+.v41-chips .chipc.mechip.on i{border-color:#fff;background:#14284d}
+.v41-plot .v41-hull{opacity:.12;transition:opacity .15s;pointer-events:none}
+.v41-plot .v41-hull.dim{opacity:.035}
+.v41-plot .v41-hull.on{opacity:.2}
+.v41-plot.all.hovering .v41-hull:not(.same){opacity:.035}
+.v41-plot.all.hovering .v41-hull.same{opacity:.22}

@@ -85,10 +85,11 @@ function v41Draw(){if(!v41D){$('#content').innerHTML=`<section class="glass sect
 // 팝업: 지상파·케이블 세부 운영 내역
 function v41Bar(parts,total,cols){if(!total)return '<i class="v41-bar0"></i>';return `<i class="v41-bar">${parts.map(([k,v],i)=>`<b style="width:${v/total*100}%;background:${cols[i%cols.length]}" title="${esc(k)} ${Math.round(v/total*100)}%"></b>`).join('')}</i>`}
 // 11-06 21:53 아리아나 원본이 리포트보다 짧은 품목(지금은 안마의자: 8월까지)은 세부 표에 '모니터링' 딱지 — 더 받지 않기로 함
+function v41AdexCab(adv,per){const A=v41D&&v41D.adex;if(!A)return null;const o={};let n=0;A.forEach(([a,y,m,pp,v])=>{if(a===adv&&y===v41Year&&(per==='ytd'||v41M(y,m)===per)){o[pp]=(o[pp]||0)+v;n++}});return n?o:null}
 function v41ArBadge(rep){const ar=Math.max(0,...v41D.R.filter(r=>r.y===v41Year).map(r=>r.m));if(!rep||!ar)return '';const miss=[...new Set(rep.rows.map(x=>x.m))].filter(m=>m>ar).sort((a,b)=>a-b);return miss.length?`<span class="v41-badge" title="아리아나(닐슨) 모니터링 원본 기준 — ${miss.join('·')}월 원본은 받지 않음">모니터링 · ${miss.join('·')}월 미반영</span>`:''}
 function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv),rep=v41Rep();
  const repMs=rep?[...new Set(rep.rows.filter(x=>x.brand===adv).map(x=>v41M(v41Year,x.m)))]:[],ms=[...new Set([...v41Months(),...repMs])].sort();
- const terr=rows.filter(r=>r.media==='지상파'),cab=rows.filter(r=>r.media!=='지상파'),Z={inv:0,net:0,ins:0,grp:0,eq:0,adj:0},T=v41Sum(terr).all||Z,C=v41Sum(cab).all||Z;
+ const terr=rows.filter(r=>r.media==='지상파'),cab=rows.filter(r=>r.media!=='지상파'),Z={inv:0,net:0,ins:0,grp:0,eq:0,adj:0},T=v41Sum(terr).all||Z,AX=v41AdexCab(adv,per);let C=v41Sum(cab).all||Z;if(AX)C={...C,inv:Object.values(AX).reduce((a,b)=>a+b,0)};  // 케이블 금액은 아덱스(먼슬리 리포트 기준), Eq GRP·횟수는 아리아나 (11-06 22:30)
  const pct=(v,t)=>t?Math.round(v/t*100)+'%':'-',num=v=>v==null||v===''?'-':Math.round(v).toLocaleString(),f1=v=>v==null?'-':(+v).toFixed(1).replace(/\.0$/,''),cprp=x=>x.eq?num(x.inv/x.eq):'-',ar=x=>x.ins?(x.grp/x.ins).toFixed(1):'-';
  // ① 지상파 / 케이블&종편 요약(먼슬리 리포트 표와 같은 모양)
  const RR=v41RepRows(adv,per),bub=rep?Object.fromEntries(Object.entries(rep.bubbles).filter(([k])=>k.split('|')[1]===adv).map(([k,v])=>[k.split('|')[0],v])):{};
@@ -120,10 +121,10 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
   ${line('모니터링 광고비 (천원)',num(T.inv),x=>pct(x.inv,T.inv))}${line('Eq GRP',num(T.eq),x=>pct(x.eq,T.eq))}${line('횟수',num(T.ins),x=>pct(x.ins,T.ins))}${line('A.R',ar(T),x=>ar(x))}${line('모니터링 CPRP (천원)',cprp(T),x=>cprp(x))}</tbody></table></div>
   <div class="v41-charts">${dims.map(d=>`<div class="v41-ch"><b>${d.n}</b><div class="r"><span>광고비</span>${v41Bar(d.keys.map(z=>[d.f(z),d.s[z].inv]),T.inv,COL)}</div><div class="r"><span>Eq GRP</span>${v41Bar(d.keys.map(z=>[d.f(z),d.s[z].eq]),T.eq,COL)}</div><div class="lg">${d.keys.map((z,i)=>`<em><i style="background:${COL[i%COL.length]}"></i>${esc(d.f(z))}</em>`).join('')}</div></div>`).join('')}</div>`:`<p class="v41-none">${v41Pick(v41Per).some(r=>r.adv===adv)?'이 기간 지상파 집행이 없어요.':'이 달 아리아나(닐슨) 세부 자료가 아직 없어요. 위 요약표는 먼슬리 리포트 기준이에요.'}</p>`;
  // ③ 케이블 MPP — 모니터링 광고비 기준만, 표 아래 MPP·채널 그래프
- const ms2=v41Sum(cab,'mpp');let mk=Object.keys(ms2).sort((a,b)=>ms2[b].inv-ms2[a].inv);const top=mk.filter(z=>ms2[z].inv/C.inv>=.01).slice(0,10),rest=mk.filter(z=>!top.includes(z));
+ const ms2=v41Sum(cab,'mpp');if(AX){for(const z in ms2)ms2[z]={...ms2[z],inv:AX[z]||0};for(const z in AX)if(!ms2[z])ms2[z]={inv:AX[z],net:0,ins:0,grp:0,eq:0,adj:0}}let mk=Object.keys(ms2).sort((a,b)=>ms2[b].inv-ms2[a].inv);const top=mk.filter(z=>ms2[z].inv/C.inv>=.01).slice(0,10),rest=mk.filter(z=>!top.includes(z));
  if(rest.length){const o={inv:0,net:0,ins:0,grp:0,eq:0,adj:0};rest.forEach(z=>{for(const k in o)o[k]+=ms2[z][k]});ms2['기타']=o;top.push('기타')}
  const mmax=Math.max(1,...top.map(z=>ms2[z].inv));
- const cabHtml=cab.length?`<div class="v41-tw"><table class="v41-t v41-ct"><colgroup><col class="c0"><col><col><col><col><col><col></colgroup><thead><tr><th>MPP</th><th>모니터링 광고비 (천원)</th><th>집행 비중</th><th>횟수</th><th>Eq GRP</th><th>Eq GRP 비중</th><th>모니터링 CPRP (천원)</th></tr></thead><tbody>
+ const cabHtml=cab.length||AX?`<div class="v41-tw"><table class="v41-t v41-ct"><colgroup><col class="c0"><col><col><col><col><col><col></colgroup><thead><tr><th>MPP</th><th>모니터링 광고비 (천원)</th><th>집행 비중</th><th>횟수</th><th>Eq GRP</th><th>Eq GRP 비중</th><th>모니터링 CPRP (천원)</th></tr></thead><tbody>
   ${top.map(z=>{const x=ms2[z];return `<tr><th>${esc(z||'(미분류)')}</th><td>${num(x.inv)}</td><td>${pct(x.inv,C.inv)}</td><td>${num(x.ins)}</td><td>${num(x.eq)}</td><td>${pct(x.eq,C.eq)}</td><td>${cprp(x)}</td></tr>`}).join('')}</tbody>
   <tfoot><tr><th>Total</th><td>${num(C.inv)}</td><td>100%</td><td>${num(C.ins)}</td><td>${num(C.eq)}</td><td>100%</td><td>${cprp(C)}</td></tr></tfoot></table></div>
   <div class="v41-ch v41-mppc"><b>MPP별 광고비</b><div class="v41-hbars">${top.map(z=>`<div class="hb"><span title="${esc(z)}">${esc(z||'(미분류)')}</span><i><b style="width:${mmax?ms2[z].inv/mmax*100:0}%"></b></i><em>${v41Won(ms2[z].inv)}</em></div>`).join('')}</div></div>`:`<p class="v41-none">${v41Pick(v41Per).some(r=>r.adv===adv)?'이 기간 케이블·종편 집행이 없어요.':'이 달 아리아나(닐슨) 세부 자료가 아직 없어요.'}</p>`;
@@ -133,7 +134,7 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
   <div id="v41-donut-slot"></div>
   <h3>지상파 · 케이블&종편 집행 요약</h3>${sumHtml||'<p class="v41-none">이 기간 집행이 없어요.</p>'}
   <h3>지상파TV 세부 운영 내역${v41ArBadge(rep)}</h3>${terrHtml}<h3>케이블TV 세부 운영 내역${v41ArBadge(rep)}</h3>${cabHtml}
-  <p class="footnote">집행 요약: ${rep?'SM C&C 먼슬리 리포트 경쟁사 TV set Performance 표 기준 — 코웨이 실집행금액은 실집행(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사 실집행금액은 보너스율 반영 추정 · 누적의 R1+·A.F는 월별 값을 더할 수 없어 비워 두고 R3+는 누적 도달률':'아리아나(닐슨) 원본'} · 세부 운영 내역: 아리아나(닐슨) 모니터링 광고비·GRP·Eq GRP, 타깃 ${esc((v41D.source||{}).target||'')} · A.R = GRP ÷ 횟수 · CPRP = 모니터링 광고비 ÷ Eq GRP · 광고유형: PR 일반프로, SP 스팟, TJ 특집/재방</p></div>`}
+  <p class="footnote">집행 요약: ${rep?'SM C&C 먼슬리 리포트 경쟁사 TV set Performance 표 기준 — 코웨이 실집행금액은 실집행(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사 실집행금액은 보너스율 반영 추정 · 누적의 R1+·A.F는 월별 값을 더할 수 없어 비워 두고 R3+는 누적 도달률':'아리아나(닐슨) 원본'} · 세부 운영 내역: 지상파는 아리아나(닐슨) 모니터링 광고비, 케이블 MPP 광고비는 아덱스(먼슬리 리포트와 같은 기준) · GRP·Eq GRP·횟수는 아리아나, 타깃 ${esc((v41D.source||{}).target||'')} · A.R = GRP ÷ 횟수 · CPRP = 모니터링 광고비 ÷ Eq GRP · 광고유형: PR 일반프로, SP 스팟, TJ 특집/재방</p></div>`}
 function v41Open(adv){const dl=$('#detail');dl.className='v41-dialog';$('#detail-body').innerHTML=v41Detail(adv);v41Cur=adv;if(!dl.open)dl.showModal();v41DnMount(adv,v41Per)}
 var v41Cur='';
 var v41BaseRender=render;
@@ -176,7 +177,7 @@ function v41DnRep(adv,per){const r=v41Rep();if(!r||!r.detail||!r.detail.length)r
  const ms=[...new Set(need.map(x=>x.m))].sort((a,b)=>a-b);
  return {t,c,etc,basis:me?'act':'monrep',detail:true,pctG,months:ms}}
 function v41DnData(adv,per){const dr=v41DnRep(adv,per);if(dr)return dr;const rows=v41Pick(per).filter(r=>r.adv===adv);const by=(f,key)=>{const o={};rows.filter(f).forEach(r=>{const k=r[key]||'(미분류)';o[k]=(o[k]||0)+r.inv});return Object.entries(o).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])};
- const t=by(r=>r.media==='지상파','ch');let c=by(r=>r.media!=='지상파','mpp');const raw=c.filter(([n])=>n==='기타'||n==='(미분류)');c=c.filter(([n])=>n!=='기타'&&n!=='(미분류)');let etc=[];  // 원래 이름이 '기타'인 MPP도 기타 묶음에 넣고 항상 맨 끝
+ const t=by(r=>r.media==='지상파','ch');const AX=v41AdexCab(adv,per);let c=AX?Object.entries(AX).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]):by(r=>r.media!=='지상파','mpp');const raw=c.filter(([n])=>n==='기타'||n==='(미분류)');c=c.filter(([n])=>n!=='기타'&&n!=='(미분류)');let etc=[];  // 원래 이름이 '기타'인 MPP도 기타 묶음에 넣고 항상 맨 끝
  if(c.length>5){etc=c.slice(5);c=c.slice(0,5)}{const all=t.reduce((x,[,v])=>x+v,0)+c.reduce((x,[,v])=>x+v,0)+etc.reduce((x,[,v])=>x+v,0)+raw.reduce((x,[,v])=>x+v,0),tiny=c.filter(([,v])=>v/all<.015);if(tiny.length&&c.length>1){c=c.filter(z=>!tiny.includes(z));etc=tiny.concat(etc)}}etc=etc.concat(raw.map(([n,v])=>[n==='기타'?'기타(분류 없음)':n,v]));const rest=etc.reduce((s,[,v])=>s+v,0);if(rest>0)c=c.concat([['기타',rest]]);
  // 11-06 20:19 리포트가 있으면 금액은 지상파·케이블&종편 합계(코웨이 실집행, 경쟁사 모니터링)만 쓰고, 방송사·MPP는 금액을 나누지 않고 모니터링 비중(%)만 표시
  // 경쟁사는 먼슬리 리포트 모니터링 금액으로 합계를 맞춤(팝업 위 숫자·PDF와 같게). 리포트가 없는 기간은 아리아나 원본 그대로

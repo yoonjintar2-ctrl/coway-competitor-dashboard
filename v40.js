@@ -33,14 +33,12 @@ function v40Donut(d,tt){const T=tt==null?1:tt;const ps=d.peer_spend||{},ms=v40Ra
  let big=all.filter(([a,v])=>v/tot>=.03||a==='코웨이'),small=all.filter(x=>!big.includes(x));if(small.length===1){big=all;small=[]}const etc=small.reduce((s,[,v])=>s+v,0);  // 3% 미만은 기타로 (11-06 12:22 — 작은 조각 이름표가 코웨이 쪽으로 몰리지 않게)
  const list=big.map(([a,v])=>({a,v}));if(etc>0)list.push({a:'기타',v:etc,etc:small});
  // 11-06 11:4x — 살짝 기운 3D 도넛(시계 방향 13°), 코웨이는 늘 왼쪽 앞. 옆면은 각도가 한 바퀴 넘어가도 끊기지 않게 계산
- const W=700,H=420,cx=W/2,cy=H/2-22,R=160,K=.56,r=R*.5,DEP=34,ROT=13,TAU=Math.PI*2,EX=17,G=['#8d969f','#a3abb3','#b9c0c6','#7f8891','#ccd2d7','#9aa3ab','#6f7881'];
+ const W=700,H=420,cx=W/2,cy=H/2-22,R=160,K=.56,r=R*.5,DEP=34,ROT=13,TAU=Math.PI*2,EX=7,G=['#8d969f','#a3abb3','#b9c0c6','#7f8891','#ccd2d7','#9aa3ab','#6f7881'];
  const rc=cy+DEP/2,cs=Math.cos(ROT*Math.PI/180),sn=Math.sin(ROT*Math.PI/180),rot=([x,y])=>[cx+(x-cx)*cs-(y-rc)*sn,rc+(x-cx)*sn+(y-rc)*cs];
  const P=(a,rr,ox,oy,dz)=>[cx+ox+Math.cos(a)*rr,cy+oy+Math.sin(a)*rr*K+(dz||0)];
  const mi=list.findIndex(z=>z.a==='코웨이');if(mi>0)list.unshift(list.splice(mi,1)[0]);
- // 코웨이 양옆에는 큰 조각을 번갈아 두고, 작은 조각·기타는 뒤쪽(코웨이 반대편)으로 — 작은 조각 안내선이 코웨이 근처에서 시작하지 않게 (11-06 12:25)
- if(mi>=0&&list.length>3){const rest=list.slice(1),L=[],Rr=[];rest.forEach((z,i)=>(i%2?Rr:L).push(z));list.splice(1,rest.length,...L,...Rr.reverse())}
  const CM=Math.PI/2+.55;let a0=mi>=0?CM-list[0].v/tot*Math.PI*T:-Math.PI/2,gi=0;
- list.forEach(z=>{z.f=z.v/tot;z.a0=a0;z.a1=a0+z.f*TAU*T;a0=z.a1;z.me=z.a==='코웨이';z.col=z.me?'#4c66b2':z.a==='기타'?'#d5dade':G[gi++%G.length];const m=(z.a0+z.a1)/2;z.m=m;z.ox=0;z.oy=0;z.R=z.me?R+EX*T:R;z.lift=z.me?9*T:0;if(z.me&&list.length>1){const g=.018*T;z.a0+=g;z.a1-=g}});
+ list.forEach(z=>{z.f=z.v/tot;z.a0=a0;z.a1=a0+z.f*TAU*T;a0=z.a1;z.me=z.a==='코웨이';z.col=z.me?'#4c66b2':z.a==='기타'?'#d5dade':G[gi++%G.length];const m=(z.a0+z.a1)/2;z.m=m;z.ox=0;z.oy=0;z.R=z.me?R+EX*T:R;z.lift=z.me?12*T:0;if(z.me&&list.length>1){const g=.018*T;z.a0+=g;z.a1-=g}});
  const arc=(z,rr,s0,s1,dz,rev)=>{const [x0,y0]=P(rev?s1:s0,rr,z.ox,z.oy,dz),[x1,y1]=P(rev?s0:s1,rr,z.ox,z.oy,dz),lg=Math.abs(s1-s0)>Math.PI?1:0;return {m:`${x0},${y0}`,a:`A${rr},${rr*K} 0 ${lg} ${rev?0:1} ${x1},${y1}`}};
  const clips=(s0,s1,lo,hi)=>{const out=[];for(const k of [-1,0,1,2]){const a=Math.max(s0,lo+k*TAU),b=Math.min(s1,hi+k*TAU);if(b>a+1e-6)out.push([a,b])}return out};
  const tip=z=>z.etc?`data-v40-etc="${esc(JSON.stringify(z.etc.map(([a,v])=>[a,v])))}|${tot}"`:`data-v40-tip="${esc(z.a)}|sos|${z.v}|${tot}"`;
@@ -56,7 +54,8 @@ function v40Donut(d,tt){const T=tt==null?1:tt;const ps=d.peer_spend||{},ms=v40Ra
    const dd=`M${p.map(q=>q.join(',')).join(' L')} Z`;return `<path d="${dd}" fill="${v40Shade(z.col,.7)}"/><path d="${dd}" fill="url(#v40-wd)" pointer-events="none"/>`};
   caps+=cap(nb[0],me.a0-.018+TAU,false)+cap(nb[1],me.a1+.018,true)}
  // 이름표: 기울인 뒤의 화면 좌표로 계산 — 조각 테두리 → 바깥 꺾임 → 세로로 줄 세운 이름표, 선끼리 순서 유지
- const labs=list.map(z=>{const s=Math.sin(z.m),front=s>0,lf=z.lift||0,[ax,ay]=rot(P(z.m,z.R,0,0,front?DEP*.55-lf/2:-lf)),[bx,by]=rot(P(z.m,z.R+18,0,0,front?DEP*.55+s*16:-lf));return {z,side:bx<cx?-1:1,ax,ay,bx,by,y:by,h:z.me?46:36}});
+ list.forEach((z,i)=>{z.am=z.m;if(mi>=0&&list.length>2&&T>=1){const w=z.a1-z.a0;if(i===list.length-1)z.am=z.a0+w*.3;else if(i===1)z.am=z.a0+w*.7}});  // 코웨이와 맞닿은 조각은 안내선 시작점을 코웨이에서 먼 쪽으로
+ const labs=list.map(z=>{const s=Math.sin(z.am),front=s>0,lf=z.lift||0,[ax,ay]=rot(P(z.am,z.R,0,0,front?DEP*.55-lf/2:-lf)),[bx,by]=rot(P(z.am,z.R+18,0,0,front?DEP*.55+s*16:-lf));return {z,side:bx<cx?-1:1,ax,ay,bx,by,y:by,h:z.me?46:36}});
  {const me=labs.find(q=>q.z.me);if(me)me.side=me.bx<cx+R*.35?-1:1}
  [-1,1].forEach(sd=>{const L=labs.filter(q=>q.side===sd).sort((p,q)=>p.by-q.by);for(let k=1;k<L.length;k++){const g=(L[k-1].h+L[k].h)/2;if(L[k].y-L[k-1].y<g)L[k].y=L[k-1].y+g}
   const lo=L.length?L.at(-1).y+L.at(-1).h/2-(H-6):0;if(lo>0)L.forEach(q=>q.y-=lo);for(let k=L.length-2;k>=0;k--){const g=(L[k+1].h+L[k].h)/2;if(L[k+1].y-L[k].y<g)L[k].y=L[k+1].y-g}

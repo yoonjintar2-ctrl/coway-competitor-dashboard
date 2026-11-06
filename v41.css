@@ -61,3 +61,17 @@ table.v41-tt,table.v41-ct,table.v41-st{table-layout:fixed}
 .v41-hbars .hb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;font-weight:700;color:#34414d}
 .v41-hbars .hb i{display:block;height:10px;border-radius:5px;background:#eef2f5;overflow:hidden}.v41-hbars .hb i b{display:block;height:100%;background:linear-gradient(90deg,#9aa6b2,#6f7c89);border-radius:5px}
 .v41-hbars .hb em{font-style:normal;font-weight:700;color:#3c4a56;text-align:right}
+/* 11-06 14:33 — 팝업 도넛(지상파·케이블) · 마우스 강조 · 진입 애니메이션 */
+.v41-dnw{overflow-x:auto}.v41-dnw svg{display:block;margin:0 auto;width:auto!important;height:auto!important;stroke:none;max-width:none}
+.v41-dn .sl,.v41-dn .cd{transition:opacity .18s}
+.v41-dn.hot .sl:not(.on),.v41-dn.hot .bk{opacity:.38}.v41-dn .bk{transition:opacity .18s}.v41-dn.hot .cd:not(.on){opacity:.42}
+.v41-dn .cd .bx{transition:stroke .15s}.v41-dn .cd.on .bx{stroke:#4c66b2;stroke-width:1.6}.v41-dn .cd.on .ln{stroke-width:2}
+.v41-dn .cd{cursor:default}
+.v41-dn.done .cd{animation:v41fade .45s ease both}
+@keyframes v41fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.v41-plot .v41-pt{animation:v41pop .55s cubic-bezier(.2,1.4,.4,1) both}
+.v41-plot .v41-ln{animation:v41fade2 .5s ease .3s both}
+.v41-plot .v41-card{animation:v41fade .45s ease both}
+@keyframes v41pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes v41fade2{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){.v41-plot .v41-pt,.v41-plot .v41-ln,.v41-plot .v41-card,.v41-dn.done .cd{animation:none}}

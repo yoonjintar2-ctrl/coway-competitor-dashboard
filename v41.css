@@ -106,7 +106,6 @@ dialog.v41-dialog .v41-ph{align-items:stretch}
 .v41-chips .chipc.on{background:var(--c);border-color:var(--c);color:#fff;box-shadow:0 5px 14px rgba(20,60,90,.18)}
 .v41-chips .chipc.on i{background:#fff}.v41-chips .chipc.on em{background:rgba(255,255,255,.25);color:#fff}.v41-chips .chipc b{font-size:11px;font-weight:900;margin-left:1px}
 .v41-chips .melg{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#55697a;margin-left:6px}
-.v41-chips .melg i{width:8px;height:8px;border-radius:50%;background:#fff;border:3px solid #14284d}
 .v41-plot.all .v41-dot{cursor:pointer;transition:opacity .15s}
 .v41-plot.all .v41-dot.dim{opacity:.2}
 .v41-plot.all.hovering .v41-dot:not(.same){opacity:.22}
@@ -119,6 +118,5 @@ dialog.v41-dialog .v41-ph{align-items:stretch}
 .v41-plot.all .v41-hov .go{opacity:1;transform:none}
 .v41-plot .v41-hovln,.v41-plot .v41-ln{pointer-events:none}
 /* 19:08 — 코웨이 칩(누르면 코웨이 카드 닫기·열기), 품목별 분포 배경 */
-.v41-chips .chipc.mechip{--c:#14284d}
-.v41-chips .chipc.mechip i{background:#fff;border:3px solid #14284d;width:9px;height:9px;box-sizing:border-box}
-.v41-chips .chipc.mechip.on i{border-color:#fff;background:#14284d}
+
+.v41-chips .melg{margin-left:4px;gap:3px}.v41-chips .melg svg{display:block;overflow:visible}

@@ -30,7 +30,7 @@ table.v40-pt{border-collapse:separate;border-spacing:0;font-size:12px;font-varia
 .v40-pt .tot{position:sticky;right:0;z-index:1;background:#e7eef3!important;font-weight:800;color:#34414d}
 .v40-pt tfoot th,.v40-pt tfoot td{background:rgba(222,231,238,.95);font-weight:800;color:#34414d;border-top:1px solid rgba(16,43,69,.1)}
 /* 그래프 두 개 */
-.v40-two{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+.v40-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
 @media (max-width:1100px){.v40-two{grid-template-columns:1fr}}
 .v40-pane{padding:14px 16px 12px;display:flex;flex-direction:column}
 #v40-mix{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0}
@@ -46,4 +46,4 @@ html.nd .v40-sec select.chip.v40-per,.v40-sec select.v40-per{height:32px!importa
 .v40-donut{display:block;margin:0 auto}
 /* 기본 svg 규칙(20px·외곽선) 무시 */
 .v40-sec svg{width:auto;height:auto;stroke:none;max-width:none}
-.v40-sec svg.v40-donut{width:100%;height:auto;max-width:640px}
+.v40-sec svg.v40-donut{width:100%;height:auto;max-width:720px}

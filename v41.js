@@ -68,7 +68,6 @@ function v41View(){const d=v41D,ALL=v41Cat==='전체';if(!ALL)v41Focus='';let pt
    pts.forEach(q=>{if(q===p)return;if(q.px>c.x-12&&q.px<c.x+cw+12&&q.py>c.y-12&&q.py<c.y+ch+12)sc+=3000;if(own>12&&segPt(A[0],A[1],B[0],B[1],q.px,q.py)<14)sc+=1500;if(rd2(c,q.px,q.py)<own+14)sc+=1200});
    if(sc<bs){bs=sc;best=c;best.ln=[A,B]}}
   if(!best)best={x:Math.min(L+PW-cw-2,Math.max(L+4,p.px+14)),y:Math.max(T+2,p.py-ch-14),w:cw,h:ch};best.p=p;cards.push(best)});
- if(ALL)g=g.replace('<!--v41hulls-->','')+v41Hulls(pts);
  // 연결선(점 → 카드의 가장 가까운 테두리)
  cards.forEach(c=>{const p=c.p,nx=Math.max(c.x,Math.min(p.px,c.x+c.w)),ny=Math.max(c.y,Math.min(p.py,c.y+c.h)),dd=Math.hypot(nx-p.px,ny-p.py);
   if(dd>14)g+=`<line class="v41-ln" x1="${p.px}" y1="${p.py}" x2="${nx}" y2="${ny}" stroke="${p.a==='코웨이'?'#8fa0d4':'#b9c3ca'}" stroke-width="1.2"/>`});
@@ -261,9 +260,9 @@ async function v41LoadAll(cats){const req=++v41Req;const out={};
 var v41Focus='',v41Pts=[],v41Geo=null,v41HovI=-1,v41Touch=false;
 var V41_TAP='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 10.5V9a1.5 1.5 0 0 1 3 0v2"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3l-1.6-2.8a1.5 1.5 0 0 1 2.6-1.5L9 15.5V11"/></svg>';
 function v41CardHtml(p){const me=p.a==='코웨이',r3=p.r&&p.r.r3!=null?`R3+${Math.round(p.r.r3)}%`:'R3+ 준비 중';return `<i class="cap" style="background:${v41CatCol(p.cat)}">${esc(p.cat)}</i><b>${esc(p.a)} <em>(${v41Won(p.won)}원)</em></b><span>(${Math.round(p.eq).toLocaleString()} eq GRP, ${r3})</span><i class="go">자세히 보기 →</i>`}
-function v41HovHide(){const plot=document.querySelector('#content .v41-plot.all');v41HovI=-1;if(!plot)return;plot.querySelectorAll('.v41-hull.same').forEach(e=>e.classList.remove('same'));const h=plot.querySelector('.v41-hov'),ln=plot.querySelector('.v41-hovln');if(h)h.hidden=true;if(ln)ln.setAttribute('visibility','hidden');plot.classList.remove('hovering');plot.querySelectorAll('.v41-dot.hot,.v41-dot.same,.v41-card.hot').forEach(e=>e.classList.remove('hot','same'))}
+function v41HovHide(){const plot=document.querySelector('#content .v41-plot.all');v41HovI=-1;if(!plot)return;const h=plot.querySelector('.v41-hov'),ln=plot.querySelector('.v41-hovln');if(h)h.hidden=true;if(ln)ln.setAttribute('visibility','hidden');plot.classList.remove('hovering');plot.querySelectorAll('.v41-dot.hot,.v41-dot.same,.v41-card.hot').forEach(e=>e.classList.remove('hot','same'))}
 function v41HovShow(i){const plot=document.querySelector('#content .v41-plot.all'),p=v41Pts[i];if(!plot||!p||!v41Geo)return;v41HovHide();v41HovI=i;
- plot.classList.add('hovering');plot.querySelectorAll('.v41-dot,.v41-hull').forEach(e=>{if(e.dataset.v41Cat===p.cat)e.classList.add('same')});const dot=plot.querySelector(`.v41-dot[data-v41-i="${i}"]`);if(dot)dot.classList.add('hot');
+ plot.classList.add('hovering');plot.querySelectorAll('.v41-dot').forEach(e=>{if(e.dataset.v41Cat===p.cat)e.classList.add('same')});const dot=plot.querySelector(`.v41-dot[data-v41-i="${i}"]`);if(dot)dot.classList.add('hot');
  const fixed=plot.querySelector(`.v41-card:not(.v41-hov)[data-v41-i="${i}"]`);if(fixed){fixed.classList.add('hot');return}  // 이미 카드가 있으면 그 카드만 강조
  const h=plot.querySelector('.v41-hov');h.innerHTML=v41CardHtml(p);h.className='v41-card all v41-hov'+(p.a==='코웨이'?' me':'');h.dataset.v41Adv=p.a;h.dataset.v41Cat=p.cat;h.dataset.v41I=i;h.style.width='156px';h.hidden=false;
  const cw=h.offsetWidth,ch=h.offsetHeight,G=v41Geo,rects=[...plot.querySelectorAll('.v41-card:not(.v41-hov)')].map(c=>({x:c.offsetLeft,y:c.offsetTop,w:c.offsetWidth,h:c.offsetHeight}));
@@ -286,15 +285,5 @@ document.addEventListener('click',e=>{if(route!=='reach')return;
  if(v41Touch&&v41HovI!==i){v41HovShow(i);return}  // 휴대폰: 첫 탭은 카드, 두 번째 탭(또는 카드 탭)에 세부 내역
  v41Per='ytd';if(v41All[p.cat]){v41AllBack={d:v41D};v41Cat=p.cat;v41D=v41All[p.cat]}v41Open(p.a)});
 
-// 품목별 분포 배경 (11-06 19:08): 같은 품목 점들을 감싸는 영역을 품목 색으로 옅게 — 점이 하나면 동그라미, 둘이면 캡슐
+// 11-06 19:17 품목별 분포 영역은 사용자 요청으로 뺌
 var v41ShowMe=true;
-function v41Hull(P){P=[...P].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);if(P.length<3)return P;const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);const lo=[],up=[];
- for(const p of P){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}
- for(const p of [...P].reverse()){while(up.length>=2&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
- return lo.slice(0,-1).concat(up.slice(0,-1))}
-function v41Hulls(pts){const by={};pts.forEach(p=>{(by[p.cat]=by[p.cat]||[]).push([p.px,p.py])});let h='';
- Object.entries(by).forEach(([c,P])=>{const H=v41Hull(P),col=v41CatCol(c),dim=v41Focus&&v41Focus!==c?' dim':v41Focus===c?' on':'';const pad=34;
-  let shape;if(H.length===1)shape=`<circle cx="${H[0][0]}" cy="${H[0][1]}" r="${pad/2}" fill="${col}"/>`;
-  else shape=`<path d="M${H.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' L')}${H.length>2?' Z':''}" fill="${col}" stroke="${col}" stroke-width="${pad}" stroke-linejoin="round" stroke-linecap="round"/>`;
-  h+=`<g class="v41-hull${dim}" data-v41-cat="${esc(c)}">${shape}</g>`});
- return h}

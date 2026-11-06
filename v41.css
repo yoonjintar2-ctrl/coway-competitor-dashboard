@@ -122,8 +122,3 @@ dialog.v41-dialog .v41-ph{align-items:stretch}
 .v41-chips .chipc.mechip{--c:#14284d}
 .v41-chips .chipc.mechip i{background:#fff;border:3px solid #14284d;width:9px;height:9px;box-sizing:border-box}
 .v41-chips .chipc.mechip.on i{border-color:#fff;background:#14284d}
-.v41-plot .v41-hull{opacity:.12;transition:opacity .15s;pointer-events:none}
-.v41-plot .v41-hull.dim{opacity:.035}
-.v41-plot .v41-hull.on{opacity:.2}
-.v41-plot.all.hovering .v41-hull:not(.same){opacity:.035}
-.v41-plot.all.hovering .v41-hull.same{opacity:.22}

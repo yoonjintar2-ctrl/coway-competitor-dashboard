@@ -84,6 +84,8 @@ function v41View(){const d=v41D,ALL=v41Cat==='전체';if(!ALL)v41Focus='';let pt
 function v41Draw(){if(!v41D){$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료가 없어요.','아리아나 자료(data/arianna)를 넣으면 보여요.')}</section>`;return}v41Controls(true);$('#content').innerHTML=v41View()}
 // 팝업: 지상파·케이블 세부 운영 내역
 function v41Bar(parts,total,cols){if(!total)return '<i class="v41-bar0"></i>';return `<i class="v41-bar">${parts.map(([k,v],i)=>`<b style="width:${v/total*100}%;background:${cols[i%cols.length]}" title="${esc(k)} ${Math.round(v/total*100)}%"></b>`).join('')}</i>`}
+// 11-06 21:53 아리아나 원본이 리포트보다 짧은 품목(지금은 안마의자: 8월까지)은 세부 표에 '모니터링' 딱지 — 더 받지 않기로 함
+function v41ArBadge(rep){const ar=Math.max(0,...v41D.R.filter(r=>r.y===v41Year).map(r=>r.m));if(!rep||!ar)return '';const miss=[...new Set(rep.rows.map(x=>x.m))].filter(m=>m>ar).sort((a,b)=>a-b);return miss.length?`<span class="v41-badge" title="아리아나(닐슨) 모니터링 원본 기준 — ${miss.join('·')}월 원본은 받지 않음">모니터링 · ${miss.join('·')}월 미반영</span>`:''}
 function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv),rep=v41Rep();
  const repMs=rep?[...new Set(rep.rows.filter(x=>x.brand===adv).map(x=>v41M(v41Year,x.m)))]:[],ms=[...new Set([...v41Months(),...repMs])].sort();
  const terr=rows.filter(r=>r.media==='지상파'),cab=rows.filter(r=>r.media!=='지상파'),Z={inv:0,net:0,ins:0,grp:0,eq:0,adj:0},T=v41Sum(terr).all||Z,C=v41Sum(cab).all||Z;
@@ -130,7 +132,7 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
   <select class="chip v41-per" data-v41-per>${[['ytd',v41Year+'년 누적'],...ms.slice().reverse().map(m=>[m,m.slice(2,4)+'.'+m.slice(5)])].map(([v,l])=>`<option value="${v}" ${v===per?'selected':''}>${l}</option>`).join('')}</select></div>
   <div id="v41-donut-slot"></div>
   <h3>지상파 · 케이블&종편 집행 요약</h3>${sumHtml||'<p class="v41-none">이 기간 집행이 없어요.</p>'}
-  <h3>지상파TV 세부 운영 내역</h3>${terrHtml}<h3>케이블TV 세부 운영 내역</h3>${cabHtml}
+  <h3>지상파TV 세부 운영 내역${v41ArBadge(rep)}</h3>${terrHtml}<h3>케이블TV 세부 운영 내역${v41ArBadge(rep)}</h3>${cabHtml}
   <p class="footnote">집행 요약: ${rep?'SM C&C 먼슬리 리포트 경쟁사 TV set Performance 표 기준 — 코웨이 실집행금액은 실집행(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사 실집행금액은 보너스율 반영 추정 · 누적의 R1+·A.F는 월별 값을 더할 수 없어 비워 두고 R3+는 누적 도달률':'아리아나(닐슨) 원본'} · 세부 운영 내역: 아리아나(닐슨) 모니터링 광고비·GRP·Eq GRP, 타깃 ${esc((v41D.source||{}).target||'')} · A.R = GRP ÷ 횟수 · CPRP = 모니터링 광고비 ÷ Eq GRP · 광고유형: PR 일반프로, SP 스팟, TJ 특집/재방</p></div>`}
 function v41Open(adv){const dl=$('#detail');dl.className='v41-dialog';$('#detail-body').innerHTML=v41Detail(adv);v41Cur=adv;if(!dl.open)dl.showModal();v41DnMount(adv,v41Per)}
 var v41Cur='';

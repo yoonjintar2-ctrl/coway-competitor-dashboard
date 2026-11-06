@@ -30,7 +30,7 @@ function v40MixChart(d,wid){wid=wid||(document.getElementById('v40-mix')||{}).cl
 function v40Shade(hex,k){const n=parseInt(hex.slice(1),16),f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return `rgb(${f(n>>16&255)},${f(n>>8&255)},${f(n&255)})`}
 function v40Donut(d,tt){const T=tt==null?1:tt;const ps=d.peer_spend||{},ms=v40Range(d,v40Per),all=v40Order(d).map(a=>[a,v40Tot(ps,a,ms)]).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
  const tot=all.reduce((s,[,v])=>s+v,0);if(!tot)return `<p class="v40-empty">이 기간에는 광고비 자료가 없어요.</p>`;
- const big=all.filter(([a,v])=>v/tot>=.01||a==='코웨이'),small=all.filter(x=>!big.includes(x)),etc=small.reduce((s,[,v])=>s+v,0);
+ let big=all.filter(([a,v])=>v/tot>=.03||a==='코웨이'),small=all.filter(x=>!big.includes(x));if(small.length===1){big=all;small=[]}const etc=small.reduce((s,[,v])=>s+v,0);  // 3% 미만은 기타로 (11-06 12:22 — 작은 조각 이름표가 코웨이 쪽으로 몰리지 않게)
  const list=big.map(([a,v])=>({a,v}));if(etc>0)list.push({a:'기타',v:etc,etc:small});
  // 11-06 11:4x — 살짝 기운 3D 도넛(시계 방향 13°), 코웨이는 늘 왼쪽 앞. 옆면은 각도가 한 바퀴 넘어가도 끊기지 않게 계산
  const W=700,H=420,cx=W/2,cy=H/2-22,R=160,K=.56,r=R*.5,DEP=34,ROT=13,TAU=Math.PI*2,EX=17,G=['#8d969f','#a3abb3','#b9c0c6','#7f8891','#ccd2d7','#9aa3ab','#6f7881'];
@@ -84,7 +84,7 @@ function v40After(){const d=v38D,card=document.querySelector('#content .v38-card
  const sec=(title,body,note,ctrl)=>`<section class="glass section v40-sec"><div class="v40-h"><h2>${title}</h2>${d.category&&ctrl?ctrl:''}</div>${d.category?body:need}${d.category&&note?`<p class="footnote v40-foot">${note}</p>`:''}</section>`;
  card.insertAdjacentHTML('afterend',
   sec('품목 내 광고주별 월별 광고비',`<div class="v38-glass">${d.category?v40PeerTable(d):''}</div>`,`${unit} · 광고주 이름을 누르면 그 광고주 화면으로 넘어가요`)+
-  sec('품목 내 Share of Spending',`<div class="v38-glass v40-pane"><div id="v40-sos">${d.category?v40Donut(d):''}</div></div>`,`${unit} · 1% 미만 광고주는 기타로 묶었어요(마우스를 올리면 세부) · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):'')+
+  sec('품목 내 Share of Spending',`<div class="v38-glass v40-pane"><div id="v40-sos">${d.category?v40Donut(d):''}</div></div>`,`${unit} · 3% 미만 광고주는 기타로 묶었어요(마우스를 올리면 세부) · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):'')+
   sec('품목 내 매체 믹스',`<div class="v38-glass v40-pane"><div class="v40-mixwrap"><div id="v40-mix">${d.category?v40MixChart(d):''}</div><button type="button" class="v38-fbtn v40-mbtn l" data-v40-mscroll="-1" aria-label="왼쪽으로" hidden>${V40_CHEV(-1)}</button><button type="button" class="v38-fbtn v40-mbtn r" data-v40-mscroll="1" aria-label="오른쪽으로" hidden>${V40_CHEV(1)}</button></div></div>`,`${unit} · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):''));
  const sc=document.getElementById('v40-pscroll');if(sc)sc.scrollLeft=sc.scrollWidth;const mx=document.getElementById('v40-mix');if(mx&&d.category)mx.innerHTML=v40MixChart(d,mx.clientWidth);v40MixBtns();v40SosArm(d)}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v40-mscroll]');if(!b)return;const sc=document.querySelector('#v40-mix .v40-mixsc');if(sc){sc.scrollBy({left:+b.dataset.v40Mscroll*sc.clientWidth*.7,behavior:'smooth'});setTimeout(v40MixBtns,450)}});

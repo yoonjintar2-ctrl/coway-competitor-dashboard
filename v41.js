@@ -134,7 +134,7 @@ render=async function(...a){try{v41Order()}catch(e){}if(route!=='reach'){v41Cont
  $('#content').innerHTML='<div class="loading glass">TV 통합 분석 자료를 불러오는 중이에요.</div>';
  try{await v41Load();if(route!=='reach')return;if(v41D){v41D._cat=v41Cat;v41D._t=Date.now()}}catch(e){$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료를 불러오지 못했어요.',e.message)}</section>`;return}v41Draw();if(typeof v38Sync==='function')v38Sync(true)};
 document.addEventListener('click',async e=>{if(route!=='reach')return;const y=e.target.closest&&e.target.closest('[data-v41-year]');if(y){v41Year=+y.dataset.v41Year;v41Per='ytd';v41Draw();if(typeof v38Sync==='function')v38Sync(false);return}
- const c=e.target.closest&&e.target.closest('.v41-card[data-v41-adv]');if(c){v41Per=v41Latest(c.dataset.v41Adv);v41Open(c.dataset.v41Adv)}});
+ const c=e.target.closest&&e.target.closest('.v41-card[data-v41-adv]');if(c){v41Per='ytd';v41Open(c.dataset.v41Adv)}});
 document.addEventListener('change',async e=>{if(e.target.id==='v41-cat'){e.stopPropagation();v41Cat=e.target.value;v41Year=null;v41Per='ytd';try{await v41Load();v41Draw();if(typeof v38Sync==='function')v38Sync(false)}catch(err){toast('불러오지 못했어요: '+err.message)}return}
  const p=e.target.closest&&e.target.closest('[data-v41-per]');if(p){v41Per=p.value;const dl=$('#detail');$('#detail-body').innerHTML=v41Detail(v41Cur);v41DnMount(v41Cur,v41Per)}},true);
 window.addEventListener('resize',()=>{if(route==='reach'&&v41D)v41Draw()});
@@ -232,5 +232,5 @@ document.addEventListener('click',e=>{const old=document.querySelector('.v41-etc
  const pop=document.createElement('div');pop.className='v41-etcpop';pop.innerHTML=`<b>기타 ${L.length}개 채널 · ${v41Eok(sum)}</b><div class="ls">${L.map(([n,v])=>`<div><span>${esc(n)}</span><em>${v41Eok(v)}</em><i>${(v/t*100).toFixed(v/t>=.01?0:1)}%</i></div>`).join('')}</div>`;
  box.style.position='relative';box.appendChild(pop);const pw=pop.offsetWidth,ph=pop.offsetHeight;let x=rb.left-rp.left-pw-10;if(x<0)x=Math.min(rp.width-pw,rb.right-rp.left+10);pop.style.left=x+'px';pop.style.top=Math.max(0,Math.min(rb.top-rp.top-ph/2+rb.height/2,box.offsetHeight-ph))+'px'});
 
-// 세부 운영 내역 팝업은 최근 월로 열기 (11-06 14:57)
+// (11-06 16:50부터 팝업 기본값은 누적 — 아래 함수는 남겨 둠)
 function v41Latest(adv){const rep=v41Rep(),a=v41D.R.filter(r=>r.y===v41Year&&r.adv===adv).map(r=>v41M(r.y,r.m)),b=rep?rep.rows.filter(x=>x.brand===adv).map(x=>v41M(v41Year,x.m)):[];const all=[...a,...b].sort();return all.length?all.at(-1):'ytd'}

@@ -127,3 +127,6 @@ html.v39-lock,html.v39-lock body{overflow:hidden!important}
 .v39-below.one .v39-legend .grad{width:110px;height:8px}
 .v39-below.one .v39-legend svg{transform:scale(.78);transform-origin:left center}
 .v39-below.one .fn{font-size:10.5px;color:#8a96a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+/* 11-06 14:59 — 범례와 주석 사이 구분선, 전체 화면에선 아래에서 조금 띄움 */
+.v39-below.one .fn{border-left:1px solid #d3dce3;padding-left:16px;margin-left:2px}
+body.v39-full .v39-below.one{margin-top:14px!important;padding-bottom:26px}

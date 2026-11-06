@@ -37,6 +37,8 @@ function v40Donut(d,tt){const T=tt==null?1:tt;const ps=d.peer_spend||{},ms=v40Ra
  const rc=cy+DEP/2,cs=Math.cos(ROT*Math.PI/180),sn=Math.sin(ROT*Math.PI/180),rot=([x,y])=>[cx+(x-cx)*cs-(y-rc)*sn,rc+(x-cx)*sn+(y-rc)*cs];
  const P=(a,rr,ox,oy,dz)=>[cx+ox+Math.cos(a)*rr,cy+oy+Math.sin(a)*rr*K+(dz||0)];
  const mi=list.findIndex(z=>z.a==='코웨이');if(mi>0)list.unshift(list.splice(mi,1)[0]);
+ // 코웨이 양옆에는 큰 조각을 번갈아 두고, 작은 조각·기타는 뒤쪽(코웨이 반대편)으로 — 작은 조각 안내선이 코웨이 근처에서 시작하지 않게 (11-06 12:25)
+ if(mi>=0&&list.length>3){const rest=list.slice(1),L=[],Rr=[];rest.forEach((z,i)=>(i%2?Rr:L).push(z));list.splice(1,rest.length,...L,...Rr.reverse())}
  const CM=Math.PI/2+.55;let a0=mi>=0?CM-list[0].v/tot*Math.PI*T:-Math.PI/2,gi=0;
  list.forEach(z=>{z.f=z.v/tot;z.a0=a0;z.a1=a0+z.f*TAU*T;a0=z.a1;z.me=z.a==='코웨이';z.col=z.me?'#4c66b2':z.a==='기타'?'#d5dade':G[gi++%G.length];const m=(z.a0+z.a1)/2;z.m=m;z.ox=0;z.oy=0;z.R=z.me?R+EX*T:R;z.lift=z.me?9*T:0;if(z.me&&list.length>1){const g=.018*T;z.a0+=g;z.a1-=g}});
  const arc=(z,rr,s0,s1,dz,rev)=>{const [x0,y0]=P(rev?s1:s0,rr,z.ox,z.oy,dz),[x1,y1]=P(rev?s0:s1,rr,z.ox,z.oy,dz),lg=Math.abs(s1-s0)>Math.PI?1:0;return {m:`${x0},${y0}`,a:`A${rr},${rr*K} 0 ${lg} ${rev?0:1} ${x1},${y1}`}};

@@ -30,9 +30,9 @@ function v37Row(x,k,list){const w=v37When(x.published_at),same=k>0&&v37When(list
   <div class="v37-thumb">${x.image?`<img src="${esc(safeUrl(x.image))}" alt="" loading="lazy" onerror="this.remove()">`:''}</div></div>`}
 function v37Controls(show){let box=document.querySelector('main>header .v37-ctrl');if(!show){if(box)box.remove();return}
  const head=document.querySelector('main>header');if(!head)return;if(!box){box=document.createElement('div');box.className='v32-ctrl v37-ctrl';head.appendChild(box)}
- const cats=['',...(v37Data.categories||[])],advs=['',...(v37Data.advertisers||[])];
+ const cats=['',...(v37Data.categories||[])],has=a=>!v37Cat||(v37Data.items||[]).some(x=>x.category_label===v37Cat&&x.advertiser===a),advs=['',...(v37Data.advertisers||[]).filter(has)];  // 고른 품목에 기사가 있는 광고주만 (11-06 점검)
  box.innerHTML=`<label>품목<select id="v37-cat" class="chip">${cats.map(c=>`<option value="${esc(c)}" ${c===v37Cat?'selected':''}>${c?esc(c):'전체 품목'}</option>`).join('')}</select></label><label>광고주<select id="v37-adv" class="chip">${advs.map(a=>`<option value="${esc(a)}" ${a===v37Adv?'selected':''}>${a?esc(a):'코웨이 + 경쟁사'}</option>`).join('')}</select></label>`}
-function v37Draw(){const items=v37Items();$('#subtitle').textContent='';v37Controls(true);
+function v37Draw(){if(v37Cat&&v37Adv&&!(v37Data.items||[]).some(x=>x.category_label===v37Cat&&x.advertiser===v37Adv))v37Adv='';const items=v37Items();$('#subtitle').textContent='';v37Controls(true);
  const up=v37Data.updated_at?v37When(v37Data.updated_at):null;
  $('#content').innerHTML=`<p class="v32-note v37-note">코웨이와 경쟁 광고주 뉴스를 발행 시각 순으로 보여 줘요(최근 ${v37Data.days}일 · 소식 ${items.length}건${v37Data.articles&&v37Data.articles>(v37Data.items||[]).length&&!v37Cat&&!v37Adv?` · 기사 ${v37Data.articles}건`:''}). 기사를 누르면 크게 보고, 링크 복사 버튼으로 이 사이트에서 그 기사가 열리는 주소를 복사해요.${up?` · ${up.date} ${up.time} 업데이트${v32Static()?'':` · PC 대시보드가 켜져 있으면 ${v37Data.interval_minutes}분마다 새 기사를 모아요`}`:''}</p>
   <section class="glass section v37-list">${items.length?items.map((x,k,l)=>v37Row(x,k,l)).join(''):empty('조건에 맞는 뉴스가 없어요.',v37Data.items.length?'품목·광고주 선택을 바꿔 보세요.':'아직 모은 뉴스가 없어요. PC 대시보드가 켜져 있으면 곧 채워져요.')}</section>

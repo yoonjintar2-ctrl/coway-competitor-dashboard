@@ -39,7 +39,7 @@ function v38View(d){
  const LANES=3,CH=22,CG=4,CT=6,lanes=Array.from({length:LANES},()=>[]);const fit=(x0,x1)=>{const k=lanes.findIndex(L=>L.every(([a,b])=>x1<a-10||x0>b+10));if(k<0)return -1;lanes[k].push([x0,x1]);return k};
  ctx.font='700 11.5px Pretendard, "Noto Sans KR", sans-serif';
  let CL=d.camps;if(!d.category){const big=CL.filter(c=>(c.amount||0)>=5e8);CL=big.length?big:[...CL].sort((a,b)=>(b.amount||0)-(a.amount||0)).slice(0,5)}
- const camps=[];for(const c of [...CL].sort((a,b)=>(b.amount||0)-(a.amount||0))){const nm=c.name.replace(new RegExp('^'+d.advertiser.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'),'').replace(/^·\s*/,'')||c.name;const txt=`${nm} · ${md(c.s)}–${md(c.e)}`;const x0=xd(c.s),x1=Math.max(xd(c.e),x0+ctx.measureText(txt).width+CH+16);const k=fit(x0,x1);if(k<0)continue;camps.push({...c,txt,x0,x1,k})}
+ const camps=[];for(const c of [...CL].sort((a,b)=>(b.amount||0)-(a.amount||0))){const nm=c.name.replace(new RegExp('^'+d.advertiser.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'),'').replace(/^·\s*/,'')||c.name;const txt=`${nm} · ${md(c.s)}–${md(c.e)}`;const x0=xd(c.s),vs=VIS0*slot+6,lx=x0<vs&&xd(c.e)>vs+60?vs:x0,x1=Math.max(xd(c.e),lx+ctx.measureText(txt).width+CH+16);const k=fit(x0,x1);if(k<0)continue;camps.push({...c,txt,x0,x1,k,lx})}  // 보이는 12개월 전에 시작한 캠페인은 이름을 보이는 왼쪽 끝에 (11-06 점검)
  ctx.font='500 11px Pretendard, "Noto Sans KR", sans-serif';
  const news=[];for(const n of [...d.news].sort((a,b)=>a.d.localeCompare(b.d))){const txt=`${md(n.d)} ${n.t}${n.n>1?` 외 ${n.n-1}건`:''}`;let x0=xd(n.d);const room=PW-6-x0-36;if(room<70)x0=Math.max(0,PW-6-36-70);let w=Math.min(240,ctx.measureText(txt).width,PW-6-x0-36),t=txt;while(t.length>6&&ctx.measureText(t+'…').width>w)t=t.slice(0,-1);if(t!==txt)t+='…';const x1=x0+36+w;const k=fit(x0,x1);if(k<0)continue;news.push({...n,txt,short:t,x0,x1,k})}
  const BAND=LANES*(CH+CG),LINE_TOP=CT+BAND+10,LINE_H=180,BAR_TOP=LINE_TOP+LINE_H-56,BAR_H=325,BASE=BAR_TOP+BAR_H;
@@ -54,15 +54,15 @@ function v38View(d){
   <pattern id="v38-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9" stroke="#25a4dc" stroke-width="1.4" stroke-opacity=".06"/></pattern>
   <pattern id="v38-yoyh" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3.6" height="8" fill="#9aa5ae" fill-opacity=".13"/></pattern>
   <filter id="v38-soft" x="-20%" y="-60%" width="140%" height="220%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#14405a" flood-opacity=".09"/></filter>
-  ${camps.map((c,i)=>`<clipPath id="v38-cl${i}"><circle cx="${c.x0+CH/2}" cy="${CT+c.k*(CH+CG)+CH/2}" r="${CH/2-3}"/></clipPath>`).join('')}
+  ${camps.map((c,i)=>`<clipPath id="v38-cl${i}"><circle cx="${c.lx+CH/2}" cy="${CT+c.k*(CH+CG)+CH/2}" r="${CH/2-3}"/></clipPath>`).join('')}
   ${M.map((m,i)=>TOT[i]?`<clipPath id="v38-bar${i}"><path d="${top(BX(i)-bw/2,bw,sy(TOT[i]))}"/></clipPath>`:'').join('')}</defs>`;
  
  M.forEach((m,i)=>{if(i&&m.endsWith('-01'))s+=`<line x1="${slot*i}" x2="${slot*i}" y1="${CT}" y2="${BASE}" stroke="#7f98ad" stroke-opacity=".09" stroke-width="5"/>`});
  // 캠페인
  camps.forEach((c,i)=>{const y=CT+c.k*(CH+CG),w=c.x1-c.x0;
   s+=`<g class="v38-camp" data-v38-camp="${esc(c.id)}"><line class="gd" x1="${c.x0+.5}" x2="${c.x0+.5}" y1="${y+CH/2}" y2="${BASE}" stroke="#3b4450"/><rect class="cap" x="${c.x0}" y="${y}" width="${w}" height="${CH}" rx="${CH/2}" fill="#fff" fill-opacity=".92"/>
-  <circle cx="${c.x0+CH/2}" cy="${y+CH/2}" r="${CH/2-2.5}" fill="#dbe7ee"/>${c.thumb?`<image href="${esc(safeUrl(c.thumb))}" x="${c.x0+3}" y="${y+3}" width="${CH-6}" height="${CH-6}" preserveAspectRatio="xMidYMid slice" clip-path="url(#v38-cl${i})" onerror="this.remove()"/>`:''}
-  <text x="${c.x0+CH+4}" y="${y+CH/2+4}" font-size="11.5" font-weight="600" fill="#6b7782">${esc(c.txt.replace(/ · \d\d\.\d\d–\d\d\.\d\d$/,''))} <tspan font-weight="500" fill="#98a3ad">· ${md(c.s)}–${md(c.e)}</tspan></text></g>`});
+  <circle cx="${c.lx+CH/2}" cy="${y+CH/2}" r="${CH/2-2.5}" fill="#dbe7ee"/>${c.thumb?`<image href="${esc(safeUrl(c.thumb))}" x="${c.lx+3}" y="${y+3}" width="${CH-6}" height="${CH-6}" preserveAspectRatio="xMidYMid slice" clip-path="url(#v38-cl${i})" onerror="this.remove()"/>`:''}
+  <text x="${c.lx+CH+4}" y="${y+CH/2+4}" font-size="11.5" font-weight="600" fill="#6b7782">${esc(c.txt.replace(/ · \d\d\.\d\d–\d\d\.\d\d$/,''))} <tspan font-weight="500" fill="#98a3ad">· ${md(c.s)}–${md(c.e)}</tspan></text></g>`});
  // 기사(점·글자, x축 연결선)
  news.forEach(n=>{const y=CT+n.k*(CH+CG)+CH/2,t=n.short||n.txt;s+=`<g class="v38-news" data-v38-news="${esc(n.u)}"><line class="gd" x1="${n.x0+13}" x2="${n.x0+13}" y1="${y+7}" y2="${BASE}" stroke="#8d98a3"/><rect x="${n.x0}" y="${y-7}" width="26" height="14" rx="7" fill="rgba(125,138,150,.13)"/><text x="${n.x0+13}" y="${y+3.2}" text-anchor="middle" font-size="9" font-weight="700" fill="#7d8a96">기사</text><text x="${n.x0+31}" y="${y+3.8}" font-size="11" fill="#5f6b77"><tspan font-weight="700" fill="#8d98a3">${esc(t.slice(0,5))}</tspan>${esc(t.slice(5))}</text><title>${esc(n.p?n.p+' · ':'')}${esc(n.t)}</title></g>`});
  // 네이버 쿼리(올해 + 전년 같은 달)

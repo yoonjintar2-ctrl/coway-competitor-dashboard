@@ -1,7 +1,7 @@
 /* v41 — 2026-11-06 도달률 비교
    품목 안 광고주별 TV 광고비 · 15초 환산 노출량(Eq GRP) · 유효도달률(R3+) 버블 차트.
    자료: 아리아나(닐슨) TV 집행 — 먼슬리 리포트 Raw_04 집계(data/arianna). 카드를 누르면 지상파·케이블 세부 운영 내역. */
-var V41_TITLE='TV 통합 분석',v41Meta=null,v41Cat='',v41Year=null,v41D=null,v41Req=0,v41Per='ytd';
+var V41_TITLE='TV 통합 분석',v41Meta=null,v41Cat='전체',v41Year=null,v41D=null,v41Req=0,v41Per='ytd';
 var V41_TYPE={PR:'일반프로',SP:'스팟',TJ:'특집/재방',YG:'예고'};
 function v41Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="reach"]'))return;const b=document.createElement('button');b.className='nav';b.dataset.route='reach';b.textContent=V41_TITLE;
  const after=nav.querySelector('[data-route="heatmap"]')||nav.querySelector('[data-route="monthly"]');if(after)after.after(b);else nav.appendChild(b)}
@@ -11,7 +11,7 @@ function v41Order(){const nav=document.querySelector('.sidebar nav');if(!nav)ret
 v41Nav();v41Order();document.addEventListener('DOMContentLoaded',()=>{v41Nav();v41Order()});[400,1500,3000].forEach(t=>setTimeout(()=>{v41Nav();v41Order()},t));
 async function v41Get(path){if(v32Static()){const r=await fetch('data/reach/'+path,{cache:'no-cache'});if(!r.ok)throw new Error('자료 없음');return r.json()}return api('/api/reach/'+path)}
 async function v41Load(){if(!v41Meta)v41Meta=v32Static()?await v41Get('meta.json'):await api('/api/reach/meta');
- const cats=v41Meta.categories||[];if(!cats.length)return null;if(!v41Cat||!cats.find(c=>c.label===v41Cat))v41Cat=(cats.find(c=>c.label==='정수기')||cats[0]).label;
+ const cats=v41Meta.categories||[];if(!cats.length)return null;if(v41Cat==='전체')return v41LoadAll(cats);v41AllBack=null;if(!v41Cat||!cats.find(c=>c.label===v41Cat))v41Cat=(cats.find(c=>c.label==='정수기')||cats[0]).label;
  const req=++v41Req;const d=v32Static()?await v41Get('c-'+encodeURIComponent(v41Cat).replace(/%/g,'_')+'.json'):await api('/api/reach/rows?category='+encodeURIComponent(v41Cat));if(req!==v41Req)return null;
  const ci=Object.fromEntries(d.cols.map((k,i)=>[k,i]));d.R=d.rows.map(r=>Object.fromEntries(d.cols.map(k=>[k,r[ci[k]]])));
  d.years=[...new Set(d.R.map(r=>r.y))].sort((a,b)=>b-a);if(!v41Year||!d.years.includes(v41Year))v41Year=d.years[0];v41D=d;return d}
@@ -23,18 +23,22 @@ function v41Reach(adv,per){const r=(v41D.reach||{})[adv]||{};const k=per==='ytd'
 function v41Months(){return [...new Set(v41D.R.filter(r=>r.y===v41Year).map(r=>v41M(r.y,r.m)))].sort()}
 function v41Controls(show){let box=document.querySelector('main>header .v41-ctrl');if(!show){if(box)box.remove();return}const head=document.querySelector('main>header');if(!head)return;
  if(!box){box=document.createElement('div');box.className='v32-ctrl v41-ctrl';head.appendChild(box)}
- box.innerHTML=`<label>품목<select id="v41-cat" class="chip">${(v41Meta.categories||[]).map(c=>`<option value="${esc(c.label)}" ${c.label===v41Cat?'selected':''}>${esc(c.name||c.label)}</option>`).join('')}</select></label>`}
+ box.innerHTML=`<label>품목<select id="v41-cat" class="chip"><option value="전체" ${v41Cat==='전체'?'selected':''}>전체</option>${(v41Meta.categories||[]).map(c=>`<option value="${esc(c.label)}" ${c.label===v41Cat?'selected':''}>${esc(c.name||c.label)}</option>`).join('')}</select></label>`}
 // 먼슬리 리포트 기준 자료(2026년) — 카드·팝업 맨 위 표 (11-06 14:04)
 function v41Rep(){const r=v41D&&v41D.report;return r&&r.year===v41Year&&Object.keys(r.bubbles||{}).length?r:null}
 function v41RepPts(rep){const by={};Object.entries(rep.bubbles).forEach(([k,v])=>{const [sec,a]=k.split('|');const o=by[a]||(by[a]={a,secs:[],won:0,eq:0,r3:null});o.secs.push(sec);o.won+=v.won/1000;o.eq+=v.eq;o.r3=v.r3});
  
  return Object.values(by).map(o=>{let r=o.secs.length>1?v41Reach(o.a,'ytd'):{r3:o.r3};return {a:o.a,eq:o.eq,won:o.won,inv:0,ins:0,r,secs:o.secs}})}
 function v41RepRows(adv,per){const r=v41Rep();if(!r)return null;const rows=r.rows.filter(x=>x.brand===adv&&(per==='ytd'||v41M(v41Year,x.m)===per));return rows.length?rows:null}
-function v41View(){const d=v41D,rows=v41Pick('ytd'),by=v41Sum(rows,'adv'),ms=v41Months();
+function v41PtsNow(){const rows=v41Pick('ytd'),by=v41Sum(rows,'adv');
  const advs=Object.keys(by).filter(a=>by[a].inv>0||by[a].eq>0).sort((a,b)=>(b==='코웨이')-(a==='코웨이')||by[b].adj-by[a].adj);
  let pts=advs.map(a=>({a,eq:by[a].eq,won:by[a].adj,inv:by[a].inv,ins:by[a].ins,r:v41Reach(a,'ytd')}));
- const rep=v41Rep();if(rep)pts=v41RepPts(rep);const hasR=pts.some(p=>p.r&&p.r.r3!=null);
- const host=$('#content'),W=Math.max(900,(host.clientWidth||1200)-60),H=Math.max(460,Math.min(640,innerHeight-260)),L=62,R=40,T=26,B=46,PW=W-L-R,PH=H-T-B;
+ const rep=v41Rep();if(rep)pts=v41RepPts(rep);return {pts,rep}}
+function v41View(){const d=v41D,ALL=v41Cat==='전체';if(!ALL)v41Focus='';let pts,rep=null;
+ if(ALL){pts=[];const save=v41D;const reps=[];try{for(const c of Object.keys(v41All)){const dc=v41All[c];if(!dc.years.includes(v41Year))continue;v41D=dc;const o=v41PtsNow();o.pts.forEach(p=>{p.cat=c});pts.push(...o.pts);if(o.rep)reps.push(o.rep)}}finally{v41D=save}rep=reps.length?{months:[Math.max(...reps.map(r=>Math.max(...r.months)))]}:null}
+ else ({pts,rep}=v41PtsNow());
+ const hasR=pts.some(p=>p.r&&p.r.r3!=null);
+ const host=$('#content'),W=Math.max(900,(host.clientWidth||1200)-60),H=ALL?Math.max(620,Math.min(820,innerHeight-160)):Math.max(460,Math.min(640,innerHeight-260)),L=62,R=40,T=26,B=46,PW=W-L-R,PH=H-T-B;
  const xmax=(()=>{const m=Math.max(1,...pts.map(p=>p.eq))*1.15;const st=[100,200,250,500,1000,2000,2500,5000];const s=st.find(v=>m/v<=9)||10000;return Math.ceil(m/s)*s})();
  const XST=(()=>{for(const s of [50,100,200,250,500,1000,2000,2500,5000,10000])if(xmax/s<=10)return s;return 20000})(),YMAX=hasR?Math.max(70,Math.ceil(Math.max(...pts.map(p=>p.r&&p.r.r3||0))/10)*10+10):70;
  const X=v=>L+v/xmax*PW,Y=v=>T+PH-v/YMAX*PH;let g='';
@@ -45,17 +49,20 @@ function v41View(){const d=v41D,rows=v41Pick('ytd'),by=v41Sum(rows,'adv'),ms=v41
  if(!hasR)g+=`<text x="${L+PW/2}" y="${T+PH/2-60}" text-anchor="middle" font-size="13" font-weight="700" fill="#9aa8b3">R3+(유효도달률) 자료를 아직 받지 않아 노출량(가로축)만 표시해요</text>`;
  // 카드 위치: 점 둘레 여러 방향·거리 중 다른 카드·점과 안 겹치는 곳 — 점이 몰리면 멀리 두고 선으로 잇기 (11-06 10:12)
  pts.forEach((p,i)=>{p.px=X(p.eq);p.py=p.r&&p.r.r3!=null?Y(p.r.r3):T+PH-14});
- const cards=[],cw=178,ch=40,ov=(a,b,pad)=>!(a.x+a.w+pad<b.x||a.x>b.x+b.w+pad||a.y+a.h+pad<b.y||a.y>b.y+b.h+pad);
+ const cards=[],cw=ALL?156:178,ch=ALL?54:40,ov=(a,b,pad)=>!(a.x+a.w+pad<b.x||a.x>b.x+b.w+pad||a.y+a.h+pad<b.y||a.y>b.y+b.h+pad);
  const near=(c,x,y)=>[Math.max(c.x,Math.min(x,c.x+c.w)),Math.max(c.y,Math.min(y,c.y+c.h))],rd2=(c,x,y)=>{const [nx,ny]=near(c,x,y);return Math.hypot(nx-x,ny-y)};
  const segPt=(x1,y1,x2,y2,px,py)=>{const dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/l));return Math.hypot(x1+t*dx-px,y1+t*dy-py)};
  const segX=(a,b,c,d)=>{const o=(p,q,r)=>Math.sign((q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]));return o(a,b,c)!==o(a,b,d)&&o(c,d,a)!==o(c,d,b)};
  const segRect=(a,b,c)=>{if(b[0]>=c.x&&b[0]<=c.x+c.w&&b[1]>=c.y&&b[1]<=c.y+c.h)return false;const E=[[[c.x,c.y],[c.x+c.w,c.y]],[[c.x+c.w,c.y],[c.x+c.w,c.y+c.h]],[[c.x,c.y+c.h],[c.x+c.w,c.y+c.h]],[[c.x,c.y],[c.x,c.y+c.h]]];return E.some(([u,v])=>segX(a,b,u,v))};
- const ANG=Array.from({length:24},(_,k)=>k*15*Math.PI/180),RAD=[16,34,58,86,120,160,210,270,340];
+ const ANG=Array.from({length:ALL?36:24},(_,k)=>k*(ALL?10:15)*Math.PI/180),RAD=ALL?[16,34,58,86,120,160,210,270,340,420,510,610,720,840]:[16,34,58,86,120,160,210,270,340];
  // 카드 자리: 다른 카드·점과 안 겹치고, 선이 다른 점·카드·선을 지나지 않고, 카드가 자기 점에 가장 가깝게 — 몰린 곳은 멀리 빼서 선으로 (11-06 10:24)
- [...pts].sort((a,b)=>(b.a==='코웨이')-(a.a==='코웨이')||b.eq-a.eq).forEach(p=>{let best=null,bs=1e12;
+ const FIX=ALL?pts.filter(p=>v41Focus?p.cat===v41Focus:p.a==='코웨이'):pts;
+ [...FIX].sort((a,b)=>(b.a==='코웨이')-(a.a==='코웨이')||b.eq-a.eq).forEach(p=>{let best=null,bs=1e12;
   for(const rd of RAD)for(const an of ANG){const cs=Math.cos(an),sn=Math.sin(an),qx=p.px+cs*rd,qy=p.py+sn*rd;
    const c={x:qx-(cs<-.35?cw:cs>.35?0:cw/2),y:qy-(sn<-.35?ch:sn>.35?0:ch/2),w:cw,h:ch};
    if(c.x<L+4||c.x+cw>L+PW-2||c.y<T+2||c.y+ch>T+PH-4)continue;
+   if(c.x+cw>L+PW-178&&c.y+ch>T+PH-24)continue;  // 가로축 제목 자리
+   if(ALL&&(cards.some(o=>ov(c,o,5))||pts.some(q=>q!==p&&q.px>c.x-9&&q.px<c.x+cw+9&&q.py>c.y-9&&q.py<c.y+ch+9)))continue;  // 전체 보기: 카드끼리·남의 점과는 절대 겹치지 않게
    const [nx,ny]=near(c,p.px,p.py),own=Math.hypot(nx-p.px,ny-p.py),A=[p.px,p.py],B=[nx,ny];let sc=own*.35;
    cards.forEach(o=>{if(ov(c,o,6))sc+=5000;if(own>12&&segRect(A,B,o))sc+=900;if(o.ln&&own>12&&segX(A,B,o.ln[0],o.ln[1]))sc+=400});
    pts.forEach(q=>{if(q===p)return;if(q.px>c.x-12&&q.px<c.x+cw+12&&q.py>c.y-12&&q.py<c.y+ch+12)sc+=3000;if(own>12&&segPt(A[0],A[1],B[0],B[1],q.px,q.py)<14)sc+=1500;if(rd2(c,q.px,q.py)<own+14)sc+=1200});
@@ -64,14 +71,16 @@ function v41View(){const d=v41D,rows=v41Pick('ytd'),by=v41Sum(rows,'adv'),ms=v41
  // 연결선(점 → 카드의 가장 가까운 테두리)
  cards.forEach(c=>{const p=c.p,nx=Math.max(c.x,Math.min(p.px,c.x+c.w)),ny=Math.max(c.y,Math.min(p.py,c.y+c.h)),dd=Math.hypot(nx-p.px,ny-p.py);
   if(dd>14)g+=`<line class="v41-ln" x1="${p.px}" y1="${p.py}" x2="${nx}" y2="${ny}" stroke="${p.a==='코웨이'?'#8fa0d4':'#b9c3ca'}" stroke-width="1.2"/>`});
- pts.forEach((p,i)=>{const me=p.a==='코웨이';g+=`<circle class="v41-pt" style="animation-delay:${(.08+i*.07).toFixed(2)}s;transform-origin:${p.px}px ${p.py}px" cx="${p.px}" cy="${p.py}" r="${me?11:8}" fill="${me?'#4c66b2':'#a3acb4'}" fill-opacity="${me?1:.9}" stroke="#fff" stroke-width="2"/>`});
+ pts.forEach((p,i)=>{const me=p.a==='코웨이',dl=(.08+i*(ALL?.035:.07)).toFixed(2);
+  if(ALL){const col=v41CatCol(p.cat),dim=v41Focus&&p.cat!==v41Focus?' dim':'';g+=`<g class="v41-dot${dim}" data-v41-i="${i}" data-v41-cat="${esc(p.cat)}">`;if(me)g+=`<circle class="v41-pt" style="animation-delay:${dl}s;transform-origin:${p.px}px ${p.py}px" cx="${p.px}" cy="${p.py}" r="17" fill="${col}" fill-opacity=".18"/>`;g+=`<circle class="v41-pt${me?' me':''}" style="animation-delay:${dl}s;transform-origin:${p.px}px ${p.py}px" cx="${p.px}" cy="${p.py}" r="${me?10:7}" fill="${col}" fill-opacity="${me?1:.82}" stroke="${me?'#14284d':'#fff'}" stroke-width="${me?3:2}"/><circle class="v41-hit" cx="${p.px}" cy="${p.py}" r="14" fill="transparent"/></g>`;return}
+  g+=`<circle class="v41-pt" style="animation-delay:${dl}s;transform-origin:${p.px}px ${p.py}px" cx="${p.px}" cy="${p.py}" r="${me?11:8}" fill="${me?'#4c66b2':'#a3acb4'}" fill-opacity="${me?1:.9}" stroke="#fff" stroke-width="2"/>`});
  const html=cards.map(c=>{const p=c.p,me=p.a==='코웨이',r3=p.r&&p.r.r3!=null?`R3+${Math.round(p.r.r3)}%`:'R3+ 준비 중';
-  return `<button type="button" class="v41-card${me?' me':''}" data-v41-adv="${esc(p.a)}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px;animation-delay:${(.35+pts.indexOf(p)*.07).toFixed(2)}s"><b>${esc(p.a)} <em>(${v41Won(p.won)}원)</em></b><span>(${Math.round(p.eq).toLocaleString()} eq GRP, ${r3})</span><i class="go">자세히 보기 →</i></button>`}).join('');
- const src=d.source||{};
- return `<section class="glass section v41-card-wrap"><div class="v41-head"><div><h2>${v41Year}년 누적 경쟁사 TV 노출량 · R3+ <small>${esc(v41Cat)}</small></h2><p>카드를 누르면 지상파·케이블 세부 운영 내역을 볼 수 있어요</p></div>
+  return `<button type="button" class="v41-card${me?' me':''}${ALL?' all':''}" data-v41-adv="${esc(p.a)}"${ALL?` data-v41-cat="${esc(p.cat)}" data-v41-i="${pts.indexOf(p)}"`:''} style="left:${c.x}px;top:${c.y}px;width:${c.w}px;animation-delay:${(.35+pts.indexOf(p)*(ALL?.035:.07)).toFixed(2)}s">${ALL?`<i class="cap" style="background:${v41CatCol(p.cat)}">${esc(p.cat)}</i>`:''}<b>${esc(p.a)} <em>(${v41Won(p.won)}원)</em></b><span>(${Math.round(p.eq).toLocaleString()} eq GRP, ${r3})</span><i class="go">자세히 보기 →</i></button>`}).join('');
+ v41Pts=pts;v41Geo={L,T,PW,PH};const src=d.source||{};
+ return `<section class="glass section v41-card-wrap"><div class="v41-head"><div><h2>${v41Year}년 누적 경쟁사 TV 노출량 · R3+ <small>${esc(v41Cat)}</small></h2><p>카드를 누르면 지상파·케이블 세부 운영 내역을 볼 수 있어요</p>${ALL?`<div class="v41-chips" role="group" aria-label="품목 카드 펼치기"><span class="hint">${V41_TAP}품목을 누르면 그 품목 카드만 펼쳐져요</span>${Object.keys(v41All).filter(c=>pts.some(p=>p.cat===c)).map(c=>{const n=pts.filter(p=>p.cat===c).length,on=v41Focus===c;return `<button type="button" class="chipc${on?' on':''}" data-v41-focus="${esc(c)}" aria-pressed="${on}" style="--c:${v41CatCol(c)}"><i></i>${esc(c)}<em>${n}</em>${on?'<b aria-hidden="true">✕</b>':''}</button>`}).join('')}<span class="melg"><i></i>코웨이</span></div>`:''}</div>
   <div class="v39-years v41-years">${d.years.map(y=>`<button type="button" class="y${y===v41Year?' on':''}" data-v41-year="${y}">${y}</button>`).join('')}</div></div>
-  <div class="v41-plot" style="height:${H}px"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}</svg>${html}</div>
-  ${rep?`<p class="footnote v41-note">${v41Year}년은 SM C&C 먼슬리 리포트(1~${Math.max(...rep.months)}월) 기준과 같게 맞췄어요 · 광고비: 코웨이는 실집행 금액(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사는 리포트 표기 금액 · Eq GRP·R3+: 닐슨, 타깃 F30-45 수도권, PR·SP·TJ·YG(시보 제외)${(v41Cat==='정수기')?' · 정수기는 리포트의 일반·얼음을 합친 값(광고비·Eq GRP는 합계, R3+는 정수기 전체로 다시 산출한 아리아나 도달률)':''}</p>`:`<p class="footnote v41-note">광고비: 아리아나 TV(지상파·케이블&종편) 모니터링 광고비에 SM C&C 실집행 추정 요율(설정 &gt; 광고비 보정)을 적용 · Eq GRP: 15초 환산 GRP, 타깃 ${esc(src.target||'')}(${esc(d.reach_target||'')}) · 자료 ${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(0,1)[0]||'')}~${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(-1)[0]||'')} · 포함=O·경쟁사=O 광고주 · ${hasR?'R3+: 아리아나 도달 분석':'R3+: 자료 준비 중'}${v41Year<2026?' · 이 해는 먼슬리 리포트가 없어 아리아나 원본 기준':''}</p>`}</section>`}
+  <div class="v41-plot${ALL?' all':''}${ALL&&v41Focus?' focus':''}" style="height:${H}px"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}${ALL?'<line class="v41-hovln" x1="0" y1="0" x2="0" y2="0" stroke="#b9c3ca" stroke-width="1.2" visibility="hidden"/>':''}</svg>${html}${ALL?'<button type="button" class="v41-card all v41-hov" hidden></button>':''}</div>
+  ${ALL?`<p class="footnote v41-note">전체: 품목별 점을 한 그래프에 모았어요(같은 품목은 같은 색, 코웨이는 굵은 테두리) · 점에 마우스를 올리면 카드가 보이고, 누르면 세부 내역이 열려요 · ${v41Year}년 ${rep?`SM C&C 먼슬리 리포트(1~${Math.max(...rep.months)}월) 기준`:'아리아나 원본 기준'} · 품목을 고르면 품목별 설명과 함께 볼 수 있어요</p>`:rep?`<p class="footnote v41-note">${v41Year}년은 SM C&C 먼슬리 리포트(1~${Math.max(...rep.months)}월) 기준과 같게 맞췄어요 · 광고비: 코웨이는 실집행 금액(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사는 리포트 표기 금액 · Eq GRP·R3+: 닐슨, 타깃 F30-45 수도권, PR·SP·TJ·YG(시보 제외)${(v41Cat==='정수기')?' · 정수기는 리포트의 일반·얼음을 합친 값(광고비·Eq GRP는 합계, R3+는 정수기 전체로 다시 산출한 아리아나 도달률)':''}</p>`:`<p class="footnote v41-note">광고비: 아리아나 TV(지상파·케이블&종편) 모니터링 광고비에 SM C&C 실집행 추정 요율(설정 &gt; 광고비 보정)을 적용 · Eq GRP: 15초 환산 GRP, 타깃 ${esc(src.target||'')}(${esc(d.reach_target||'')}) · 자료 ${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(0,1)[0]||'')}~${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(-1)[0]||'')} · 포함=O·경쟁사=O 광고주 · ${hasR?'R3+: 아리아나 도달 분석':'R3+: 자료 준비 중'}${v41Year<2026?' · 이 해는 먼슬리 리포트가 없어 아리아나 원본 기준':''}</p>`}</section>`}
 function v41Draw(){if(!v41D){$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료가 없어요.','아리아나 자료(data/arianna)를 넣으면 보여요.')}</section>`;return}v41Controls(true);$('#content').innerHTML=v41View()}
 // 팝업: 지상파·케이블 세부 운영 내역
 function v41Bar(parts,total,cols){if(!total)return '<i class="v41-bar0"></i>';return `<i class="v41-bar">${parts.map(([k,v],i)=>`<b style="width:${v/total*100}%;background:${cols[i%cols.length]}" title="${esc(k)} ${Math.round(v/total*100)}%"></b>`).join('')}</i>`}
@@ -134,7 +143,7 @@ render=async function(...a){try{v41Order()}catch(e){}if(route!=='reach'){v41Cont
  $('#content').innerHTML='<div class="loading glass">TV 통합 분석 자료를 불러오는 중이에요.</div>';
  try{await v41Load();if(route!=='reach')return;if(v41D){v41D._cat=v41Cat;v41D._t=Date.now()}}catch(e){$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료를 불러오지 못했어요.',e.message)}</section>`;return}v41Draw();if(typeof v38Sync==='function')v38Sync(true)};
 document.addEventListener('click',async e=>{if(route!=='reach')return;const y=e.target.closest&&e.target.closest('[data-v41-year]');if(y){v41Year=+y.dataset.v41Year;v41Per='ytd';v41Draw();if(typeof v38Sync==='function')v38Sync(false);return}
- const c=e.target.closest&&e.target.closest('.v41-card[data-v41-adv]');if(c){v41Per='ytd';v41Open(c.dataset.v41Adv)}});
+ const c=e.target.closest&&e.target.closest('.v41-card[data-v41-adv]');if(c){v41Per='ytd';const ct=c.dataset.v41Cat;if(ct&&v41All[ct]){v41AllBack={d:v41D};v41Cat=ct;v41D=v41All[ct]}v41Open(c.dataset.v41Adv)}});
 document.addEventListener('change',async e=>{if(e.target.id==='v41-cat'){e.stopPropagation();v41Cat=e.target.value;v41Year=null;v41Per='ytd';try{await v41Load();v41Draw();if(typeof v38Sync==='function')v38Sync(false)}catch(err){toast('불러오지 못했어요: '+err.message)}return}
  const p=e.target.closest&&e.target.closest('[data-v41-per]');if(p){v41Per=p.value;const dl=$('#detail');$('#detail-body').innerHTML=v41Detail(v41Cur);v41DnMount(v41Cur,v41Per)}},true);
 window.addEventListener('resize',()=>{if(route==='reach'&&v41D)v41Draw()});
@@ -234,3 +243,43 @@ document.addEventListener('click',e=>{const old=document.querySelector('.v41-etc
 
 // (11-06 16:50부터 팝업 기본값은 누적 — 아래 함수는 남겨 둠)
 function v41Latest(adv){const rep=v41Rep(),a=v41D.R.filter(r=>r.y===v41Year&&r.adv===adv).map(r=>v41M(r.y,r.m)),b=rep?rep.rows.filter(x=>x.brand===adv).map(x=>v41M(v41Year,x.m)):[];const all=[...a,...b].sort();return all.length?all.at(-1):'ytd'}
+
+// TV 통합 분석 '전체' (11-06 17:27): 모든 품목을 한 그래프에 — 품목별 색, 카드 위 품목 캡슐, 코웨이 강조, 기본값
+var v41All={},v41AllBack=null;
+var V41_CATCOL={'정수기':'#2f86d1','비데':'#8b6cd6','공기청정기':'#1fa39a','매트리스':'#e3893a','안마의자':'#d4577d','전기레인지':'#c8a21f','음식물처리기':'#5f9b3a'};
+function v41CatCol(c){return V41_CATCOL[c]||'#7d8a96'}
+async function v41LoadAll(cats){const req=++v41Req;const out={};
+ await Promise.all(cats.map(async c=>{const d=v32Static()?await v41Get('c-'+encodeURIComponent(c.label).replace(/%/g,'_')+'.json'):await api('/api/reach/rows?category='+encodeURIComponent(c.label));
+  const ci=Object.fromEntries(d.cols.map((k,i)=>[k,i]));d.R=d.rows.map(r=>Object.fromEntries(d.cols.map(k=>[k,r[ci[k]]])));d.years=[...new Set(d.R.map(r=>r.y))].sort((a,b)=>b-a);out[c.label]=d}));
+ if(req!==v41Req)return null;v41All={};cats.forEach(c=>{if(out[c.label])v41All[c.label]=out[c.label]});
+ const years=[...new Set(Object.values(v41All).flatMap(d=>d.years))].sort((a,b)=>b-a);if(!v41Year||!years.includes(v41Year))v41Year=years[0];
+ v41D={all:true,years,R:[],rows:[],cols:[],reach:{},source:{},report:null};return v41D}
+(()=>{const dl=document.getElementById('detail');if(dl)dl.addEventListener('close',()=>{if(v41AllBack){v41Cat='전체';v41D=v41AllBack.d;v41AllBack=null}})})();
+
+// 전체 보기 — 점에 마우스를 올리면 카드 한 장(고정 카드와 안 겹치게), 범례 칩(하나만)으로 그 품목 카드만 펼치기 (11-06 17:40)
+var v41Focus='',v41Pts=[],v41Geo=null,v41HovI=-1,v41Touch=false;
+var V41_TAP='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 10.5V9a1.5 1.5 0 0 1 3 0v2"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5.2-3l-1.6-2.8a1.5 1.5 0 0 1 2.6-1.5L9 15.5V11"/></svg>';
+function v41CardHtml(p){const me=p.a==='코웨이',r3=p.r&&p.r.r3!=null?`R3+${Math.round(p.r.r3)}%`:'R3+ 준비 중';return `<i class="cap" style="background:${v41CatCol(p.cat)}">${esc(p.cat)}</i><b>${esc(p.a)} <em>(${v41Won(p.won)}원)</em></b><span>(${Math.round(p.eq).toLocaleString()} eq GRP, ${r3})</span><i class="go">자세히 보기 →</i>`}
+function v41HovHide(){const plot=document.querySelector('#content .v41-plot.all');v41HovI=-1;if(!plot)return;const h=plot.querySelector('.v41-hov'),ln=plot.querySelector('.v41-hovln');if(h)h.hidden=true;if(ln)ln.setAttribute('visibility','hidden');plot.classList.remove('hovering');plot.querySelectorAll('.v41-dot.hot,.v41-dot.same,.v41-card.hot').forEach(e=>e.classList.remove('hot','same'))}
+function v41HovShow(i){const plot=document.querySelector('#content .v41-plot.all'),p=v41Pts[i];if(!plot||!p||!v41Geo)return;v41HovHide();v41HovI=i;
+ plot.classList.add('hovering');plot.querySelectorAll('.v41-dot').forEach(e=>{if(e.dataset.v41Cat===p.cat)e.classList.add('same')});const dot=plot.querySelector(`.v41-dot[data-v41-i="${i}"]`);if(dot)dot.classList.add('hot');
+ const fixed=plot.querySelector(`.v41-card:not(.v41-hov)[data-v41-i="${i}"]`);if(fixed){fixed.classList.add('hot');return}  // 이미 카드가 있으면 그 카드만 강조
+ const h=plot.querySelector('.v41-hov');h.innerHTML=v41CardHtml(p);h.className='v41-card all v41-hov'+(p.a==='코웨이'?' me':'');h.dataset.v41Adv=p.a;h.dataset.v41Cat=p.cat;h.dataset.v41I=i;h.style.width='156px';h.hidden=false;
+ const cw=h.offsetWidth,ch=h.offsetHeight,G=v41Geo,rects=[...plot.querySelectorAll('.v41-card:not(.v41-hov)')].map(c=>({x:c.offsetLeft,y:c.offsetTop,w:c.offsetWidth,h:c.offsetHeight}));
+ const ov=c=>rects.some(r=>!(c.x+c.w+6<r.x||c.x>r.x+r.w+6||c.y+c.h+6<r.y||c.y>r.y+r.h+6));let best=null,bd=1e9;
+ for(const rd of [14,30,52,80,115,155,200,260,330])for(let k=0;k<16;k++){const an=k*Math.PI/8,cs=Math.cos(an),sn=Math.sin(an),qx=p.px+cs*rd,qy=p.py+sn*rd,c={x:qx-(cs<-.35?cw:cs>.35?0:cw/2),y:qy-(sn<-.35?ch:sn>.35?0:ch/2),w:cw,h:ch};
+  if(c.x<G.L+4||c.x+cw>G.L+G.PW-2||c.y<G.T+2||c.y+ch>G.T+G.PH-4)continue;if(ov(c))continue;
+  const hid=v41Pts.filter(q=>q!==p&&q.px>c.x-8&&q.px<c.x+cw+8&&q.py>c.y-8&&q.py<c.y+ch+8),me=hid.some(q=>q.a==='코웨이');  // 다른 점(특히 코웨이)을 덮지 않게
+  const sc=rd+hid.length*140+(me?2000:0)+(c.x<p.px&&c.x+cw>p.px&&c.y<p.py&&c.y+ch>p.py?999:0);if(sc<bd){bd=sc;best=c}}
+ if(!best)best={x:Math.min(G.L+G.PW-cw-2,Math.max(G.L+4,p.px+14)),y:Math.max(G.T+2,p.py-ch-14),w:cw,h:ch};
+ h.style.left=best.x+'px';h.style.top=best.y+'px';
+ const nx=Math.max(best.x,Math.min(p.px,best.x+cw)),ny=Math.max(best.y,Math.min(p.py,best.y+ch)),ln=plot.querySelector('.v41-hovln');
+ if(ln&&Math.hypot(nx-p.px,ny-p.py)>14){ln.setAttribute('x1',p.px);ln.setAttribute('y1',p.py);ln.setAttribute('x2',nx);ln.setAttribute('y2',ny);ln.setAttribute('visibility','visible')}}
+document.addEventListener('pointerdown',e=>{v41Touch=e.pointerType==='touch'},true);
+document.addEventListener('mouseover',e=>{if(route!=='reach'||v41Touch)return;const d=e.target.closest&&e.target.closest('.v41-plot.all .v41-dot');if(d){const i=+d.dataset.v41I;if(i!==v41HovI)v41HovShow(i);return}
+ if(e.target.closest&&e.target.closest('.v41-plot.all .v41-hov'))return;if(v41HovI>=0&&!(e.target.closest&&e.target.closest('.v41-plot.all .v41-card')))v41HovHide()});
+document.addEventListener('click',e=>{if(route!=='reach')return;
+ const f=e.target.closest&&e.target.closest('[data-v41-focus]');if(f){v41Focus=v41Focus===f.dataset.v41Focus?'':f.dataset.v41Focus;v41HovI=-1;v41Draw();return}
+ const d=e.target.closest&&e.target.closest('.v41-plot.all .v41-dot');if(!d)return;const i=+d.dataset.v41I,p=v41Pts[i];if(!p)return;
+ if(v41Touch&&v41HovI!==i){v41HovShow(i);return}  // 휴대폰: 첫 탭은 카드, 두 번째 탭(또는 카드 탭)에 세부 내역
+ v41Per='ytd';if(v41All[p.cat]){v41AllBack={d:v41D};v41Cat=p.cat;v41D=v41All[p.cat]}v41Open(p.a)});

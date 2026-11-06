@@ -57,3 +57,8 @@ html.nd .v40-sec select.chip.v40-per,.v40-sec select.v40-per{height:32px!importa
 .v40-mbtn[hidden]{display:none!important}
 .v40-mbtn.off{opacity:.35;pointer-events:none}
 #v40-sos{display:flex;justify-content:center}
+/* 11-06 점검: 광고주 이름 칸(고정)을 불투명하게 — 옆으로 밀린 숫자가 비쳐 보이지 않게 */
+.v40-pt th[scope=row],.v40-pt thead th:first-child{background:#eef3f6;box-shadow:6px 0 8px -6px rgba(20,60,90,.22)}
+.v40-pt tr.me th[scope=row]{background:#dbecf7}
+.v40-pt tfoot th[scope=row]{background:#dee7ee}
+.v40-pt thead th:first-child{background:#e2eaf0}

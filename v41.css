@@ -90,3 +90,31 @@ dialog.v41-dialog .v41-ph{align-items:stretch}
 .v41-only{display:inline-block;margin:-4px 0 0;font-size:11.5px;font-weight:800;color:#55697a;background:#eef2f6;border-radius:999px;padding:3px 10px}
 .v41-dnw{margin-top:16px}
 .v41-pop .v41-charts{margin-top:14px}
+/* 11-06 17:27 — TV 통합 분석 '전체': 카드 위 품목 캡슐, 품목 색 범례, 코웨이 강조 */
+.v41-card.all{padding:7px 10px 6px}
+.v41-card.all .cap{display:inline-block;font-style:normal;font-size:10px;font-weight:800;color:#fff;border-radius:999px;padding:1px 8px;margin-bottom:3px;line-height:1.6;letter-spacing:-.01em}
+.v41-card.all.me{border:1.5px solid #14284d;background:#fff;box-shadow:0 6px 18px rgba(20,40,77,.18)}
+.v41-card.all.me b,.v41-card.all.me b em{color:#14284d}
+/* 17:40 — 품목 칩(하나만 고름: 그 품목 카드만 펼침), 마우스를 올린 점 카드 */
+.v41-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px 6px;margin-top:10px}
+.v41-chips .hint{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:#1a8cc2;margin-right:2px}
+.v41-chips .chipc{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 9px;border-radius:999px;border:1.5px solid #dfe8ee;border-color:color-mix(in srgb,var(--c) 40%,#fff);background:#fff;color:#34414d;font:inherit;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 2px 6px rgba(20,60,90,.07);transition:transform .12s,box-shadow .12s,background .12s,border-color .12s}
+.v41-chips .chipc i{width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0}
+.v41-chips .chipc em{font-style:normal;font-size:10.5px;font-weight:800;color:#7d8a96;background:#f1f4f6;border-radius:999px;padding:0 6px;line-height:16px}
+.v41-chips .chipc:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(20,60,90,.14);border-color:var(--c)}
+.v41-chips .chipc:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.v41-chips .chipc.on{background:var(--c);border-color:var(--c);color:#fff;box-shadow:0 5px 14px rgba(20,60,90,.18)}
+.v41-chips .chipc.on i{background:#fff}.v41-chips .chipc.on em{background:rgba(255,255,255,.25);color:#fff}.v41-chips .chipc b{font-size:11px;font-weight:900;margin-left:1px}
+.v41-chips .melg{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#55697a;margin-left:6px}
+.v41-chips .melg i{width:8px;height:8px;border-radius:50%;background:#fff;border:3px solid #14284d}
+.v41-plot.all .v41-dot{cursor:pointer;transition:opacity .15s}
+.v41-plot.all .v41-dot.dim{opacity:.2}
+.v41-plot.all.hovering .v41-dot:not(.same){opacity:.22}
+.v41-plot.all.hovering .v41-dot.same{opacity:1}
+.v41-plot.all .v41-dot.hot .v41-pt{stroke:#14284d;stroke-width:3}
+.v41-plot.all.hovering .v41-ln{opacity:.35}
+.v41-plot.all .v41-card.hot{border-color:#1a8cc2;box-shadow:0 6px 20px rgba(26,140,194,.25);z-index:6}
+.v41-plot.all .v41-card.hot .go{opacity:1;transform:none}
+.v41-plot.all .v41-hov{z-index:8;animation-duration:.16s!important;animation-delay:0s!important}
+.v41-plot.all .v41-hov .go{opacity:1;transform:none}
+.v41-plot .v41-hovln,.v41-plot .v41-ln{pointer-events:none}

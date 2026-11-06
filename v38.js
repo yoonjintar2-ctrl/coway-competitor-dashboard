@@ -1,7 +1,7 @@
 /* v38 — 2026-11-05 월별 통합 분석(test) · 설정 > 디지털 자료 규칙
    광고주(또는 세부 품목)를 고르면 최근 25개월(화면엔 12개월, 좌우 버튼으로 이동)을 월 단위로:
    캠페인 캡슐·관련 기사(같은 띠, 높이 고정) → 네이버 쿼리(올해·전년) → 매체별 광고비 막대(전년 막대·경쟁사 평균 영역) → 표 → 유튜브·인스타그램 게시물. */
-var V38_TITLE='월별 통합 분석',v38Opt=null,v38Adv='',v38Cat='',v38D=null,v38Req=0;
+var v38First=true,V38_TITLE='월별 통합 분석',v38Opt=null,v38Adv='',v38Cat='',v38D=null,v38Req=0;
 var V38_CATS=[['tv','TV','#1b84bd',[['tv_terr','지상파'],['tv_cable','종편·케이블']]],['dg','디지털','#4aa9da',[['dg_video','동영상'],['dg_pc','PC'],['dg_mo','MO']]],['radio','라디오','#8cc7e5',[['radio','라디오']]],['print','인쇄','#bfdfef',[['news','신문'],['mag','잡지']]]];
 var V38_G='#858f99';  // 네이버 쿼리: 무채색(광고비 막대가 주인공, 11-05 14:58)
 function v38Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="monthly"]'))return;
@@ -13,8 +13,9 @@ function v38K(v){if(v==null)return '';if(v>=1e6)return [(v/1e6).toFixed(1).repla
 function v38Smooth(p){if(p.length<2)return p.length?`M${p[0][0]},${p[0][1]}`:'';let d=`M${p[0][0]},${p[0][1]}`;for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c,t=.18;d+=` C${b[0]+(c[0]-a[0])*t},${b[1]+(c[1]-a[1])*t} ${c[0]-(e[0]-b[0])*t},${c[1]-(e[1]-b[1])*t} ${c[0]},${c[1]}`}return d}
 function v38Days(m){return new Date(+m.slice(0,4),+m.slice(5,7),0).getDate()}
 async function v38Load(){if(!v38Opt){v38Opt=(await api('/api/monthly/options')).options||[];if(!v38Adv&&v38Opt.length){const cw=v38Opt.find(o=>o.advertiser==='코웨이');if(cw){v38Adv='코웨이';if((cw.categories||[]).includes('정수기'))v38Cat='정수기'}else v38Adv=v38Opt[0].advertiser}}
- let o=v38Opt.find(x=>x.advertiser===v38Adv);if(!o&&v38Opt.length){o=v38Opt.find(x=>x.advertiser==='코웨이')||v38Opt[0];v38Adv=o.advertiser;v38Cat=''}  // 목록에 없는 광고주(예전 주소·다른 화면에서 넘어온 값)면 코웨이로 (11-06)
+ let o=v38Opt.find(x=>x.advertiser===v38Adv);if(!o&&v38Opt.length){o=v38Opt.find(x=>x.advertiser==='코웨이')||v38Opt[0];v38Adv=o.advertiser;v38Cat=o.advertiser==='코웨이'&&(o.categories||[]).includes('정수기')?'정수기':''}  // 목록에 없는 광고주(예전 주소·다른 화면에서 넘어온 값)면 코웨이로 (11-06)
  if(o&&v38Cat&&!o.categories.includes(v38Cat))v38Cat='';
+ if(v38First){v38First=false;if(o&&v38Adv==='코웨이'&&!v38Cat&&(o.categories||[]).includes('정수기'))v38Cat='정수기'}  // 처음 들어올 때는 코웨이·정수기 (11-06 13:41)
  const req=++v38Req;let d;
  if(o&&o.files){d=await api('/api/monthly-file/'+encodeURIComponent(o.files[v38Cat||'']||''))}
  else d=await api('/api/monthly?advertiser='+encodeURIComponent(v38Adv)+'&category='+encodeURIComponent(v38Cat));
@@ -159,7 +160,7 @@ document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest
  document.querySelectorAll(`.v38-tbox tr[data-v38-grp="${k}"]`).forEach(r=>r.classList.toggle('open',op));document.querySelectorAll(`.v38-tbox tr[data-v38-sub="${k}"]`).forEach(r=>r.hidden=!op)});
 
 // ---------- 설정 > 디지털 자료 규칙 ----------
-if(typeof v7Tabs!=='undefined')v7Tabs.push(['researchad','디지털 자료 규칙']);
+if(typeof v7Tabs!=='undefined')v7Tabs.push(['digitalrules','디지털 자료 규칙']);
 var v38Rules=null,v38RaStatus=null,v38RaFilter='';
 function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  const tbl=(cols,rows,lim=400)=>`<div class="v38-tw"><table class="v32-rn"><thead><tr>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rows.slice(0,lim).map(r=>`<tr>${cols.map(c=>`<td>${esc(String(r[c[0]]??''))}</td>`).join('')}</tr>`).join('')}</tbody></table>${rows.length>lim?`<small>앞 ${lim}줄만 보여요(전체 ${rows.length}줄)</small>`:''}</div>`;
@@ -173,9 +174,9 @@ function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  <section class="glass section">${header('index · 경쟁사 선별 규칙','업종(소)+브랜드 마다 포함 여부·품목(업종수정)·광고주명 수정·주요 경쟁을 정해요. 포함=O 인 브랜드만 디지털 광고비에 들어가요(품목이 없는 브랜드 광고는 \'브랜드\').')}
   <input type="search" id="v38-ra-filter" class="v38-filter" placeholder="광고주·브랜드·업종으로 찾기" value="${esc(v38RaFilter)}">${tbl([['industry_m','업종(중)'],['industry_s','업종(소)'],['advertiser','광고주'],['brand','브랜드'],['include','포함'],['category','업종수정(품목)'],['display','광고주명 수정'],['competitor','주요경쟁']],idx,300)}${paste('index')}</section>
  <section class="glass section">${header('매체 구분','유튜브·메타로 따로 보는 매체예요(나머지는 기타).')}${tbl([['media','매체'],['group','구분']],(R.media_groups||[]).filter(m=>m.group!=='기타'))}</section>`}
-if(typeof v7Draw==='function'){var v38BaseDraw=v7Draw;v7Draw=function(){if(v7Tab!=='researchad')return v38BaseDraw();
+if(typeof v7Draw==='function'){var v38BaseDraw=v7Draw;v7Draw=function(){if(v7Tab!=='digitalrules')return v38BaseDraw();
  $('#content').innerHTML=`<div class="v7-layout">${v7Menu()}<div class="v38-rules">${v38Rules?v38RulesView():empty('규칙을 불러오는 중이에요.')}</div></div>`;
- if(!v38Rules)Promise.all([api('/api/ra/rules'),api('/api/ra/status')]).then(([r,s])=>{v38Rules=r;v38RaStatus=s;if(v7Tab==='researchad'&&route==='settings')v7Draw()}).catch(e=>{const el=document.querySelector('.v38-rules');if(el)el.innerHTML=empty('디지털 자료 규칙을 불러오지 못했어요.',e.message)})}}
+ if(!v38Rules)Promise.all([api('/api/ra/rules'),api('/api/ra/status')]).then(([r,s])=>{v38Rules=r;v38RaStatus=s;if(v7Tab==='digitalrules'&&route==='settings')v7Draw()}).catch(e=>{const el=document.querySelector('.v38-rules');if(el)el.innerHTML=empty('디지털 자료 규칙을 불러오지 못했어요.',e.message)})}}
 document.addEventListener('input',e=>{if(e.target.id==='v38-ra-filter'){v38RaFilter=e.target.value;clearTimeout(window.__v38f);window.__v38f=setTimeout(()=>{const p=e.target.selectionStart;v7Draw();const i=document.getElementById('v38-ra-filter');if(i){i.focus();i.setSelectionRange(p,p)}},250)}});
 var V38_COLS={advertisers:['ra_name','nielsen','display','competitor','note'],industry_map:['industry_s','category','note'],index:['industry_m','industry_s','advertiser','brand','include','category','display','competitor']};
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-v38-save]');if(!b)return;const k=b.dataset.v38Save,ta=document.querySelector(`[data-v38-paste="${k}"]`);const lines=(ta.value||'').split(/\r?\n/).filter(l=>l.trim());

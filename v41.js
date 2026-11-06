@@ -87,6 +87,8 @@ function v41Bar(parts,total,cols){if(!total)return '<i class="v41-bar0"></i>';re
 // 11-06 21:53 아리아나 원본이 리포트보다 짧은 품목(지금은 안마의자: 8월까지)은 세부 표에 '모니터링' 딱지 — 더 받지 않기로 함
 function v41AdexCab(adv,per){const A=v41D&&v41D.adex;if(!A)return null;const o={};let n=0;A.forEach(([a,y,m,pp,v])=>{if(a===adv&&y===v41Year&&(per==='ytd'||v41M(y,m)===per)){o[pp]=(o[pp]||0)+v;n++}});return n?o:null}
 function v41ArBadge(rep){const ar=Math.max(0,...v41D.R.filter(r=>r.y===v41Year).map(r=>r.m));if(!rep||!ar)return '';const miss=[...new Set(rep.rows.map(x=>x.m))].filter(m=>m>ar).sort((a,b)=>a-b);return miss.length?`<span class="v41-badge" title="아리아나(닐슨) 모니터링 원본 기준 — ${miss.join('·')}월 원본은 받지 않음">모니터링 · ${miss.join('·')}월 미반영</span>`:''}
+// 2026-11-06 23:20 1~6월 먼슬리 리포트는 닐슨(아덱스) 보너스율 2025년 기준 — 팝업에 분명히 표시
+function v41BonusNote(per){if(v41Year!==2026)return '';const m=per==='ytd'?0:+String(per).slice(5,7);const a='<b>2026년 1~6월</b>: 닐슨 보너스율 <b>2025년</b> 기준 · SM C&C 보정률 <b>2026년</b> 기준',b='<b>2026년 7월~</b>: 닐슨 보너스율 · SM C&C 보정률 모두 <b>2026년</b> 기준';const t=m===0?a+' &nbsp;/&nbsp; '+b:m<=6?a:b;return `<p class="v41-bonus-note">${t}</p>`}
 function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv),rep=v41Rep();
  const repMs=rep?[...new Set(rep.rows.filter(x=>x.brand===adv).map(x=>v41M(v41Year,x.m)))]:[],ms=[...new Set([...v41Months(),...repMs])].sort();
  const terr=rows.filter(r=>r.media==='지상파'),cab=rows.filter(r=>r.media!=='지상파'),Z={inv:0,net:0,ins:0,grp:0,eq:0,adj:0},T=v41Sum(terr).all||Z,AX=v41AdexCab(adv,per);let C=v41Sum(cab).all||Z;if(AX)C={...C,inv:Object.values(AX).reduce((a,b)=>a+b,0)};  // 케이블 금액은 아덱스(먼슬리 리포트 기준), Eq GRP·횟수는 아리아나 (11-06 22:30)
@@ -134,7 +136,7 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
   <div id="v41-donut-slot"></div>
   <h3>지상파 · 케이블&종편 집행 요약</h3>${sumHtml||'<p class="v41-none">이 기간 집행이 없어요.</p>'}
   <h3>지상파TV 세부 운영 내역${v41ArBadge(rep)}</h3>${terrHtml}<h3>케이블TV 세부 운영 내역${v41ArBadge(rep)}</h3>${cabHtml}
-  <p class="footnote">집행 요약: ${rep?'SM C&C 먼슬리 리포트 경쟁사 TV set Performance 표 기준 — 코웨이 실집행금액은 실집행(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사 실집행금액은 보너스율 반영 추정 · 누적의 R1+·A.F는 월별 값을 더할 수 없어 비워 두고 R3+는 누적 도달률':'아리아나(닐슨) 원본'} · 세부 운영 내역: 지상파는 아리아나(닐슨) 모니터링 광고비, 케이블 MPP 광고비는 아덱스(먼슬리 리포트와 같은 기준 — 2026년 1~6월은 리포트처럼 2025년 보너스율, 7월부터 2026년 보너스율) · GRP·Eq GRP·횟수는 아리아나, 타깃 ${esc((v41D.source||{}).target||'')} · A.R = GRP ÷ 횟수 · CPRP = 모니터링 광고비 ÷ Eq GRP · 광고유형: PR 일반프로, SP 스팟, TJ 특집/재방</p></div>`}
+  ${v41BonusNote(per)}<p class="footnote">집행 요약: ${rep?'SM C&C 먼슬리 리포트 경쟁사 TV set Performance 표 기준 — 코웨이 실집행금액은 실집행(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사 실집행금액은 보너스율 반영 추정 · 누적의 R1+·A.F는 월별 값을 더할 수 없어 비워 두고 R3+는 누적 도달률':'아리아나(닐슨) 원본'} · 세부 운영 내역: 지상파는 아리아나(닐슨) 모니터링 광고비, 케이블 MPP 광고비는 먼슬리 리포트(PDF) 세부 표 값 그대로(리포트 세부 표에 없는 광고주·월만 아덱스) · GRP·Eq GRP·횟수는 아리아나, 타깃 ${esc((v41D.source||{}).target||'')} · A.R = GRP ÷ 횟수 · CPRP = 모니터링 광고비 ÷ Eq GRP · 광고유형: PR 일반프로, SP 스팟, TJ 특집/재방</p></div>`}
 function v41Open(adv){const dl=$('#detail');dl.className='v41-dialog';$('#detail-body').innerHTML=v41Detail(adv);v41Cur=adv;if(!dl.open)dl.showModal();v41DnMount(adv,v41Per)}
 var v41Cur='';
 var v41BaseRender=render;

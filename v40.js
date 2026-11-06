@@ -32,36 +32,41 @@ function v40Donut(d){const ps=d.peer_spend||{},ms=v40Range(d,v40Per),all=v40Orde
  const tot=all.reduce((s,[,v])=>s+v,0);if(!tot)return `<p class="v40-empty">이 기간에는 광고비 자료가 없어요.</p>`;
  const big=all.filter(([a,v])=>v/tot>=.01||a==='코웨이'),small=all.filter(x=>!big.includes(x)),etc=small.reduce((s,[,v])=>s+v,0);
  const list=big.map(([a,v])=>({a,v}));if(etc>0)list.push({a:'기타',v:etc,etc:small});
- const W=660,H=380,cx=W/2,cy=H/2-10,R=152,K=.56,r=R*.52,DEP=28,G=['#8d969f','#a3abb3','#b9c0c6','#7f8891','#ccd2d7','#9aa3ab','#6f7881'];
+ // 11-06 11:4x — 살짝 기운 3D 도넛(시계 방향 13°), 코웨이는 늘 왼쪽 앞. 옆면은 각도가 한 바퀴 넘어가도 끊기지 않게 계산
+ const W=700,H=420,cx=W/2,cy=H/2-22,R=160,K=.56,r=R*.5,DEP=34,ROT=13,TAU=Math.PI*2,EX=17,G=['#8d969f','#a3abb3','#b9c0c6','#7f8891','#ccd2d7','#9aa3ab','#6f7881'];
+ const rc=cy+DEP/2,cs=Math.cos(ROT*Math.PI/180),sn=Math.sin(ROT*Math.PI/180),rot=([x,y])=>[cx+(x-cx)*cs-(y-rc)*sn,rc+(x-cx)*sn+(y-rc)*cs];
  const P=(a,rr,ox,oy,dz)=>[cx+ox+Math.cos(a)*rr,cy+oy+Math.sin(a)*rr*K+(dz||0)];
- // 코웨이 조각을 앞쪽 가운데(아래)에 두고, 나머지는 큰 순서로 왼쪽→위→오른쪽. 작은 조각들이 오른쪽 옆에 모여 이름표 선이 도넛 위를 지나지 않음 (11-06 12:0x)
- const mi=list.findIndex(z=>z.a==='코웨이');if(mi>0)list.unshift(list.splice(mi,1)[0]);let a0=mi>=0?Math.PI/2-list[0].v/tot*Math.PI:-Math.PI/2,gi=0;
- list.forEach(z=>{z.f=z.v/tot;z.a0=a0;z.a1=a0+z.f*Math.PI*2;a0=z.a1;z.me=z.a==='코웨이';z.col=z.me?'#4c66b2':z.a==='기타'?'#d5dade':G[gi++%G.length];const m=(z.a0+z.a1)/2;z.m=m;z.ox=z.me?Math.cos(m)*14:0;z.oy=z.me?Math.sin(m)*14*K:0});
+ const mi=list.findIndex(z=>z.a==='코웨이');if(mi>0)list.unshift(list.splice(mi,1)[0]);
+ const CM=Math.PI/2+.55;let a0=mi>=0?CM-list[0].v/tot*Math.PI:-Math.PI/2,gi=0;
+ list.forEach(z=>{z.f=z.v/tot;z.a0=a0;z.a1=a0+z.f*TAU;a0=z.a1;z.me=z.a==='코웨이';z.col=z.me?'#4c66b2':z.a==='기타'?'#d5dade':G[gi++%G.length];const m=(z.a0+z.a1)/2;z.m=m;z.ox=z.me?Math.cos(m)*EX:0;z.oy=z.me?Math.sin(m)*EX*K:0});
  const arc=(z,rr,s0,s1,dz,rev)=>{const [x0,y0]=P(rev?s1:s0,rr,z.ox,z.oy,dz),[x1,y1]=P(rev?s0:s1,rr,z.ox,z.oy,dz),lg=Math.abs(s1-s0)>Math.PI?1:0;return {m:`${x0},${y0}`,a:`A${rr},${rr*K} 0 ${lg} ${rev?0:1} ${x1},${y1}`}};
- const clip=(s0,s1,lo,hi)=>{const a=Math.max(s0,lo),b=Math.min(s1,hi);return b>a?[a,b]:null};
+ const clips=(s0,s1,lo,hi)=>{const out=[];for(const k of [-1,0,1,2]){const a=Math.max(s0,lo+k*TAU),b=Math.min(s1,hi+k*TAU);if(b>a+1e-6)out.push([a,b])}return out};
  const tip=z=>z.etc?`data-v40-etc="${esc(JSON.stringify(z.etc.map(([a,v])=>[a,v])))}|${tot}"`:`data-v40-tip="${esc(z.a)}|sos|${z.v}|${tot}"`;
- let back='',walls='',tops='';
- list.forEach(z=>{// 안쪽 벽(뒤쪽 절반: 위쪽 화면)
-  [[-Math.PI/2,0],[Math.PI,1.5*Math.PI]].forEach(([lo,hi])=>{const c=clip(z.a0,z.a1,lo,hi);if(!c)return;const t=arc(z,r,c[0],c[1],0),b=arc(z,r,c[0],c[1],DEP,true);back+=`<path d="M${t.m} ${t.a} L${b.m} ${b.a} Z" fill="${v40Shade(z.col,.62)}"/>`});
-  // 바깥 벽(앞쪽 절반)
-  const c=clip(z.a0,z.a1,0,Math.PI);if(c){const t=arc(z,R,c[0],c[1],0),b=arc(z,R,c[0],c[1],DEP,true);const dd=`M${t.m} ${t.a} L${b.m} ${b.a} Z`;walls+=`<path class="v40-seg" ${tip(z)} d="${dd}" fill="${v40Shade(z.col,.76)}"/><path d="${dd}" fill="url(#v40-wd)" pointer-events="none"/>`}
-  // 윗면
+ const wall=(z,rr,c,shade,cls)=>{const t=arc(z,rr,c[0],c[1],0),b=arc(z,rr,c[0],c[1],DEP,true),dd=`M${t.m} ${t.a} L${b.m} ${b.a} Z`;return `<path ${cls?`class="v40-seg" ${tip(z)}`:''} d="${dd}" fill="${v40Shade(z.col,shade)}"/><path d="${dd}" fill="url(#v40-wd)" pointer-events="none"/>`};
+ let back='',caps='',walls='',wallMe='',tops='',topMe='';
+ list.forEach(z=>{clips(z.a0,z.a1,Math.PI,TAU).forEach(c=>back+=wall(z,r,c,.6,false));
+  const w=clips(z.a0,z.a1,0,Math.PI).map(c=>wall(z,R,c,.78,true)).join('');if(z.me)wallMe+=w;else walls+=w;
   if(list.length===1){tops+=`<path d="M${P(0,R,0,0)} A${R},${R*K} 0 1 1 ${P(Math.PI,R,0,0)} A${R},${R*K} 0 1 1 ${P(0,R,0,0)} M${P(0,r,0,0)} A${r},${r*K} 0 1 0 ${P(Math.PI,r,0,0)} A${r},${r*K} 0 1 0 ${P(0,r,0,0)} Z" fill="${z.col}" fill-rule="evenodd"/>`;return}
-  const o=arc(z,R,z.a0,z.a1,0),i=arc(z,r,z.a0,z.a1,0,true);const td=`M${o.m} ${o.a} L${i.m} ${i.a} Z`;tops+=`<path class="v40-seg" ${tip(z)} d="${td}" fill="${z.col}"/><path d="${td}" fill="url(#v40-hl)" pointer-events="none"/>`});
- // 이름표: 조각 바깥 테두리 → 바깥으로 짧게 꺾임 → 세로로 줄 세운 이름표. 선끼리 안 닿게 좌우·위아래 순서를 지킴 (11-06 11:18)
- const labs=list.map(z=>{const sn=Math.sin(z.m),front=sn>0,[ax,ay]=P(z.m,R,z.ox,z.oy,front?DEP*.55:0),[bx,by]=P(z.m,R+16,z.ox,z.oy,front?DEP*.55+sn*16:0);return {z,side:Math.cos(z.m)<0?-1:1,ax,ay,bx,by,y:by,h:z.me?46:36}});
- {const me=labs.find(q=>q.z.me);if(me&&Math.abs(Math.cos(me.z.m))<.5){const nl=labs.filter(q=>q!==me&&q.side<0).length,nr=labs.filter(q=>q!==me&&q.side>0).length;me.side=nl<=nr?-1:1}}
+  const o=arc(z,R,z.a0,z.a1,0),i=arc(z,r,z.a0,z.a1,0,true),td=`M${o.m} ${o.a} L${i.m} ${i.a} Z`,t=`<path class="v40-seg" ${tip(z)} d="${td}" fill="${z.col}"/><path d="${td}" fill="url(#v40-hl)" pointer-events="none"/>`;if(z.me)topMe+=t;else tops+=t});
+ // 떨어진 코웨이 조각 양 끝 단면 + 그 틈으로 보이는 이웃 조각 단면
+ if(mi>=0&&list.length>1){const me=list[0],nb=[list[list.length-1],list[1]];
+  const cap=(z,a,start)=>{const vis=start?Math.cos(a)<0:Math.cos(a)>0;if(!vis)return '';const p=[P(a,r,z.ox,z.oy,0),P(a,R,z.ox,z.oy,0),P(a,R,z.ox,z.oy,DEP),P(a,r,z.ox,z.oy,DEP)];
+   const dd=`M${p.map(q=>q.join(',')).join(' L')} Z`;return `<path d="${dd}" fill="${v40Shade(z.col,.7)}"/><path d="${dd}" fill="url(#v40-wd)" pointer-events="none"/>`};
+  caps+=cap(nb[0],me.a0+TAU,false)+cap(nb[1],me.a1,true);wallMe=cap(me,me.a0,true)+cap(me,me.a1,false)+wallMe}
+ // 이름표: 기울인 뒤의 화면 좌표로 계산 — 조각 테두리 → 바깥 꺾임 → 세로로 줄 세운 이름표, 선끼리 순서 유지
+ const labs=list.map(z=>{const s=Math.sin(z.m),front=s>0,[ax,ay]=rot(P(z.m,R,z.ox,z.oy,front?DEP*.55:0)),[bx,by]=rot(P(z.m,R+18,z.ox,z.oy,front?DEP*.55+s*16:0));return {z,side:bx<cx?-1:1,ax,ay,bx,by,y:by,h:z.me?46:36}});
+ {const me=labs.find(q=>q.z.me);if(me)me.side=me.bx<cx+R*.35?-1:1}
  [-1,1].forEach(sd=>{const L=labs.filter(q=>q.side===sd).sort((p,q)=>p.by-q.by);for(let k=1;k<L.length;k++){const g=(L[k-1].h+L[k].h)/2;if(L[k].y-L[k-1].y<g)L[k].y=L[k-1].y+g}
   const lo=L.length?L.at(-1).y+L.at(-1).h/2-(H-6):0;if(lo>0)L.forEach(q=>q.y-=lo);for(let k=L.length-2;k>=0;k--){const g=(L[k+1].h+L[k].h)/2;if(L[k+1].y-L[k].y<g)L[k].y=L[k+1].y-g}
   const hi=L.length?16+L[0].h/2-L[0].y:0;if(hi>0)L.forEach(q=>q.y+=hi)});
- let lb='';labs.forEach(q=>{const z=q.z,col=cx+q.side*(R+48),tx=col+q.side*6,pct=z.f*100,pc=pct>=1?Math.round(pct)+'%':'1% 미만',an=q.side<0?'end':'start';
-  const mx=cx+q.side*Math.max(Math.abs(q.bx-cx)+6,R+30);  // 꺾인 뒤 이름표 줄까지: 도넛 바깥쪽으로만
-  lb+=`<path d="M${q.ax},${q.ay} L${q.bx},${q.by} L${mx},${q.y} L${col},${q.y}" fill="none" stroke="${z.me?'#7f93c9':'#a9b5be'}" stroke-width="1.3" stroke-linejoin="round"/><circle cx="${q.ax}" cy="${q.ay}" r="2.4" fill="${z.me?'#4c66b2':'#8d98a2'}"/>
-  <g ${tip(z)} class="v40-seg">${z.me?`<text x="${tx}" y="${q.y-3}" text-anchor="${an}" font-size="19" font-weight="900" fill="#1d4f91">${esc(z.a)} ${pc}</text><text x="${tx}" y="${q.y+16}" text-anchor="${an}" font-size="14.5" font-weight="600" fill="#7f93c9">${v38Money(z.v)}</text>`
+ let lb='';labs.forEach(q=>{const z=q.z,col=cx+q.side*(R+62),tx=col+q.side*6,pct=z.f*100,pc=pct>=1?Math.round(pct)+'%':'1% 미만',an=q.side<0?'end':'start';
+  const mx=cx+q.side*Math.max(Math.abs(q.bx-cx)+8,R+42);
+  lb+=`<path d="M${q.ax},${q.ay} L${q.bx},${q.by} L${mx},${q.y} L${col},${q.y}" fill="none" stroke="${z.me?'#7f93c9':'#a9b5be'}" stroke-width="1.3" stroke-linejoin="round"/><circle cx="${q.ax}" cy="${q.ay}" r="2.6" fill="${z.me?'#4c66b2':'#8d98a2'}"/>
+  <g ${tip(z)} class="v40-seg">${z.me?`<text x="${tx}" y="${q.y-3}" text-anchor="${an}" font-size="20" font-weight="900" fill="#1d4f91">${esc(z.a)} ${pc}</text><text x="${tx}" y="${q.y+16}" text-anchor="${an}" font-size="14.5" font-weight="600" fill="#7f93c9">${v38Money(z.v)}</text>`
   :`<text x="${tx}" y="${q.y-2}" text-anchor="${an}" font-size="14.5" font-weight="800" fill="#4a5764">${esc(z.a)} ${pc}</text><text x="${tx}" y="${q.y+13}" text-anchor="${an}" font-size="12" font-weight="600" fill="#97a3ad">${v38Money(z.v)}${z.etc?` · ${z.etc.length}곳`:''}</text>`}</g>`});
- const ctr='';  // 도넛 가운데는 비움 (11-06 10:30)
- const defs=`<defs><linearGradient id="v40-hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="v40-wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#0c2236" stop-opacity=".16"/></linearGradient></defs>`;
- return `<svg class="v40-donut" viewBox="0 0 ${W} ${H}" width="100%">${defs}${back}${walls}${tops}${ctr}${lb}</svg>`}
+ const defs=`<defs><linearGradient id="v40-hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="v40-wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#0c2236" stop-opacity=".18"/></linearGradient><radialGradient id="v40-sh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#0c2236" stop-opacity=".13"/><stop offset="1" stop-color="#0c2236" stop-opacity="0"/></radialGradient></defs>`;
+ const shadow=`<ellipse cx="${cx}" cy="${cy+DEP+10}" rx="${R*1.12}" ry="${R*K*.9}" fill="url(#v40-sh)"/>`;
+ return `<svg class="v40-donut" viewBox="0 0 ${W} ${H}" width="100%">${defs}<g transform="rotate(${ROT} ${cx} ${rc})">${shadow}${back}${caps}${walls}${wallMe}${tops}${topMe}</g>${lb}</svg>`}
 var V40_CHEV=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="${d<0?'M15 5l-7 7 7 7':'M9 5l7 7-7 7'}"/></svg>`;
 function v40MixBtns(){const sc=document.querySelector('#v40-mix .v40-mixsc');document.querySelectorAll('[data-v40-mscroll]').forEach(b=>{if(!sc){b.hidden=true;return}const over=sc.scrollWidth>sc.clientWidth+2,dir=+b.dataset.v40Mscroll;b.hidden=!over;b.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
 function v40After(){const d=v38D,card=document.querySelector('#content .v38-card');if(!d||!card||route!=='monthly')return;document.querySelectorAll('#content .v40-sec').forEach(x=>x.remove());

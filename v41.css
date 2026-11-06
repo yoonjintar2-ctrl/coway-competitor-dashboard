@@ -120,3 +120,4 @@ dialog.v41-dialog .v41-ph{align-items:stretch}
 /* 19:08 — 코웨이 칩(누르면 코웨이 카드 닫기·열기), 품목별 분포 배경 */
 
 .v41-chips .melg{margin-left:4px;gap:3px}.v41-chips .melg svg{display:block;overflow:visible}
+.v41-badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:#eef2f5;color:#6b7a88;font-size:11px;font-weight:800;vertical-align:2px;letter-spacing:0}

@@ -117,3 +117,6 @@ body.v39-full .v39-sc svg#v39-svg{width:100%!important;height:100%!important;max
 body.v39-full .v39-stick,body.v39-full .v39-arr{display:none!important}
 body.v39-full .v39-below{margin-top:26px}
 body.v39-full .v39-below .v39-legend{margin-bottom:8px}
+/* 11-06 13:25 — 스크롤하면 카드가 화면에 붙은 채 카메라만 3D → 위에서 본 2D */
+.v39-track{position:relative}
+html .v39-track>.v39-card.v39-pin{position:sticky!important;top:12px;z-index:1}

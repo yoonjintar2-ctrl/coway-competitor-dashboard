@@ -50,12 +50,13 @@ function v39Short(t,n){t=String(t||'').replace(/\s+/g,' ').trim();return t.lengt
 const V39_EVT={camp:['캠페인','#25a4dc'],creative:['신규 소재','#f08a3c'],news:['기사','#7d8a96']};
 const V39_EVM={camp:'#9fc3d6',creative:'#dcb89a',news:'#b3bbc2'};  // 풍선 점: 옅은 색(히트맵이 주인공)
 function v39Build(m){
- const {CW,DX,DY,pad,h0,hk,OX,ML,MR,T}=V39_V,cw=CW-pad,dx=DX*.86,dy=DY*.86;
+ // 카메라: v39K 0 = 비스듬한 3D, 1 = 위에서 내려다본 2D(스크롤에 따라, 11-06 13:25)
+ const cam=Math.max(0,Math.min(1,v39K||0)),ce=cam*cam*(3-2*cam),{CW,pad,OX,ML,MR}=V39_V,DX=V39_V.DX*(1-ce),DY=V39_V.DY+(-CW-V39_V.DY)*ce,T=V39_V.T*(1-ce),h0=V39_V.h0*(1-ce),hk=V39_V.hk*(1-ce),cw=CW-pad,dx=DX*.86,dy=DY*.86;
  const wd=x=>(new Date(x+'T00:00:00').getDay()+6)%7,wd0=wd(m.days[0]),col=i=>Math.floor((i+wd0)/7),NCOL=col(m.days.length-1)+1;
- const H=Math.max(400,Math.min(780,(window.innerHeight||900)-330)),OY=H-T-14,W=OX+NCOL*CW+MR+8*DX+20;
+ const H=Math.max(400,Math.min(780,(window.innerHeight||900)-330)),OY=H-V39_V.T-14,W=OX+NCOL*CW+MR+8*V39_V.DX+20;
  const Hh=v=>h0+Math.sqrt(Math.min(1,(v||0)/m.smax))*hk;
  const F=(u,t)=>[OX+u+t*DX,OY+t*DY];  // 팔레트 윗면 좌표(u: 가로 px, t: 줄 깊이)
- const lie=(u,t,k=.052)=>`matrix(1,0,${(-DX*k).toFixed(3)},${(-DY*k).toFixed(3)},${F(u,t)})`;  // 바닥에 누운 글자
+ const lie=(u,t,k=.936/Math.abs(DY))=>`matrix(1,0,${(-DX*k).toFixed(3)},${(-DY*k).toFixed(3)},${F(u,t)})`;  // 바닥에 누운 글자
  let s=`<defs><filter id="v39sh" x="-5%" y="-40%" width="110%" height="180%"><feGaussianBlur stdDeviation="10"/></filter><linearGradient id="v39pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef3f7"/><stop offset="1" stop-color="#dfe7ee"/></linearGradient><linearGradient id="v39hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>`,stick='';
  const cells=[],src=m.me,WK=['월','화','수','목','금','토','일'];
  const sorted=m.days.filter(x=>x<=m.today).map(x=>src.q[x]).filter(v=>v!=null).sort((a,b)=>a-b);
@@ -68,7 +69,7 @@ function v39Build(m){
  const mstart=mm=>col(m.days.indexOf(`${m.Y}-${String(mm).padStart(2,'0')}-01`))*CW;
  for(let mm=1;mm<=12;mm++){const ua=mstart(mm),ub=mm<12?mstart(mm+1):NCOL*CW-pad,[xa,ya]=F(ua,t0),[xm]=F((ua+ub)/2,t0),fut=`${m.Y}-${String(mm).padStart(2,'0')}-01`>m.today;
   if(mm>1)s+=`<line x1="${xa}" x2="${xa}" y1="${ya+4}" y2="${ya+T-4}" stroke="#b5c3ce" stroke-width="1"/>`;
-  s+=`<text x="${xm}" y="${ya+T/2+4.2}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${fut?'#a9b6c0':'#566b7b'}">${mm}월</text>`}
+  s+=`<text x="${xm}" y="${ya+T/2+4.2+ce*9}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${fut?'#a9b6c0':'#566b7b'}">${mm}월</text>`}
  // 요일: 팔레트 양쪽 여백에 누운 글자
  WK.forEach((t,r)=>{const tt=r+.2;s+=`<text transform="${lie(-20,tt)}" text-anchor="end" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text><text transform="${lie(NCOL*CW-pad+16,tt)}" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text>`});
  // 이슈: 풍선 자리
@@ -118,13 +119,13 @@ function v39Legend(){const g=[0,.15,.3,.4,.5,.6,.7,.78,.88,1].map(p=>v39Rgb(v39C
 function v39View(){const d=v39D,m=v39Model(d);
  if(!m.me)return `<section class="glass section">${empty(`${v39Adv} · ${v39Cat||'전체'} ${d.year}년 자료가 없어요.`,'다른 품목이나 연도를 골라 보세요.')}</section>`;
  const b=v39Build(m);v39Last={...b,today:m.today,m};
- return `<section class="glass section v39-card"><div class="v39-ch"><div><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2><p class="v39-kw">${v39Adv?'검색 키워드 · ':''}${esc(b.kw)}<button type="button" class="v39-kwbtn" data-v39-kwopen>${v39Adv?'키워드 보기·수정 요청':'광고주별 키워드'}</button></p></div>
+ return `<div class="v39-track"><section class="glass section v39-card"><div class="v39-ch"><div><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2><p class="v39-kw">${v39Adv?'검색 키워드 · ':''}${esc(b.kw)}<button type="button" class="v39-kwbtn" data-v39-kwopen>${v39Adv?'키워드 보기·수정 요청':'광고주별 키워드'}</button></p></div>
   <div class="v39-icons">${v39Years()}<button type="button" class="v39-ic" data-v39-png title="이미지로 저장(1월~12월 전체)" aria-label="이미지로 저장">${V39_IMG}</button><button type="button" class="v39-ic" data-v39-xls title="엑셀 원본 내려받기" aria-label="엑셀 원본 내려받기">${V39_XLS}</button><button type="button" class="v39-ic" data-v39-full title="${v39IsFull()?'전체 화면 끝내기(Esc)':'전체 화면으로 보기'}" aria-label="전체 화면">${v39IsFull()?V39_SHRINK:V39_GROW}</button></div></div>
   <div class="v39-vp"><div class="v39-sc" id="v39-sc"><svg id="v39-svg" width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}">${b.svg}</svg></div>
   <svg class="v39-stick" width="360" height="${b.H}">${b.stick}</svg>
   <button type="button" class="v39-arr l" data-v39-scroll="-1" aria-label="이전">‹</button><button type="button" class="v39-arr r" data-v39-scroll="1" aria-label="다음">›</button><div class="v39-tip" id="v39-tip" hidden></div></div>
   <div class="v39-below">${v39Legend()}<p class="footnote">칸 = 하루 · 색 = 네이버 검색수 순위(그해 기준) · 높이 = 그날 광고비 · 풍선 = 캠페인 시작·신규 소재·주요 기사(누르면 자세히) · 좌우로 넘겨 1월~12월</p>
-  <p class="footnote">${esc(d.note||'')}${v39Adv?'':' · 업종 전체는 같은 품목 경쟁사(인덱스 경쟁사=O)와 코웨이의 합계'}</p></div></section>`}
+  <p class="footnote">${esc(d.note||'')}${v39Adv?'':' · 업종 전체는 같은 품목 경쟁사(인덱스 경쟁사=O)와 코웨이의 합계'}</p></div></section></div>`}
 function v39Animate(full){const b=v39Last;if(!b)return;v39Hot(null);const els=[...document.querySelectorAll('#v39-svg>.v39-c')];const id=++v39Anim;const N=b.cells.length;
  const ncol=Math.max(...b.cells.map(c=>c.x));const t0=performance.now(),D0=650,DUR=750;
  const ease=t=>1-Math.pow(1-t,3);
@@ -135,7 +136,7 @@ function v39Animate(full){const b=v39Last;if(!b)return;v39Hot(null);const els=[.
 function v39Scroll0(){const sc=document.getElementById('v39-sc'),b=v39Last;if(!sc||!b)return;const c=b.cells.find(z=>z.d===b.today);
  sc.scrollLeft=c?Math.max(0,c.x-sc.clientWidth*.72):(b.m.Y<new Date().getFullYear()?0:sc.scrollWidth);v39Arrows()}
 function v39Arrows(){const sc=document.getElementById('v39-sc');if(!sc)return;document.querySelectorAll('[data-v39-scroll]').forEach(btn=>{const dir=+btn.dataset.v39Scroll;btn.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
-function v39Draw(anim){v39HotCol=null;$('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';v39Controls(true);$('#content').innerHTML=v39View();v39Scroll0();v39Animate(!anim);
+function v39Draw(anim){v39HotCol=null;$('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';v39Controls(true);v39K=0;$('#content').innerHTML=v39View();v39Track();v39Scroll0();v39Animate(!anim);setTimeout(()=>{const k=v39ScrollK();if(k>0){v39K=k;v39Recam()}},50);
  const sc=document.getElementById('v39-sc');if(sc)sc.addEventListener('scroll',()=>{v39Arrows();v39Hot(null)},{passive:true})}
 
 var v39BaseRender=render;
@@ -283,3 +284,19 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
  const c=document.getElementById('content');if(c&&c.requestFullscreen)c.requestFullscreen().catch(()=>v39Max(true));else v39Max(true)});  // 브라우저가 막으면 화면 꽉 채우기로
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('v39-max')&&!document.querySelector('dialog[open]'))v39Max(false)});
 document.addEventListener('fullscreenchange',()=>{v39FullCls();if(route!=='heatmap'||!v39D)return;try{v39Draw(false)}catch(e){}});
+
+// ---------- 스크롤에 따라 카메라 각도: 내리면 위에서 본 2D, 올리면 3D (11-06 13:25) ----------
+var v39K=0,v39KRaf=0;const V39_RUN=380;
+function v39Recam(){const sv=document.getElementById('v39-svg');if(!sv||!v39Last||route!=='heatmap')return;v39Hot(null);++v39Anim;
+ const m=v39Last.m,b=v39Build(m);v39Last={...b,today:m.today,m};sv.setAttribute('width',b.W);sv.setAttribute('height',b.H);sv.setAttribute('viewBox',`0 0 ${b.W} ${b.H}`);sv.innerHTML=b.svg;
+ const els=[...sv.querySelectorAll(':scope>.v39-c')];b.cells.forEach((c,k)=>v39Paint(els[k],c,1));const t=document.getElementById('v39-today');if(t)t.innerHTML=v39Today();
+ sv.classList.toggle('v39-top',v39K>.5)}
+function v39Track(){const tr=document.querySelector('#content .v39-track'),card=tr&&tr.querySelector('.v39-card');if(!tr||!card)return;
+ if(v39IsFull()){tr.style.height='';card.classList.remove('v39-pin');return}card.classList.add('v39-pin');tr.style.height=(card.offsetHeight+V39_RUN)+'px'}
+function v39ScrollK(){const tr=document.querySelector('#content .v39-track');if(!tr||route!=='heatmap'||v39IsFull())return 0;
+ const top=parseFloat(getComputedStyle(tr.querySelector('.v39-card')).top)||0,par=tr.offsetParent;let base=0;
+ let el=tr.parentElement;while(el&&el!==document.body){const o=getComputedStyle(el).overflowY;if(o==='auto'||o==='scroll'){base=el.getBoundingClientRect().top;break}el=el.parentElement}
+ return Math.max(0,Math.min(1,(base+top-tr.getBoundingClientRect().top)/V39_RUN))}
+function v39OnScroll(){if(v39KRaf)return;v39KRaf=requestAnimationFrame(()=>{v39KRaf=0;const k=v39ScrollK();if(Math.abs(k-v39K)<.004&&!(k===0&&v39K>0)&&!(k===1&&v39K<1))return;v39K=k;v39Recam()})}
+document.addEventListener('scroll',e=>{if(route==='heatmap'&&!(e.target&&e.target.id==='v39-sc'))v39OnScroll()},{capture:true,passive:true});
+window.addEventListener('resize',()=>{if(route==='heatmap')v39Track()});

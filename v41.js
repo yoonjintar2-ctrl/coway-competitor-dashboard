@@ -8,7 +8,7 @@ function v41Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.
 v41Nav();document.addEventListener('DOMContentLoaded',v41Nav);setTimeout(v41Nav,1500);
 async function v41Get(path){if(v32Static()){const r=await fetch('data/reach/'+path,{cache:'no-cache'});if(!r.ok)throw new Error('자료 없음');return r.json()}return api('/api/reach/'+path)}
 async function v41Load(){if(!v41Meta)v41Meta=v32Static()?await v41Get('meta.json'):await api('/api/reach/meta');
- const cats=v41Meta.categories||[];if(!cats.length)return null;if(!v41Cat||!cats.find(c=>c.label===v41Cat))v41Cat=cats[0].label;
+ const cats=v41Meta.categories||[];if(!cats.length)return null;if(!v41Cat||!cats.find(c=>c.label===v41Cat))v41Cat=(cats.find(c=>c.label==='정수기')||cats[0]).label;
  const req=++v41Req;const d=v32Static()?await v41Get('c-'+encodeURIComponent(v41Cat).replace(/%/g,'_')+'.json'):await api('/api/reach/rows?category='+encodeURIComponent(v41Cat));if(req!==v41Req)return null;
  const ci=Object.fromEntries(d.cols.map((k,i)=>[k,i]));d.R=d.rows.map(r=>Object.fromEntries(d.cols.map(k=>[k,r[ci[k]]])));
  d.years=[...new Set(d.R.map(r=>r.y))].sort((a,b)=>b-a);if(!v41Year||!d.years.includes(v41Year))v41Year=d.years[0];v41D=d;return d}

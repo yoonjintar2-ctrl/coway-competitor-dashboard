@@ -35,3 +35,7 @@ table.v41-t{border-collapse:collapse;width:100%;font-size:12px;font-variant-nume
 .v41-ch .lg{display:flex;flex-wrap:wrap;gap:3px 8px;margin-top:7px}.v41-ch .lg em{font-style:normal;font-size:10px;color:#55697a;display:flex;align-items:center;gap:3px}.v41-ch .lg i{width:8px;height:8px;border-radius:2px;display:inline-block}
 .v41-none{font-size:12.5px;color:#8a96a3;margin:6px 0 0}
 .v41-pop select.v41-per,html.nd .v41-pop select.chip.v41-per{height:32px!important;padding:0 30px 0 12px!important;line-height:30px!important;font-size:12px!important}
+/* 카드에 마우스 올리면 '자세히 보기' (11-06 11:19) */
+.v41-card .go{position:absolute;right:8px;bottom:-13px;font-style:normal;font-size:10.5px;font-weight:800;color:#fff;background:#1a8cc2;border-radius:999px;padding:3px 9px;box-shadow:0 3px 10px rgba(26,140,194,.3);opacity:0;transform:translateY(-3px);transition:opacity .15s,transform .15s;pointer-events:none;white-space:nowrap}
+.v41-card.me .go{background:#4c66b2;box-shadow:0 3px 10px rgba(76,102,178,.3)}
+.v41-card:hover{z-index:5}.v41-card:hover .go{opacity:1;transform:none}

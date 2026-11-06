@@ -47,3 +47,13 @@ html.nd .v40-sec select.chip.v40-per,.v40-sec select.v40-per{height:32px!importa
 /* 기본 svg 규칙(20px·외곽선) 무시 */
 .v40-sec svg{width:auto;height:auto;stroke:none;max-width:none}
 .v40-sec svg.v40-donut{width:100%;height:auto;max-width:720px}
+/* 11-06 11:18 — 영역 분리·주석은 아래로·매체 믹스 좌우 버튼 */
+.v40-sec .v40-h{justify-content:space-between;align-items:center}
+.v40-foot{margin:10px 2px 0;font-size:11.5px;color:#8a96a3}
+.v40-mixwrap{position:relative}
+.v40-mixsc{overflow-x:auto;scrollbar-width:none}.v40-mixsc::-webkit-scrollbar{display:none}
+.v40-mbtn{position:absolute;top:calc(50% - 36px);z-index:3}
+.v40-mbtn.l{left:-22px}.v40-mbtn.r{right:-22px}
+.v40-mbtn[hidden]{display:none!important}
+.v40-mbtn.off{opacity:.35;pointer-events:none}
+#v40-sos{display:flex;justify-content:center}

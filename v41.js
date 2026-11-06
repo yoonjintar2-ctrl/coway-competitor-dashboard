@@ -56,7 +56,7 @@ function v41View(){const d=v41D,rows=v41Pick('ytd'),by=v41Sum(rows,'adv'),ms=v41
   if(dd>14)g+=`<line x1="${p.px}" y1="${p.py}" x2="${nx}" y2="${ny}" stroke="${p.a==='코웨이'?'#8fa0d4':'#b9c3ca'}" stroke-width="1.2"/>`});
  pts.forEach(p=>{const me=p.a==='코웨이';g+=`<circle cx="${p.px}" cy="${p.py}" r="${me?11:8}" fill="${me?'#4c66b2':'#a3acb4'}" fill-opacity="${me?1:.9}" stroke="#fff" stroke-width="2"/>`});
  const html=cards.map(c=>{const p=c.p,me=p.a==='코웨이',r3=p.r&&p.r.r3!=null?`R3+${Math.round(p.r.r3)}%`:'R3+ 준비 중';
-  return `<button type="button" class="v41-card${me?' me':''}" data-v41-adv="${esc(p.a)}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px"><b>${esc(p.a)} <em>(${v41Won(p.won)}원)</em></b><span>(${Math.round(p.eq).toLocaleString()} eq GRP, ${r3})</span></button>`}).join('');
+  return `<button type="button" class="v41-card${me?' me':''}" data-v41-adv="${esc(p.a)}" style="left:${c.x}px;top:${c.y}px;width:${c.w}px"><b>${esc(p.a)} <em>(${v41Won(p.won)}원)</em></b><span>(${Math.round(p.eq).toLocaleString()} eq GRP, ${r3})</span><i class="go">자세히 보기 →</i></button>`}).join('');
  const src=d.source||{};
  return `<section class="glass section v41-card-wrap"><div class="v41-head"><div><h2>${v41Year}년 누적 경쟁사 TV 노출량 · R3+ <small>${esc(v41Cat)}</small></h2><p>카드를 누르면 지상파·케이블 세부 운영 내역을 볼 수 있어요</p></div>
   <div class="v39-years v41-years">${d.years.map(y=>`<button type="button" class="y${y===v41Year?' on':''}" data-v41-year="${y}">${y}</button>`).join('')}</div></div>
@@ -86,7 +86,8 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
   <select class="chip v41-per" data-v41-per>${[['ytd',v41Year+'년 누적'],...ms.slice().reverse().map(m=>[m,m.slice(2,4)+'.'+m.slice(5)])].map(([v,l])=>`<option value="${v}" ${v===per?'selected':''}>${l}</option>`).join('')}</select></div>
   <h3>지상파TV 세부 운영 내역</h3>${terrHtml}<h3>케이블TV 세부 운영 내역</h3>${cabHtml}
   <p class="footnote">모니터링 광고비·NET·GRP·Eq GRP는 아리아나(닐슨) 자료, 타깃 ${esc((v41D.source||{}).target||'')} · 광고비(실집행 추정)는 설정의 SM C&C 요율 적용 · A.R = GRP ÷ 횟수 · CPRP = 모니터링 광고비 ÷ Eq GRP · 광고유형: PR 일반프로, SP 스팟, TJ 특집/재방</p></div>`}
-function v41Open(adv){const dl=$('#detail');dl.className='v41-dialog';$('#detail-body').innerHTML=v41Detail(adv);dl.dataset.v41Adv=adv;if(!dl.open)dl.showModal()}
+function v41Open(adv){const dl=$('#detail');dl.className='v41-dialog';$('#detail-body').innerHTML=v41Detail(adv);v41Cur=adv;if(!dl.open)dl.showModal()}
+var v41Cur='';
 var v41BaseRender=render;
 render=async function(...a){if(route!=='reach'){v41Controls(false);return v41BaseRender.apply(this,a)}
  if(typeof v38Hist!=='undefined'){const pop=v38Hist.pop;v38Hist.pop=false;if(typeof v12Pop!=='undefined')v12Pop=true;v38Sync(pop||!v38Hist.ready);v38Hist.ready=true}
@@ -95,9 +96,9 @@ render=async function(...a){if(route!=='reach'){v41Controls(false);return v41Bas
  if(!v41D)$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료를 불러오는 중이에요.')}</section>`;
  try{await v41Load();if(route!=='reach')return}catch(e){$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료를 불러오지 못했어요.',e.message)}</section>`;return}v41Draw();if(typeof v38Sync==='function')v38Sync(true)};
 document.addEventListener('click',async e=>{if(route!=='reach')return;const y=e.target.closest&&e.target.closest('[data-v41-year]');if(y){v41Year=+y.dataset.v41Year;v41Per='ytd';v41Draw();if(typeof v38Sync==='function')v38Sync(false);return}
- const c=e.target.closest&&e.target.closest('[data-v41-adv]');if(c){v41Per='ytd';v41Open(c.dataset.v41Adv)}});
+ const c=e.target.closest&&e.target.closest('.v41-card[data-v41-adv]');if(c){v41Per='ytd';v41Open(c.dataset.v41Adv)}});
 document.addEventListener('change',async e=>{if(e.target.id==='v41-cat'){e.stopPropagation();v41Cat=e.target.value;v41Year=null;v41Per='ytd';try{await v41Load();v41Draw();if(typeof v38Sync==='function')v38Sync(false)}catch(err){toast('불러오지 못했어요: '+err.message)}return}
- const p=e.target.closest&&e.target.closest('[data-v41-per]');if(p){v41Per=p.value;const dl=$('#detail');$('#detail-body').innerHTML=v41Detail(dl.dataset.v41Adv)}},true);
+ const p=e.target.closest&&e.target.closest('[data-v41-per]');if(p){v41Per=p.value;const dl=$('#detail');$('#detail-body').innerHTML=v41Detail(v41Cur)}},true);
 window.addEventListener('resize',()=>{if(route==='reach'&&v41D)v41Draw()});
 // 주소(#/reach?cat=)
 if(typeof V38_ROUTES!=='undefined'&&!V38_ROUTES.includes('reach'))V38_ROUTES.push('reach');

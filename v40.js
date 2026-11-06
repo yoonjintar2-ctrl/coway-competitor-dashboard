@@ -1,4 +1,4 @@
-/* v40 — 2026-11-06 월별 통합 분석 하단: 품목 내 광고주별 월별 광고비 + 매체 믹스·쉐어 오브 스펜딩
+/* v40 — 2026-11-06 광고비 통합 분석 하단: 품목 내 광고주별 월별 광고비 + 매체 믹스·쉐어 오브 스펜딩
    품목(세부 품목)을 골랐을 때만 — 그 품목에 쓴 광고비만(경쟁사 모두 + 코웨이). */
 var V40_MIX=[['tv_terr','지상파','#4c66b2'],['tv_cable','종편·케이블','#7fc4e4'],['dg','디지털','#9fd6c8'],['radio','라디오','#6ea7a3'],['news','신문','#8a97ab'],['mag','잡지','#c3c8cd']];
 var v40Per='ytd';  // 'ytd' 또는 'YYYY-MM'
@@ -11,7 +11,7 @@ function v40Sel(d){const ms=v40Months(d);return `<select class="chip v40-per" da
 function v40PeerTable(d){const ps=d.peer_spend||{},M=d.months,CUR=d.current,VIS=M.slice(-12),advs=v40Order(d).filter(a=>v40Tot(ps,a,M)>0);
  if(!advs.length)return `<p class="v40-empty">이 품목은 최근 2년 광고비 자료가 없어요.</p>`;
  const cell=(a,m)=>{let t=0;for(const v of Object.values((ps[a]||{})[m]||{}))t+=v||0;return t};
- const rows=advs.map(a=>`<tr class="${a===d.advertiser?'me':''}${a==='코웨이'?' cw':''}"><th scope="row"><button type="button" data-v40-adv="${esc(a)}" title="${esc(a)} 월별 통합 분석으로">${esc(a)}</button></th>${M.map(m=>{const v=cell(a,m);return `<td class="${v?'':'z'}${m===CUR?' cur':''}">${v38Money(v)}</td>`}).join('')}<td class="tot">${v38Money(VIS.reduce((s,m)=>s+cell(a,m),0))}</td></tr>`).join('');
+ const rows=advs.map(a=>`<tr class="${a===d.advertiser?'me':''}${a==='코웨이'?' cw':''}"><th scope="row"><button type="button" data-v40-adv="${esc(a)}" title="${esc(a)} 광고비 통합 분석으로">${esc(a)}</button></th>${M.map(m=>{const v=cell(a,m);return `<td class="${v?'':'z'}${m===CUR?' cur':''}">${v38Money(v)}</td>`}).join('')}<td class="tot">${v38Money(VIS.reduce((s,m)=>s+cell(a,m),0))}</td></tr>`).join('');
  const sum=M.map(m=>advs.reduce((s,a)=>s+cell(a,m),0));
  return `<div class="v40-tbl" id="v40-pscroll"><table class="v40-pt"><thead><tr><th scope="col">광고주</th>${M.map(m=>`<th scope="col" class="${m===CUR?'cur':''}">${+m.slice(5)}월<small>${m.slice(2,4)}년</small></th>`).join('')}<th scope="col" class="tot">최근 12개월</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><th scope="row">품목 합계</th>${sum.map((v,i)=>`<td class="${M[i]===CUR?'cur':''}">${v38Money(v)}</td>`).join('')}<td class="tot">${v38Money(VIS.reduce((s,m)=>s+sum[M.indexOf(m)],0))}</td></tr></tfoot></table></div>`}
 // 매체 믹스: 광고주별 100% 막대 + 업종 평균
@@ -81,7 +81,7 @@ var V40_CHEV=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 function v40MixBtns(){const sc=document.querySelector('#v40-mix .v40-mixsc');document.querySelectorAll('[data-v40-mscroll]').forEach(b=>{if(!sc){b.hidden=true;return}const over=sc.scrollWidth>sc.clientWidth+2,dir=+b.dataset.v40Mscroll;b.hidden=!over;b.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
 function v40After(){const d=v38D,card=document.querySelector('#content .v38-card');if(!d||!card||route!=='monthly')return;document.querySelectorAll('#content .v40-sec').forEach(x=>x.remove());
  const need=`<div class="v40-need">세부 품목을 고르면 품목 안 광고주별 광고비 비교와 매체 믹스·Share of Spending 그래프를 볼 수 있어요. 위쪽 <b>세부 품목</b>에서 품목을 선택해 주세요.</div>`;
- const unit=`${esc(d.category)} 품목에 쓴 광고비만 · 경쟁사 전체와 코웨이 · TV는 SM C&C 실집행 추정, 디지털은 월별 통합 분석과 같은 기준`;
+ const unit=`${esc(d.category)} 품목에 쓴 광고비만 · 경쟁사 전체와 코웨이 · TV는 SM C&C 실집행 추정, 디지털은 광고비 통합 분석과 같은 기준`;
  const sec=(title,body,note,ctrl)=>`<section class="glass section v40-sec"><div class="v40-h"><h2>${title}</h2>${d.category&&ctrl?ctrl:''}</div>${d.category?body:need}${d.category&&note?`<p class="footnote v40-foot">${note}</p>`:''}</section>`;
  card.insertAdjacentHTML('afterend',
   sec('품목 내 광고주별 월별 광고비',`<div class="v38-glass">${d.category?v40PeerTable(d):''}</div>`,`${unit} · 광고주 이름을 누르면 그 광고주 화면으로 넘어가요`)+
@@ -95,7 +95,7 @@ if(typeof v38Draw==='function'){var v40BaseDraw=v38Draw;v38Draw=function(...a){c
 document.addEventListener('change',e=>{const s=e.target.closest&&e.target.closest('[data-v40-per]');if(!s||!v38D)return;v40Per=s.value;document.querySelectorAll('[data-v40-per]').forEach(x=>x.value=v40Per);
  const a=document.getElementById('v40-mix'),b=document.getElementById('v40-sos');if(a)a.innerHTML=v40MixChart(v38D);if(b)v40SosAnim(v38D);v40MixBtns()});
 document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-v40-adv]');if(!b||route!=='monthly')return;const a=b.dataset.v40Adv;if(a===v38Adv)return;
- const o=(v38Opt||[]).find(x=>x.advertiser===a);if(!o){toast('이 광고주는 월별 통합 분석 목록에 없어요.');return}v38Adv=a;if(!(o.categories||[]).includes(v38Cat))v38Cat='';
+ const o=(v38Opt||[]).find(x=>x.advertiser===a);if(!o){toast('이 광고주는 광고비 통합 분석 목록에 없어요.');return}v38Adv=a;if(!(o.categories||[]).includes(v38Cat))v38Cat='';
  document.querySelector('#content .v38-card')?.classList.add('loading');try{await v38Load();v38Draw();if(typeof v38Sync==='function')v38Sync();window.scrollTo({top:0,behavior:'smooth'})}catch(err){toast('불러오지 못했어요: '+err.message)}});
 document.addEventListener('mousemove',e=>{if(route!=='monthly')return;const et=e.target.closest&&e.target.closest('[data-v40-etc]');if(et){const [js,t]=et.dataset.v40Etc.split(/\|(?=[^|]*$)/),L=JSON.parse(js);
   return v38Tip(`<b class="h">기타 ${L.length}곳 · ${v38Money(L.reduce((s,[,v])=>s+v,0))}</b>${L.map(([a,v])=>`<div class="r"><span><b>${esc(a)}</b></span><b>${v38Money(v)} <small style="font-weight:600;color:#8a96a3">${(v/t*100).toFixed(v/t>=.001?1:2)}%</small></b></div>`).join('')}`,e.clientX,e.clientY)}

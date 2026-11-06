@@ -1,7 +1,7 @@
-/* v38 — 2026-11-05 월별 통합 분석(test) · 설정 > 디지털 자료 규칙
+/* v38 — 2026-11-05 광고비 통합 분석(test) · 설정 > 디지털 자료 규칙
    광고주(또는 세부 품목)를 고르면 최근 25개월(화면엔 12개월, 좌우 버튼으로 이동)을 월 단위로:
    캠페인 캡슐·관련 기사(같은 띠, 높이 고정) → 네이버 쿼리(올해·전년) → 매체별 광고비 막대(전년 막대·경쟁사 평균 영역) → 표 → 유튜브·인스타그램 게시물. */
-var v38First=true,V38_TITLE='월별 통합 분석',v38Opt=null,v38Adv='',v38Cat='',v38D=null,v38Req=0;
+var v38First=true,V38_TITLE='광고비 통합 분석',v38Opt=null,v38Adv='',v38Cat='',v38D=null,v38Req=0;
 var V38_CATS=[['tv','TV','#1b84bd',[['tv_terr','지상파'],['tv_cable','종편·케이블']]],['dg','디지털','#4aa9da',[['dg_video','동영상'],['dg_pc','PC'],['dg_mo','MO']]],['radio','라디오','#8cc7e5',[['radio','라디오']]],['print','인쇄','#bfdfef',[['news','신문'],['mag','잡지']]]];
 var V38_G='#858f99';  // 네이버 쿼리: 무채색(광고비 막대가 주인공, 11-05 14:58)
 function v38Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="monthly"]'))return;
@@ -168,7 +168,7 @@ function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  const paste=k=>ro?'':`<details class="v38-paste"><summary>엑셀에서 붙여넣어 바꾸기</summary><p>엑셀에서 머리글 없이 같은 열 순서로 복사해 붙여넣으면 이 표를 통째로 바꿔요.</p><textarea data-v38-paste="${k}" rows="5"></textarea><button type="button" class="primary" data-v38-save="${k}">저장</button></details>`;
  return `<section class="glass section">${header('디지털 자료 연결',`디지털 광고비는 디지털 자료 '데이터 통합'(PC배너·모바일배너·동영상) 엑셀을 월 단위로 써요. 같은 달 자료가 다시 들어오면 그 달을 통째로 바꿔요. 아이디·비밀번호는 대시보드가 다루지 않아요.`)}
   <div class="v38-st"><span>저장된 달 <b>${(st.months||[]).length}개월</b>${(st.months||[]).length?` (${st.months[0]} ~ ${st.months.at(-1)})`:''}</span><span>최근 받은 파일 <b>${esc((st.files||[])[0]?.name||'없음')}</b></span>${ro?'':'<a class="primary" href="/ra-bridge.html" target="_blank" rel="noopener">디지털 자료 연결 페이지 열기</a>'}</div>
-  ${(st.unknown||[]).length?`<h4>확인 필요 · 규칙(index)에 없는 경쟁사 브랜드 (최근 3개월 광고비 순)</h4>${tbl([['advertiser','광고주'],['brand','브랜드'],['industry_s','업종(소)'],['amount_k','광고비']],st.unknown.map(u=>({...u,amount_k:v38Money(u.amount)})),30)}<p class="v38-help">이름이 바뀐 브랜드('(구)…' 등)나 새 브랜드예요. 아래 index 표에 넣어 포함 여부를 정하면 월별 통합 분석에 반영돼요. 정하기 전에는 빼고 보여요(추정하지 않음).</p>`:''}</section>
+  ${(st.unknown||[]).length?`<h4>확인 필요 · 규칙(index)에 없는 경쟁사 브랜드 (최근 3개월 광고비 순)</h4>${tbl([['advertiser','광고주'],['brand','브랜드'],['industry_s','업종(소)'],['amount_k','광고비']],st.unknown.map(u=>({...u,amount_k:v38Money(u.amount)})),30)}<p class="v38-help">이름이 바뀐 브랜드('(구)…' 등)나 새 브랜드예요. 아래 index 표에 넣어 포함 여부를 정하면 광고비 통합 분석에 반영돼요. 정하기 전에는 빼고 보여요(추정하지 않음).</p>`:''}</section>
  <section class="glass section">${header('광고주명 맵핑 · 주요 경쟁 여부',`디지털 자료 광고주명 → 닐슨(아덱스) 광고주명 → 보고서 표기명. 경쟁 여부 O인 광고주만 받아요. 기본값: ${esc(R.meta?.source||'')}`)}${tbl([['ra_name','디지털 자료 광고주명'],['nielsen','닐슨 광고주명'],['display','주요 경쟁(표기)'],['competitor','여부'],['note','참고']],R.advertisers||[])}${paste('advertisers')}</section>
  <section class="glass section">${header('업종(소) → 품목','디지털 자료 업종(소)를 대시보드 품목으로 묶는 기준이에요.')}${tbl([['industry_s','업종(소)'],['category','품목'],['note','참고']],R.industry_map||[])}${paste('industry_map')}</section>
  <section class="glass section">${header('index · 경쟁사 선별 규칙','업종(소)+브랜드 마다 포함 여부·품목(업종수정)·광고주명 수정·주요 경쟁을 정해요. 포함=O 인 브랜드만 디지털 광고비에 들어가요(품목이 없는 브랜드 광고는 \'브랜드\').')}
@@ -181,9 +181,9 @@ document.addEventListener('input',e=>{if(e.target.id==='v38-ra-filter'){v38RaFil
 var V38_COLS={advertisers:['ra_name','nielsen','display','competitor','note'],industry_map:['industry_s','category','note'],index:['industry_m','industry_s','advertiser','brand','include','category','display','competitor']};
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-v38-save]');if(!b)return;const k=b.dataset.v38Save,ta=document.querySelector(`[data-v38-paste="${k}"]`);const lines=(ta.value||'').split(/\r?\n/).filter(l=>l.trim());
  if(!lines.length)return toast('붙여넣은 내용이 없어요.');const cols=V38_COLS[k];const rows=lines.map(l=>{const c=l.split('\t');const o={};cols.forEach((n,i)=>o[n]=(c[i]||'').trim());if(k==='advertisers')o.primary=true;return o});
- if(!confirm(`${rows.length}줄로 이 표를 바꿀까요?`))return;try{await api('/api/ra/rules',{kind:k,rows});v38Rules=null;v7Draw();toast('저장했어요. 월별 통합 분석에 바로 반영돼요.')}catch(err){toast('저장하지 못했어요: '+err.message)}});
+ if(!confirm(`${rows.length}줄로 이 표를 바꿀까요?`))return;try{await api('/api/ra/rules',{kind:k,rows});v38Rules=null;v7Draw();toast('저장했어요. 광고비 통합 분석에 바로 반영돼요.')}catch(err){toast('저장하지 못했어요: '+err.message)}});
 
-// ---------- 캠페인 분석 하단 '최근 12개월 월별 매체 광고비': 매체 묶음 소계 · 디지털은 월별 통합 분석 기준 (11-05 11:45) ----------
+// ---------- 캠페인 분석 하단 '최근 12개월 월별 매체 광고비': 매체 묶음 소계 · 디지털은 광고비 통합 분석 기준 (11-05 11:45) ----------
 var V38_BK={terrestrial:'지상파',general:'종편',cable:'케이블',dg_video:'동영상',dg_pc:'PC',dg_mo:'MO',digital_video:'디지털 영상',digital_banner:'디지털 배너',newspaper:'신문',magazine:'잡지',radio:'라디오',print:'신문·잡지'};
 if(typeof advertiserMonthlyPanel==='function'){var v38BaseAMP=advertiserMonthlyPanel;advertiserMonthlyPanel=function(d){
  const data=d.advertiser_monthly;if(!data||!data.groups)return v38BaseAMP(d);const months=data.rows,lastMonth=data.end.slice(0,7);
@@ -192,18 +192,18 @@ if(typeof advertiserMonthlyPanel==='function'){var v38BaseAMP=advertiserMonthlyP
  const row=(label,keys,cls)=>{const tot=months.reduce((a,r)=>a+sum(keys,r),0),rt=months.reduce((a,r)=>a+raws(keys,r),0);
   return `<tr class="${cls}"><th scope="row">${label}</th>${months.map(r=>`<td title="원본 ${number(raws(keys,r))}원 · 표시 ${number(sum(keys,r))}원">${M(sum(keys,r))}</td>`).join('')}<td class="v4-total-col" title="원본 ${number(rt)}원 · 표시 ${number(tot)}원">${M(tot)}</td></tr>`};
  const body=data.groups.map(g=>g.keys.length>1?g.keys.map(k=>row(`<span class="v38-sub-n">${V38_BK[k]||k}</span>`,[k],'v38-item')).join('')+row(`${g.label} 소계`,g.keys,'v38-subtot'):row(g.label,g.keys,'v38-subtot')).join('');
- const src=data.digital_source==='ra'?(v32Static()?' · 디지털은 월별 통합 분석과 같은 디지털 집행 자료 기준':' · 디지털은 월별 통합 분석과 같은 디지털 자료 기준(포함=O)'):'';
+ const src=data.digital_source==='ra'?(v32Static()?' · 디지털은 광고비 통합 분석과 같은 디지털 집행 자료 기준':' · 디지털은 광고비 통합 분석과 같은 디지털 자료 기준(포함=O)'):'';
  return `<section class="glass section advertiser-monthly v38-ampsec">${header(`${esc(d.campaign.advertiser)} · 최근 12개월 월별 매체 광고비`,`${data.start} — ${data.end} · ${esc(data.scope)} 합산 · 단위 백만원${adjusted()?' · 보정 추정액':''}${src}`)}<button type="button" class="v38-xlsbtn" data-v38-xls="${esc(d.campaign.advertiser)}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>엑셀 다운로드</button><div class="monthly-table-scroll"><table class="data-table monthly-spend-table v4-monthly v38-amp"><thead><tr><th scope="col">매체</th>${months.map(r=>`<th scope="col">${r.month.slice(2).replace('-','.')}${r.month===lastMonth?'*':''}</th>`).join('')}<th scope="col" class="v4-total-col">12개월 합계</th></tr></thead><tbody>${body}</tbody><tfoot><tr><th scope="row">월 합계</th>${months.map(r=>`<td title="${number(r.total)}원">${M(r.total)}</td>`).join('')}<td class="v4-total-col" title="${number(grand)}원">${v4Million(grand)}</td></tr></tfoot></table></div><p class="footnote">* 마지막 월은 선택 종료일(${dateLabel(data.end)})까지의 부분월입니다. —는 확보된 원본에서 집행액이 관측되지 않은 항목입니다. 셀에 마우스를 올리면 원 단위 금액을 확인합니다.</p></section>`}}
 
 
-// ---------- 네이버 쿼리 키워드 보기·고치기(연필) — 월별 통합 분석 · 캠페인 분석 (11-05 12:15) ----------
+// ---------- 네이버 쿼리 키워드 보기·고치기(연필) — 광고비 통합 분석 · 캠페인 분석 (11-05 12:15) ----------
 var V38_PEN='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 async function v38KwOpen(adv,cat){if(v32Static())return alert('키워드는 PC 대시보드에서만 고칠 수 있어요.\n회사 PC에서 대시보드(127.0.0.1:8765)를 열어 바꿔 주세요.');
  const dialog=$('#detail');dialog.className='v38-kwdialog';$('#detail-body').innerHTML=`<div class="v38-kw"><h2>네이버 쿼리 키워드 · ${esc(adv)}</h2><p class="v38-help">불러오는 중이에요…</p></div>`;if(!dialog.open)dialog.showModal();
  let d;try{d=await api('/api/keywords?advertiser='+encodeURIComponent(adv))}catch(e){$('#detail-body').innerHTML=`<div class="v38-kw">${empty('키워드를 불러오지 못했어요.',e.message)}</div>`;return}
  const draw=()=>{const by={};d.keywords.forEach(k=>(by[k.label]=by[k.label]||[]).push(k));
   const st=k=>k.status==='ok'?`${k.first?k.first.slice(2,7).replace('-','.'):''}~ 추정`:k.status==='pending'?'추정 준비 중(몇 분 걸려요)':k.status==='skipped'?'추정 불가 · '+esc(k.reason||''):esc(k.status||'');
-  $('#detail-body').innerHTML=`<div class="v38-kw"><h2>네이버 쿼리 키워드 · ${esc(adv)}</h2><p class="v38-help">월별 통합 분석과 캠페인 분석의 쿼리는 아래 키워드의 추정 검색수를 더한 값이에요. 키워드를 추가하면 약 2년치를 바로 추정하고, 제거하면 집계에서만 빠져요(모은 자료는 보존).</p>
+  $('#detail-body').innerHTML=`<div class="v38-kw"><h2>네이버 쿼리 키워드 · ${esc(adv)}</h2><p class="v38-help">광고비 통합 분석과 캠페인 분석의 쿼리는 아래 키워드의 추정 검색수를 더한 값이에요. 키워드를 추가하면 약 2년치를 바로 추정하고, 제거하면 집계에서만 빠져요(모은 자료는 보존).</p>
   ${Object.entries(by).map(([l,list])=>`<div class="v38-kwgrp"><b>${esc(l)}</b>${list.map(k=>`<span class="v38-kwchip${k.added?' new':''}">${esc(k.keyword)}<em>${st(k)}</em><button type="button" data-v38-kwdel="${esc(k.category)}|${esc(k.keyword)}" title="제거" aria-label="${esc(k.keyword)} 제거">×</button></span>`).join('')}</div>`).join('')||'<p class="v38-help">아직 키워드가 없어요.</p>'}
   <form class="v38-kwadd" data-v38-kwform><select name="cat">${d.categories.map(c=>`<option value="${esc(c.code)}" ${c.code===cat?'selected':''}>${esc(c.label)}</option>`).join('')}</select><input name="kw" placeholder="추가할 키워드 (예: ${esc(adv)}정수기)" maxlength="40" required><button type="submit" class="primary">추가</button></form></div>`};
  draw();window.__v38kw={adv,cat,set:x=>{d=x;draw()}}}
@@ -317,5 +317,5 @@ if(typeof v37Link==='function')v37Link=function(id){const base=v32Static()?locat
 
 // ---------- 캠페인 분석 '경쟁사 광고비 비교': 디지털 기준 안내 (11-05 16:41) ----------
 if(typeof annualPanel==='function'){var v38BaseAnnual=annualPanel;annualPanel=function(d){const h=v38BaseAnnual(d);if(!h)return h;
- const note=`<p class="footnote v38-annote">TV·라디오·인쇄는 아덱스(TV는 SM C&C 실집행 추정 요율 반영), 디지털은 월별 통합 분석과 같은 ${v32Static()?'디지털 집행 자료':'디지털 자료'} 기준(포함=O) · 자료가 없는 달의 디지털은 비워 둠</p>`;
+ const note=`<p class="footnote v38-annote">TV·라디오·인쇄는 아덱스(TV는 SM C&C 실집행 추정 요율 반영), 디지털은 광고비 통합 분석과 같은 ${v32Static()?'디지털 집행 자료':'디지털 자료'} 기준(포함=O) · 자료가 없는 달의 디지털은 비워 둠</p>`;
  return h.replace(/<\/section>\s*$/,note+'</section>')}}

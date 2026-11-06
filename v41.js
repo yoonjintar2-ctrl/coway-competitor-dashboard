@@ -5,7 +5,7 @@ var V41_TITLE='TV 통합 분석',v41Meta=null,v41Cat='',v41Year=null,v41D=null,v
 var V41_TYPE={PR:'일반프로',SP:'스팟',TJ:'특집/재방',YG:'예고'};
 function v41Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="reach"]'))return;const b=document.createElement('button');b.className='nav';b.dataset.route='reach';b.textContent=V41_TITLE;
  const after=nav.querySelector('[data-route="heatmap"]')||nav.querySelector('[data-route="monthly"]');if(after)after.after(b);else nav.appendChild(b)}
-// 메뉴 순서: … 월별 통합 분석 → TV 통합 분석 → 연간 히트맵 …, 뉴스 클리핑은 맨 아래 (11-06 15:26)
+// 메뉴 순서: … 광고비 통합 분석 → TV 통합 분석 → 검색쿼리 히트맵 …, 뉴스 클리핑은 맨 아래 (11-06 15:26)
 function v41Order(){const nav=document.querySelector('.sidebar nav');if(!nav)return;const g=r=>nav.querySelector(`[data-route="${r}"]`),m=g('monthly'),rc=g('reach'),nw=g('news');
  if(m&&rc&&m.nextElementSibling!==rc)m.after(rc);if(nw&&nav.lastElementChild!==nw)nav.appendChild(nw)}
 v41Nav();v41Order();document.addEventListener('DOMContentLoaded',()=>{v41Nav();v41Order()});[400,1500,3000].forEach(t=>setTimeout(()=>{v41Nav();v41Order()},t));

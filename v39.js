@@ -1,9 +1,9 @@
-/* v39 — 2026-11-05 연간 히트맵
+/* v39 — 2026-11-05 검색쿼리 히트맵
    품목·광고주를 고르면 1월 1일~12월 31일을 하루 한 칸(주 단위 열, 월요일이 맨 뒤)으로 쌓은 입체 히트맵.
    색 = 네이버 검색수 순위(그래프마다 그해 기준: 하위는 무채색·투명 → 연노랑 → 노랑 → 주황 → 빨강), 높이 = 그날 광고비(위·아래 같은 기준).
    위 = 선택 광고주, 아래 = 같은 품목 경쟁사 평균(선택 광고주 제외). 오늘 강조, 아직 오지 않은 날은 평평한 회색.
    필터를 바꾸면 막대가 평평한 상태에서 올라오며 색이 입혀짐. 이미지(PNG)·엑셀 원본 내려받기, 연도 이동. */
-var V39_TITLE='연간 히트맵',v39Cat='정수기',v39Adv='코웨이',v39Year=null,v39D=null,v39Cache={},v39Req=0,v39Anim=0,v39Idx=null,v39Last=null;
+var V39_TITLE='검색쿼리 히트맵',v39Cat='정수기',v39Adv='코웨이',v39Year=null,v39D=null,v39Cache={},v39Req=0,v39Anim=0,v39Idx=null,v39Last=null;
 function v39Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="heatmap"]'))return;
  const b=document.createElement('button');b.className='nav';b.dataset.route='heatmap';b.textContent=V39_TITLE;
  const after=nav.querySelector('[data-route="monthly"]');if(after)after.after(b);else nav.appendChild(b)}
@@ -148,10 +148,10 @@ render=async function(...a){
  document.querySelectorAll('.sidebar [data-route]').forEach(n=>n.classList.toggle('active',n.dataset.route==='heatmap'));
  try{document.documentElement.dataset.ndRoute='heatmap'}catch(e){}
  $('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';
- if(!v39D)$('#content').innerHTML='<div class="loading glass">연간 히트맵을 그리는 중이에요.</div>';
+ if(!v39D)$('#content').innerHTML='<div class="loading glass">검색쿼리 히트맵을 그리는 중이에요.</div>';
  const req=++v39Req;
  try{const o=await v39Opts();if(v39Adv&&!o.some(x=>x.advertiser===v39Adv)&&o.length)v39Adv=o[0].advertiser;const d=await v39Load();if(req!==v39Req||route!=='heatmap')return;v39D=d;v39Year=d.year}
- catch(e){$('#content').innerHTML=`<section class="glass section">${empty('연간 히트맵을 불러오지 못했어요.',e.message)}</section>`;return}
+ catch(e){$('#content').innerHTML=`<section class="glass section">${empty('검색쿼리 히트맵을 불러오지 못했어요.',e.message)}</section>`;return}
  v39Draw(true);if(typeof v38Sync==='function')v38Sync(true)};
 
 async function v39Change(){$('#content').querySelector('.v39-card')?.classList.add('loading');const req=++v39Req;
@@ -195,7 +195,7 @@ window.addEventListener('blur',()=>{if(v39HotCol!=null)v39Hot(null)});
 
 // 이미지(PNG): 1월~12월 전체, 왼쪽 이름표·요일 포함
 async function v39Png(){const svg=document.getElementById('v39-svg'),st=document.querySelector('.v39-stick');if(!svg||!v39Last)return;v39Animate(true);v39Hot(null);
- const b=v39Last,head=58,W=b.W,H=b.H+head+14;const title=`${v39Adv||((v39Cat||'전체')+' 업종 전체')} — ${v39D.year}년 연간 히트맵`+(v39Adv&&b.kw?` · ${b.kw}`:'');
+ const b=v39Last,head=58,W=b.W,H=b.H+head+14;const title=`${v39Adv||((v39Cat||'전체')+' 업종 전체')} — ${v39D.year}년 검색쿼리 히트맵`+(v39Adv&&b.kw?` · ${b.kw}`:'');
  const stick=[...st.querySelectorAll('text')].map(t=>t.outerHTML).join('');
  const xml=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif"><rect width="${W}" height="${H}" fill="#f6f9fb"/><text x="12" y="34" font-size="20" font-weight="900" fill="#102b45">${esc(title)}</text><text x="12" y="54" font-size="12" fill="#6b7c88">칸 = 하루 · 색 = 네이버 검색수 순위(그해 기준) · 높이 = 그날 광고비 · 코웨이 경쟁사 분석 플랫폼</text><g transform="translate(0,${head})">${svg.innerHTML}${stick}</g></svg>`;
  const img=new Image();img.onload=()=>{const k=2,cv=document.createElement('canvas');cv.width=W*k;cv.height=H*k;const ctx=cv.getContext('2d');ctx.scale(k,k);ctx.drawImage(img,0,0);
@@ -206,7 +206,7 @@ function v39XlsDown(){if(!v39Last||typeof v38Xlsx!=='function')return;const m=v3
  const rows=[[`${adv} · ${cat} · ${m.Y}년 날짜별 네이버 검색수·광고비 (광고비 단위 원)`],[],['날짜','요일','검색수','광고비','그날 이슈']];
  for(const d of m.days){if(d>m.today)break;const wk='일월화수목금토'[new Date(d+'T00:00:00').getDay()];const iss=m.ev.filter(z=>z.d===d).map(z=>`[${(V39_EVT[z.type]||['이슈'])[0]}] ${v39Adv?'':(z.adv||'')+' '}${z.title}`).join(' / ');
   rows.push([d,wk,m.me.q[d]==null?'':Math.round(m.me.q[d]),Math.round(m.me.s[d]||0),iss])}
- const blob=v38Xlsx(rows,'연간 히트맵');const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${adv}_${cat}_${m.Y}_연간히트맵.xlsx`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},600)}
+ const blob=v38Xlsx(rows,'검색쿼리 히트맵');const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${adv}_${cat}_${m.Y}_연간히트맵.xlsx`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},600)}
 
 // 처음 열 때 주소가 #/heatmap 이면
 if(v39FromHash()&&typeof listing!=='undefined'&&listing){render()}

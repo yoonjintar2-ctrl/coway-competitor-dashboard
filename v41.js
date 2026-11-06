@@ -146,14 +146,17 @@ var v41DnLast=null,v41DnEtc=null;const V41_BL=['#2a4fa8','#4a6fcf','#8fb0f0'],V4
 function v41Eok(k){const e=(k||0)/1e5;return e>=10?Math.round(e).toLocaleString()+'억':e>=.1?e.toFixed(1)+'억':Math.round((k||0)/10)+'만'}
 function v41Shade(h,k){const n=parseInt(h.slice(1),16),f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return `rgb(${f(n>>16&255)},${f(n>>8&255)},${f(n&255)})`}
 function v41DnData(adv,per){const rows=v41Pick(per).filter(r=>r.adv===adv);const by=(f,key)=>{const o={};rows.filter(f).forEach(r=>{const k=r[key]||'(미분류)';o[k]=(o[k]||0)+r.inv});return Object.entries(o).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])};
- const t=by(r=>r.media==='지상파','ch');let c=by(r=>r.media!=='지상파','mpp');let etc=[];if(c.length>6){etc=c.slice(5);const rest=etc.reduce((s,[,v])=>s+v,0);c=c.slice(0,5).concat([['기타',rest]])}return {t,c,etc}}
+ const t=by(r=>r.media==='지상파','ch');let c=by(r=>r.media!=='지상파','mpp');const raw=c.filter(([n])=>n==='기타'||n==='(미분류)');c=c.filter(([n])=>n!=='기타'&&n!=='(미분류)');let etc=[];  // 원래 이름이 '기타'인 MPP도 기타 묶음에 넣고 항상 맨 끝
+ if(c.length>5){etc=c.slice(5);c=c.slice(0,5)}{const all=t.reduce((x,[,v])=>x+v,0)+c.reduce((x,[,v])=>x+v,0)+etc.reduce((x,[,v])=>x+v,0)+raw.reduce((x,[,v])=>x+v,0),tiny=c.filter(([,v])=>v/all<.015);if(tiny.length&&c.length>1){c=c.filter(z=>!tiny.includes(z));etc=tiny.concat(etc)}}etc=etc.concat(raw.map(([n,v])=>[n==='기타'?'기타(분류 없음)':n,v]));const rest=etc.reduce((s,[,v])=>s+v,0);if(rest>0)c=c.concat([['기타',rest]]);return {t,c,etc}}
 function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[,v])=>s+v,0),tot=tT+tC;if(!tot)return '';
  const R=148,K=.56,r=R*.5,DEP=32,ROT=13,TAU=Math.PI*2,GAP=(tT&&tC)?10:0,BW=168,BH=42,PITCH=50,top0=34;
- const n=Math.max(D.t.length,D.c.length),cy=top0+18+R*.9,H=Math.max(top0+n*PITCH+4,cy+R*K+DEP+58),cx=W/2,rc=cy+DEP/2,cs=Math.cos(ROT*Math.PI/180),sn=Math.sin(ROT*Math.PI/180);
+ const n=Math.max(D.t.length,D.c.length),cy=top0+18+R*.9,H=Math.max(top0+n*PITCH+4,cy+R*K+DEP+92),cx=W/2,rc=cy+DEP/2,cs=Math.cos(ROT*Math.PI/180),sn=Math.sin(ROT*Math.PI/180);
  const rot=([x,y])=>[cx+(x-cx)*cs-(y-rc)*sn,rc+(x-cx)*sn+(y-rc)*cs],P=(a,rr,ox,dz)=>[cx+(ox||0)+Math.cos(a)*rr,cy+Math.sin(a)*rr*K+(dz||0)];
  const fT=tT/tot,S=[];let a=Math.PI-fT*Math.PI;const sep=GAP?.018:0;  // 두 덩어리 사이 각도 틈도 조금
  const tn=D.t.length;D.t.map((x,i)=>[x,i]).reverse().forEach(([[nm,v],i],j)=>{const sp=v/tot*TAU*T;S.push({k:'t'+i,n:nm,v,g:'t',col:V41_BL[Math.min(i,2)],ox:-GAP,a0:a+(j===0?sep:0),a1:a+sp-(j===tn-1?sep:0)});a+=sp});  // 지상파는 큰 채널이 위쪽에 오게(카드 순서와 맞춰 선이 덜 엇갈리게)
  a=-(1-fT)*Math.PI;D.c.forEach(([nm,v],i)=>{const sp=v/tot*TAU*T;S.push({k:'c'+i,n:nm,v,g:'c',col:nm==='기타'?'#d4d9de':V41_GR[Math.min(i,5)],ox:GAP,a0:a+(i===0?sep:0),a1:a+sp-(i===D.c.length-1?sep:0)});a+=sp});
+ if(!(tT&&tC)){  // 한 덩어리뿐: 큰 순서대로 오른쪽(위→아래, 시계 방향)부터 채우고 나머지는 왼쪽(위→아래, 반시계 방향) — 카드 순서와 조각 순서를 맞춤 (11-06 15:04)
+  const G=S.splice(0);let acc=0,ra=-Math.PI/2,la=-Math.PI/2;G.forEach(z=>{const sp=z.a1-z.a0;z.ox=0;if(acc<.5||z===G[0]){z.side=1;z.a0=ra;z.a1=ra+sp;ra+=sp;acc+=z.v/tot}else{z.side=-1;z.a1=la;z.a0=la-sp;la-=sp}S.push(z)})}
  S.forEach(s=>{if(s.a1<s.a0)s.a1=s.a0});
  const arc=(s,rr,b0,b1,dz,rev)=>{const [x0,y0]=P(rev?b1:b0,rr,s.ox,dz),[x1,y1]=P(rev?b0:b1,rr,s.ox,dz),lg=Math.abs(b1-b0)>Math.PI?1:0;return [`${x0.toFixed(1)},${y0.toFixed(1)}`,`A${rr},${(rr*K).toFixed(1)} 0 ${lg} ${rev?0:1} ${x1.toFixed(1)},${y1.toFixed(1)}`]};
  const clips=(b0,b1,lo,hi)=>{const o=[];for(const k of [-1,0,1,2]){const x=Math.max(b0,lo+k*TAU),y=Math.min(b1,hi+k*TAU);if(y>x+1e-6)o.push([x,y])}return o};
@@ -164,28 +167,38 @@ function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[
   const [m,aa]=arc(s,R,s.a0,s.a1,0),[mi,ai]=arc(s,r,s.a0,s.a1,0,true);s.td=`M${m} ${aa} L${mi} ${ai} Z`;tops+=`<g class="sl" data-v41-k="${s.k}"><path d="${s.td}" fill="${s.col}"/><path d="${s.td}" fill="url(#v41hl)"/></g>`});
  // 두 덩어리 사이 잘린 단면
  const cap=(s,ang,start)=>{const vis=start?Math.cos(ang)<0:Math.cos(ang)>0;if(!vis)return '';const p=[P(ang,r,s.ox),P(ang,R,s.ox),P(ang,R,s.ox,DEP),P(ang,r,s.ox,DEP)];return `<g class="sl" data-v41-k="${s.k}"><path d="M${p.map(q=>q.map(z=>z.toFixed(1)).join(',')).join(' L')} Z" fill="${v41Shade(s.col,.68)}"/></g>`};
- const gT=S.filter(s=>s.g==='t'),gC=S.filter(s=>s.g==='c');if(GAP||T<1){if(gT.length)caps+=cap(gT[0],gT[0].a0,true)+cap(gT.at(-1),gT.at(-1).a1,false);if(gC.length)caps+=cap(gC[0],gC[0].a0,true)+cap(gC.at(-1),gC.at(-1).a1,false)}
+ const gT=S.filter(s=>s.g==='t'),gC=S.filter(s=>s.g==='c');if(!(tT&&tC)){if(T<1){const Rs=S.filter(z=>z.side>0),Ls=S.filter(z=>z.side<0);if(Rs.length)caps+=cap(Rs.at(-1),Rs.at(-1).a1,false);if(Ls.length)caps+=cap(Ls.at(-1),Ls.at(-1).a0,true)}}else if(GAP||T<1){if(gT.length)caps+=cap(gT[0],gT[0].a0,true)+cap(gT.at(-1),gT.at(-1).a1,false);if(gC.length)caps+=cap(gC[0],gC[0].a0,true)+cap(gC.at(-1),gC.at(-1).a1,false)}
  // 카드 + 연결선 (다 펼쳐진 뒤에만)
- let lab='';if(T>=1){[[-1,gT,'지상파',tT,'#2a4fa8'],[1,gC,'케이블&종편',tC,'#56616c']].forEach(([side,grp,tl,tv,tc])=>{if(!grp.length)return;
-  // 카드 순서(광고비 순, 기타 맨 아래)대로 조각 위 시작점을 고르고, 선끼리 닿지 않게(겹치면 조각 안 다른 지점으로) (11-06 14:57)
-  const ord=[...grp].sort((p,q)=>(p.n==='기타')-(q.n==='기타')||q.v-p.v),colx=side<0?BW:W-BW,bx0=side<0?0:W-BW;
+ let lab='';if(T>=1){
+  // 카드 열: 두 덩어리면 지상파 왼쪽·케이블 오른쪽, 한 덩어리뿐이면 조각 위치(왼쪽 반/오른쪽 반)로 나눔. 열마다 광고비 순, 기타는 맨 아래 (11-06 15:04)
+  const ordr=a=>[...a].sort((p,q)=>(p.n==='기타')-(q.n==='기타')||q.v-p.v),cols=[];
+  if(gT.length&&gC.length){cols.push([-1,ordr(gT),'지상파',tT,'#2a4fa8'],[1,ordr(gC),'케이블&종편',tC,'#56616c'])}
+  else{const G=gT.length?gT:gC,nm=gT.length?'지상파':'케이블&종편',tc=gT.length?'#2a4fa8':'#56616c',mid=z=>(z.a0+z.a1)/2,Lh=G.filter(z=>z.side<0),Rh=G.filter(z=>z.side>0);
+   cols.push([-1,ordr(Lh),gT.length?nm:'',tT+tC,tc],[1,ordr(Rh),gT.length?'':nm,tT+tC,tc])}
   const rim=(s,f)=>{const m=s.a0+(s.a1-s.a0)*f,fr=Math.sin(m)>0;return {A:rot(P(m,R,s.ox,fr?DEP*.5:0)),E:rot(P(m,R+16,s.ox,fr?DEP*.5+Math.sin(m)*12:-2))}};
-  let ext=0;grp.forEach(s=>{for(let f=0;f<=1;f+=.1){const {E}=rim(s,f);ext=Math.max(ext,Math.abs(E[0]-cx))}});const X0=cx+side*(ext+10),lim=Math.abs(colx-cx)-8;
-  const inDn=(x,y)=>{const u=(x-cx)*cs+(y-rc)*sn,v=-(x-cx)*sn+(y-rc)*cs,e=dv=>(u/(R+GAP+4))**2+((v-dv)/(R*K+4))**2<1;return e(-DEP/2)||e(DEP/2)||(Math.abs(u)<R+GAP&&Math.abs(v)<DEP/2)};  // 윗면·옆면 모두
-  // 선분 교차(닿음·겹침 포함)
-  const X=(p1,p2,p3,p4)=>{const o=(a,b,c)=>{const v=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);return Math.abs(v)<1e-6?0:Math.sign(v)},on=(a,b,c)=>Math.min(a[0],b[0])-2<=c[0]&&c[0]<=Math.max(a[0],b[0])+2&&Math.min(a[1],b[1])-2<=c[1]&&c[1]<=Math.max(a[1],b[1])+2;
-   const d1=o(p3,p4,p1),d2=o(p3,p4,p2),d3=o(p1,p2,p3),d4=o(p1,p2,p4);if(d1*d2<0&&d3*d4<0)return true;
-   if(d1===0&&on(p3,p4,p1))return true;if(d2===0&&on(p3,p4,p2))return true;if(d3===0&&on(p1,p2,p3))return true;if(d4===0&&on(p1,p2,p4))return true;
-   const near=(a,b,c,d)=>{const dd=(p,q,r)=>{const dx=q[0]-p[0],dy=q[1]-p[1],l=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((r[0]-p[0])*dx+(r[1]-p[1])*dy)/l));return Math.hypot(p[0]+t*dx-r[0],p[1]+t*dy-r[1])};return Math.min(dd(a,b,c),dd(a,b,d),dd(c,d,a),dd(c,d,b))<6};return near(p1,p2,p3,p4)};
-  // 선: 조각 테두리 → 바깥으로 조금 → 자기 전용 세로 통로(x) → 카드 높이 → 카드. 선끼리 닿지 않는 조합을 고름 (11-06 14:57)
-  let bot=0;for(let t=0;t<=Math.PI;t+=.05)bot=Math.max(bot,rot(P(t,R,side*GAP,DEP))[1]);let dives=0;const segs=[],used=new Set(),maxK=Math.max(0,Math.floor((lim-Math.abs(X0-cx))/8));const L=ord.map((s,i)=>{const y=top0+i*PITCH+BH/2;let best=null,bs=1e12;
-   for(const f of [.5,.35,.65,.2,.8,.1,.9])for(let k=0;k<=maxK;k++)for(const dive of [0,1]){if(used.has(k))continue;const {A,E}=rim(s,f),x=X0+side*k*8,yd=bot+10+dives*8,D=dive?[E[0],yd]:E,B1=[x,D[1]],B2=[x,y],C=[colx,y];
-    if(dive&&E[1]>yd)continue;const pts=dive?[A,E,D,B1,B2,C]:[A,E,B1,B2,C],sg=[];for(let z=1;z<pts.length;z++)if(Math.hypot(pts[z][0]-pts[z-1][0],pts[z][1]-pts[z-1][1])>.5)sg.push([pts[z-1],pts[z]]);
-    let pen=Math.abs(f-.5)*4+k*.6+dive*25;sg.forEach(([p1,p2])=>segs.forEach(([p3,p4])=>{if(X(p1,p2,p3,p4))pen+=1000}));
-    sg.slice(1).forEach(([p1,p2])=>{for(let t=.1;t<1;t+=.1){if(inDn(p1[0]+(p2[0]-p1[0])*t,p1[1]+(p2[1]-p1[1])*t))pen+=60}});
-    if(pen<bs){bs=pen;best={s,A,y,k,sg,pts,dive}}}
-   used.add(best.k);if(best.dive)dives++;segs.push(...best.sg);return best});
-  lab+=`<text x="${bx0}" y="${top0-12}" font-size="14.5" font-weight="900" fill="${tc}">${tl} <tspan fill="#102b45">${v41Eok(tv)}</tspan> <tspan font-size="12" font-weight="700" fill="#8a96a3">${Math.round(tv/tot*100)}%</tspan></text>`;
+  const inDn=(x,y)=>{const u=(x-cx)*cs+(y-rc)*sn,v=-(x-cx)*sn+(y-rc)*cs,e=dv=>(u/(R+GAP+4))**2+((v-dv)/(R*K+4))**2<1;return e(-DEP/2)||e(DEP/2)||(Math.abs(u)<R+GAP&&Math.abs(v)<DEP/2)};
+  const dd=(p,q,r)=>{const dx=q[0]-p[0],dy=q[1]-p[1],l=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((r[0]-p[0])*dx+(r[1]-p[1])*dy)/l));return Math.hypot(p[0]+t*dx-r[0],p[1]+t*dy-r[1])};
+  const oo=(a,b,c)=>{const v=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);return Math.abs(v)<1e-6?0:Math.sign(v)};
+  const segD=(a,b,c,d)=>(oo(a,b,c)*oo(a,b,d)<0&&oo(c,d,a)*oo(c,d,b)<0)?0:Math.min(dd(a,b,c),dd(a,b,d),dd(c,d,a),dd(c,d,b));
+  let bot=0;for(let t=0;t<=Math.PI;t+=.05)for(const ox of [-GAP,GAP])bot=Math.max(bot,rot(P(t,R,ox,DEP))[1]);
+  const MIN=10,GAPL=12,ALLSEG=[];  // 두 열의 선도 서로 닿지 않게 함께 검사
+  cols.forEach(([side,ord,tl,tv,tc])=>{if(!ord.length)return;const colx=side<0?BW:W-BW,bx0=side<0?0:W-BW;
+   let ext=0;ord.forEach(s=>{for(let f=0;f<=1;f+=.1){const {E}=rim(s,f);ext=Math.max(ext,Math.abs(E[0]-cx))}});const X0=cx+side*(ext+10),lim=Math.abs(colx-cx)-8,maxK=Math.max(0,Math.floor((lim-Math.abs(X0-cx))/GAPL));
+   const ys=ord.map((s,i)=>top0+i*PITCH+BH/2);
+   // 선: 조각 테두리 → 바깥으로 조금 → (필요하면 아래로) → 자기 전용 세로 통로 → 카드 높이 → 카드. 여러 순서로 시도해 선끼리 가장 멀리 떨어지는 배치를 고름
+   const run=seq=>{const segs=[...ALLSEG],used=new Set(),out=new Array(ord.length);let total=0;
+    for(const i of seq){const s=ord[i],y=ys[i];let best=null,bs=1e12;
+     for(const f of [.5,.35,.65,.2,.8,.1,.9,.03,.97]){const {A,E}=rim(s,f);const back=Math.sin(s.a0+(s.a1-s.a0)*f)<0,drops=[0,12,24,36,48];if(back)drops.push(-12,-24,-36,-48);else for(const z of [0,12,24,36,48])drops.push(Math.max(0,Math.round(bot+12+z-E[1])));
+      for(const d of new Set(drops))for(let k=0;k<=maxK;k++){if(used.has(k))continue;const x=X0+side*k*GAPL,Dp=[E[0],E[1]+d],B1=[x,Dp[1]],B2=[x,y],C=[colx,y];
+       const pts=d?[A,E,Dp,B1,B2,C]:[A,E,B1,B2,C],sg=[];for(let z=1;z<pts.length;z++)if(Math.hypot(pts[z][0]-pts[z-1][0],pts[z][1]-pts[z-1][1])>.5)sg.push([pts[z-1],pts[z]]);
+       let pen=Math.abs(f-.5)*4+k*.5+Math.abs(d)*.2;for(const [p1,p2] of sg)for(const [p3,p4] of segs){const g=segD(p1,p2,p3,p4);if(g<MIN)pen+=1000+(MIN-g)*50}
+       if(pen>=bs)continue;sg.slice(1).forEach(([p1,p2])=>{for(let t=.1;t<1;t+=.1){if(inDn(p1[0]+(p2[0]-p1[0])*t,p1[1]+(p2[1]-p1[1])*t))pen+=60}});
+       if(pen<bs){bs=pen;best={s,A,y,k,sg,pts}}}}
+     used.add(best.k);segs.push(...best.sg);out[i]=best;total+=bs}
+    return {out,total}};
+   const idx=ord.map((_,i)=>i),cand=[idx,[...idx].reverse(),[...idx].sort((a,b)=>rim(ord[a],.5).A[1]-rim(ord[b],.5).A[1]),[...idx].sort((a,b)=>rim(ord[b],.5).A[1]-rim(ord[a],.5).A[1]),[...idx].sort((a,b)=>Math.abs(rim(ord[a],.5).A[0]-cx)-Math.abs(rim(ord[b],.5).A[0]-cx)),[...idx].sort((a,b)=>Math.abs(rim(ord[b],.5).A[0]-cx)-Math.abs(rim(ord[a],.5).A[0]-cx))];
+   let bestRun=null;for(const sq of cand){const r=run(sq);if(!bestRun||r.total<bestRun.total)bestRun=r;if(r.total<1000)break}const L=bestRun.out;L.forEach(q=>ALLSEG.push(...q.sg));
+   if(tl)lab+=`<text x="${bx0}" y="${top0-12}" font-size="14.5" font-weight="900" fill="${tc}">${tl} <tspan fill="#102b45">${v41Eok(tv)}</tspan> <tspan font-size="12" font-weight="700" fill="#8a96a3">${Math.round(tv/tot*100)}%</tspan></text>`;
   L.forEach(q=>{const s=q.s,y=q.y,st=s.g==='t'?'#8fa0d4':'#b3bcc4',f=v=>v.toFixed(1);q.ax=q.A[0];q.ay=q.A[1];
    lab+=`<g class="cd${s.n==='기타'&&(D.etc||[]).length?' etc':''}" data-v41-k="${s.k}"><path class="ln" d="M${q.pts.map(p=>f(p[0])+','+f(p[1])).join(' L')}" fill="none" stroke="${st}" stroke-width="1.3" stroke-linejoin="round"/><circle cx="${q.ax.toFixed(1)}" cy="${q.ay.toFixed(1)}" r="2.6" fill="${st}"/>
     <rect class="bx" x="${bx0+.5}" y="${y-BH/2}" width="${BW-1}" height="${BH}" rx="10" fill="#fff" stroke="${s.g==='t'?'#cdd7ef':'#dfe4e8'}"/><rect x="${bx0+11}" y="${y-5}" width="10" height="10" rx="2.5" fill="${s.col}"/>

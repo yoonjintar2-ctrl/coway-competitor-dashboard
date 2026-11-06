@@ -276,9 +276,10 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 var V39_GROW='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>';
 var V39_SHRINK='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/></svg>';
 function v39IsFull(){return !!document.fullscreenElement||document.body.classList.contains('v39-max')}
-function v39Max(on){document.body.classList.toggle('v39-max',on);if(route==='heatmap'&&v39D)try{v39Draw(false)}catch(e){}}
+function v39FullCls(){document.body.classList.toggle('v39-full',v39IsFull())}
+function v39Max(on){document.body.classList.toggle('v39-max',on);v39FullCls();if(route==='heatmap'&&v39D)try{v39Draw(false)}catch(e){}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v39-full]');if(!b)return;e.preventDefault();
  if(document.fullscreenElement){document.exitFullscreen().catch(()=>{});return}if(document.body.classList.contains('v39-max')){v39Max(false);return}
  const c=document.getElementById('content');if(c&&c.requestFullscreen)c.requestFullscreen().catch(()=>v39Max(true));else v39Max(true)});  // 브라우저가 막으면 화면 꽉 채우기로
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('v39-max')&&!document.querySelector('dialog[open]'))v39Max(false)});
-document.addEventListener('fullscreenchange',()=>{if(route!=='heatmap'||!v39D)return;try{v39Draw(false)}catch(e){}});
+document.addEventListener('fullscreenchange',()=>{v39FullCls();if(route!=='heatmap'||!v39D)return;try{v39Draw(false)}catch(e){}});

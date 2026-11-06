@@ -107,8 +107,13 @@ dialog.v39-evdialog{width:min(560px,94vw)}
 .v39-kwok{margin:0;align-self:center;font-size:11px;color:#2e8a57}
 .v39-kwadv{border:0;background:none;padding:0;font:inherit;font-weight:800;color:#102b45;cursor:pointer}.v39-kwadv:hover{color:#1a8cc2}
 .v39-kwnone{font-size:11.5px;color:#9aa7b1}
-/* 전체 화면 */
-#content:fullscreen{background:linear-gradient(180deg,#eef5fa,#e4eef5);padding:28px 32px;overflow:auto;box-sizing:border-box}
-#content:fullscreen .v39-card{margin:0;min-height:calc(100vh - 56px);box-sizing:border-box}
-body.v39-max #content{position:fixed;inset:0;z-index:900;background:linear-gradient(180deg,#eef5fa,#e4eef5);padding:28px 32px;overflow:auto;box-sizing:border-box;margin:0;max-width:none;width:auto}
-body.v39-max #content .v39-card{margin:0;min-height:calc(100vh - 56px);box-sizing:border-box}
+/* 전체 화면 — 그래프를 화면에 맞춰(스크롤 없이), 배경은 옅은 무채색 그라데이션 (11-06 10:25) */
+#content:fullscreen,body.v39-max #content{background:radial-gradient(1100px 520px at 18% -10%,rgba(255,255,255,.95),rgba(255,255,255,0) 62%),radial-gradient(900px 500px at 100% 110%,rgba(214,228,238,.55),rgba(214,228,238,0) 60%),linear-gradient(180deg,#f8fafb 0%,#eef2f5 100%);padding:24px 30px;overflow:hidden;box-sizing:border-box}
+body.v39-max #content{position:fixed;inset:0;z-index:900;margin:0;max-width:none;width:auto}
+body.v39-full #content .v39-card{margin:0;height:calc(100vh - 48px);box-sizing:border-box;display:flex;flex-direction:column;background:rgba(255,255,255,.72)!important;box-shadow:0 10px 40px rgba(20,50,80,.08)}
+body.v39-full .v39-vp{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+body.v39-full .v39-sc{overflow:hidden!important;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+body.v39-full .v39-sc svg#v39-svg{width:100%!important;height:100%!important;max-width:100%;max-height:100%}
+body.v39-full .v39-stick,body.v39-full .v39-arr{display:none!important}
+body.v39-full .v39-below{margin-top:26px}
+body.v39-full .v39-below .v39-legend{margin-bottom:8px}

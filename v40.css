@@ -46,4 +46,4 @@ html.nd .v40-sec select.chip.v40-per,.v40-sec select.v40-per{height:32px!importa
 .v40-donut{display:block;margin:0 auto}
 /* 기본 svg 규칙(20px·외곽선) 무시 */
 .v40-sec svg{width:auto;height:auto;stroke:none;max-width:none}
-.v40-sec svg.v40-donut{width:100%;height:auto;max-width:560px}
+.v40-sec svg.v40-donut{width:100%;height:auto;max-width:640px}

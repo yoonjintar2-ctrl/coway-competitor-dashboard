@@ -26,19 +26,33 @@ function v40MixChart(d,wid){wid=wid||(document.getElementById('v40-mix')||{}).cl
   const me=a==='코웨이',avg=a==='업종 평균';s+=`<text x="${4+i*CW+CW/2}" y="${T+H+17}" text-anchor="middle" font-size="11" font-weight="${me?800:600}" fill="${me?'#1d4f91':avg?'#8a96a3':'#55697a'}">${esc(a.length>7?a.slice(0,6)+'…':a)}</text>`});
  return `<div class="v40-legend">${used.map(([,n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('')}</div><div class="v40-mixsc"><svg width="${W}" height="${T+H+28}" viewBox="0 0 ${W} ${T+H+28}">${s}</svg></div>`}
 // 쉐어 오브 스펜딩 도넛
-function v40Donut(d){const ps=d.peer_spend||{},ms=v40Range(d,v40Per),list=v40Order(d).map(a=>[a,v40Tot(ps,a,ms)]).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
- const tot=list.reduce((s,[,v])=>s+v,0);if(!tot)return `<p class="v40-empty">이 기간에는 광고비 자료가 없어요.</p>`;
- const W=560,H=310,cx=W/2,cy=H/2+4,R=120,r=70,G=['#a3abb3','#b9c0c6','#8d969f','#ccd2d7','#9aa3ab','#dde2e6','#7f8891'];let a0=-Math.PI/2,s='',labs=[],gi=0;
- list.forEach(([a,v])=>{const f=v/tot,a1=a0+f*Math.PI*2,big=a1-a0>Math.PI?1:0,me=a==='코웨이',col=me?'#4c66b2':G[gi++%G.length];
-  const p=(ang,rr)=>[cx+Math.cos(ang)*rr,cy+Math.sin(ang)*rr],[x0,y0]=p(a0,R),[x1,y1]=p(a1,R),[x2,y2]=p(a1,r),[x3,y3]=p(a0,r);
-  s+=list.length===1?`<circle cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${col}" stroke-width="${R-r}"/>`:`<path class="v40-seg" d="M${x0},${y0} A${R},${R} 0 ${big} 1 ${x1},${y1} L${x2},${y2} A${r},${r} 0 ${big} 0 ${x3},${y3} Z" fill="${col}" stroke="#fff" stroke-width="1.5" data-v40-tip="${esc(a)}|sos|${v}|${tot}"/>`;
-  const mid=(a0+a1)/2;labs.push({a,f,me,mid,x:Math.cos(mid),y:cy+Math.sin(mid)*(R+22)});a0=a1});
- // 이름표: 좌우로 나눠 겹치지 않게 세로로 밀기
- ['L','R'].forEach(side=>{const L=labs.filter(z=>(z.x<0)===(side==='L')).sort((p,q)=>p.y-q.y);for(let i=1;i<L.length;i++)if(L[i].y-L[i-1].y<15)L[i].y=L[i-1].y+15;const over=L.length?L.at(-1).y-(H-8):0;if(over>0)L.forEach(z=>z.y-=over)});
- labs.forEach(z=>{const ex=cx+Math.cos(z.mid)*R,ey=cy+Math.sin(z.mid)*R,lx=cx+(z.x<0?-1:1)*(R+30),tx=cx+(z.x<0?-1:1)*(R+34),pct=z.f*100;
-  s+=`<path d="M${ex},${ey} L${cx+Math.cos(z.mid)*(R+12)},${z.y} L${lx},${z.y}" fill="none" stroke="#c4ccd2" stroke-width="1"/><text x="${tx}" y="${z.y+4}" text-anchor="${z.x<0?'end':'start'}" font-size="11.5" font-weight="${z.me?800:600}" fill="${z.me?'#1d4f91':'#55697a'}">${esc(z.a)}, ${pct>=1?Math.round(pct)+'%':pct>=.1?pct.toFixed(1)+'%':'0.1% 미만'}</text>`});
- s+=`<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="11" fill="#8a96a3">품목 합계</text><text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="15" font-weight="900" fill="#102b45">${v38Money(tot)}</text>`;
- return `<svg class="v40-donut" viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">${s}</svg>`}
+// 쉐어 오브 스펜딩: 3D 도넛(기울인 타원 + 옆면), 코웨이 조각만 살짝 띄움, 1% 미만은 기타로 묶고 마우스 올리면 세부 (11-06 10:24)
+function v40Shade(hex,k){const n=parseInt(hex.slice(1),16),f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return `rgb(${f(n>>16&255)},${f(n>>8&255)},${f(n&255)})`}
+function v40Donut(d){const ps=d.peer_spend||{},ms=v40Range(d,v40Per),all=v40Order(d).map(a=>[a,v40Tot(ps,a,ms)]).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+ const tot=all.reduce((s,[,v])=>s+v,0);if(!tot)return `<p class="v40-empty">이 기간에는 광고비 자료가 없어요.</p>`;
+ const big=all.filter(([a,v])=>v/tot>=.01||a==='코웨이'),small=all.filter(x=>!big.includes(x)),etc=small.reduce((s,[,v])=>s+v,0);
+ const list=big.map(([a,v])=>({a,v}));if(etc>0)list.push({a:'기타',v:etc,etc:small});
+ const W=600,H=380,cx=W/2,cy=H/2-6,R=176,K=.56,r=R*.54,DEP=30,G=['#8d969f','#a3abb3','#b9c0c6','#7f8891','#ccd2d7','#9aa3ab','#6f7881'];
+ const P=(a,rr,ox,oy,dz)=>[cx+ox+Math.cos(a)*rr,cy+oy+Math.sin(a)*rr*K+(dz||0)];let a0=-Math.PI/2,gi=0;
+ list.forEach(z=>{z.f=z.v/tot;z.a0=a0;z.a1=a0+z.f*Math.PI*2;a0=z.a1;z.me=z.a==='코웨이';z.col=z.me?'#4c66b2':z.a==='기타'?'#d5dade':G[gi++%G.length];const m=(z.a0+z.a1)/2;z.m=m;z.ox=z.me?Math.cos(m)*14:0;z.oy=z.me?Math.sin(m)*14*K:0});
+ const arc=(z,rr,s0,s1,dz,rev)=>{const [x0,y0]=P(rev?s1:s0,rr,z.ox,z.oy,dz),[x1,y1]=P(rev?s0:s1,rr,z.ox,z.oy,dz),lg=Math.abs(s1-s0)>Math.PI?1:0;return {m:`${x0},${y0}`,a:`A${rr},${rr*K} 0 ${lg} ${rev?0:1} ${x1},${y1}`}};
+ const clip=(s0,s1,lo,hi)=>{const a=Math.max(s0,lo),b=Math.min(s1,hi);return b>a?[a,b]:null};
+ const tip=z=>z.etc?`data-v40-etc="${esc(JSON.stringify(z.etc.map(([a,v])=>[a,v])))}|${tot}"`:`data-v40-tip="${esc(z.a)}|sos|${z.v}|${tot}"`;
+ let back='',walls='',tops='';
+ list.forEach(z=>{// 안쪽 벽(뒤쪽 절반: 위쪽 화면)
+  [[-Math.PI/2,0],[Math.PI,1.5*Math.PI]].forEach(([lo,hi])=>{const c=clip(z.a0,z.a1,lo,hi);if(!c)return;const t=arc(z,r,c[0],c[1],0),b=arc(z,r,c[0],c[1],DEP,true);back+=`<path d="M${t.m} ${t.a} L${b.m} ${b.a} Z" fill="${v40Shade(z.col,.62)}"/>`});
+  // 바깥 벽(앞쪽 절반)
+  const c=clip(z.a0,z.a1,0,Math.PI);if(c){const t=arc(z,R,c[0],c[1],0),b=arc(z,R,c[0],c[1],DEP,true);walls+=`<path class="v40-seg" ${tip(z)} d="M${t.m} ${t.a} L${b.m} ${b.a} Z" fill="${v40Shade(z.col,.74)}"/>`}
+  // 윗면
+  if(list.length===1){tops+=`<path d="M${P(0,R,0,0)} A${R},${R*K} 0 1 1 ${P(Math.PI,R,0,0)} A${R},${R*K} 0 1 1 ${P(0,R,0,0)} M${P(0,r,0,0)} A${r},${r*K} 0 1 0 ${P(Math.PI,r,0,0)} A${r},${r*K} 0 1 0 ${P(0,r,0,0)} Z" fill="${z.col}" fill-rule="evenodd"/>`;return}
+  const o=arc(z,R,z.a0,z.a1,0),i=arc(z,r,z.a0,z.a1,0,true);tops+=`<path class="v40-seg" ${tip(z)} d="M${o.m} ${o.a} L${i.m} ${i.a} Z" fill="${z.col}" stroke="rgba(255,255,255,.85)" stroke-width="1.2"/>`});
+ // 이름표(이름 비중 + 금액), 좌우로 나눠 세로로 밀기
+ const labs=list.map(z=>({z,side:Math.cos(z.m)<0?-1:1,y:cy+z.oy+Math.sin(z.m)*(R*K+26)+(Math.sin(z.m)>0?DEP:0)}));
+ [-1,1].forEach(sd=>{const L=labs.filter(q=>q.side===sd).sort((p,q)=>p.y-q.y);for(let k=1;k<L.length;k++)if(L[k].y-L[k-1].y<30)L[k].y=L[k-1].y+30;const ov=L.length?L.at(-1).y-(H-24):0;if(ov>0)L.forEach(q=>q.y-=ov);for(let k=L.length-2;k>=0;k--)if(L[k+1].y-L[k].y<30)L[k].y=L[k+1].y-30});
+ let lb='';labs.forEach(q=>{const z=q.z,[ex,ey]=P(z.m,R*.97,z.ox,z.oy,Math.sin(z.m)>0?DEP*.5:0),lx=cx+q.side*(R+22),tx=cx+q.side*(R+28),pct=z.f*100,pc=pct>=1?Math.round(pct)+'%':'1% 미만';
+  lb+=`<path d="M${ex},${ey} L${cx+Math.cos(z.m)*(R+10)},${q.y-4} L${lx},${q.y-4}" fill="none" stroke="#c4ccd2" stroke-width="1"/><g ${tip(z)} class="v40-seg"><text x="${tx}" y="${q.y-6}" text-anchor="${q.side<0?'end':'start'}" font-size="12.5" font-weight="${z.me?900:700}" fill="${z.me?'#1d4f91':'#3c4a56'}">${esc(z.a)} ${pc}</text><text x="${tx}" y="${q.y+9}" text-anchor="${q.side<0?'end':'start'}" font-size="11" fill="#8a96a3">${v38Money(z.v)}${z.etc?` · ${z.etc.length}곳`:''}</text></g>`});
+ const ctr=`<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="20" font-weight="900" fill="#102b45">${v38Money(tot)}</text><text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="11" fill="#8a96a3">품목 합계</text>`;
+ return `<svg class="v40-donut" viewBox="0 0 ${W} ${H}" width="100%">${back}${walls}${tops}${ctr}${lb}</svg>`}
 function v40Charts(d){return `<div class="v40-two"><div class="v38-glass v40-pane"><div class="v40-ph"><h3>매체 믹스</h3>${v40Sel(d)}</div><div id="v40-mix">${v40MixChart(d)}</div></div>
  <div class="v38-glass v40-pane"><div class="v40-ph"><h3>Share of Spending</h3>${v40Sel(d)}</div><div id="v40-sos">${v40Donut(d)}</div></div></div>`}
 function v40After(){const d=v38D,card=document.querySelector('#content .v38-card');if(!d||!card||route!=='monthly')return;document.querySelectorAll('#content .v40-sec').forEach(x=>x.remove());
@@ -53,5 +67,7 @@ document.addEventListener('change',e=>{const s=e.target.closest&&e.target.closes
 document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-v40-adv]');if(!b||route!=='monthly')return;const a=b.dataset.v40Adv;if(a===v38Adv)return;
  const o=(v38Opt||[]).find(x=>x.advertiser===a);if(!o){toast('이 광고주는 월별 통합 분석 목록에 없어요.');return}v38Adv=a;if(!(o.categories||[]).includes(v38Cat))v38Cat='';
  document.querySelector('#content .v38-card')?.classList.add('loading');try{await v38Load();v38Draw();if(typeof v38Sync==='function')v38Sync();window.scrollTo({top:0,behavior:'smooth'})}catch(err){toast('불러오지 못했어요: '+err.message)}});
-document.addEventListener('mousemove',e=>{if(route!=='monthly')return;const g=e.target.closest&&e.target.closest('[data-v40-tip]');if(!g){if(document.getElementById('v38-tip')&&!e.target.closest('.v38-box'))v38Tip(null);return}
+document.addEventListener('mousemove',e=>{if(route!=='monthly')return;const et=e.target.closest&&e.target.closest('[data-v40-etc]');if(et){const [js,t]=et.dataset.v40Etc.split(/\|(?=[^|]*$)/),L=JSON.parse(js);
+  return v38Tip(`<b class="h">기타 ${L.length}곳 · ${v38Money(L.reduce((s,[,v])=>s+v,0))}</b>${L.map(([a,v])=>`<div class="r"><span><b>${esc(a)}</b></span><b>${v38Money(v)} <small style="font-weight:600;color:#8a96a3">${(v/t*100).toFixed(v/t>=.001?1:2)}%</small></b></div>`).join('')}`,e.clientX,e.clientY)}
+ const g=e.target.closest&&e.target.closest('[data-v40-tip]');if(!g){if(document.getElementById('v38-tip')&&!e.target.closest('.v38-box'))v38Tip(null);return}
  const [a,k,v,t]=g.dataset.v40Tip.split('|'),nm=k==='sos'?'광고비':(V40_MIX.find(x=>x[0]===k)||[,k])[1];v38Tip(`<b class="h">${esc(a)}</b><div class="r"><span><b>${nm}</b></span><b>${v38Money(+v)}</b></div><div class="s">${k==='sos'?'품목 합계의':'광고주 광고비의'} ${(+v/+t*100).toFixed(1)}%</div>`,e.clientX,e.clientY)},{passive:true});

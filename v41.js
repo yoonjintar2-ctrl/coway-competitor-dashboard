@@ -36,13 +36,20 @@ function v41View(){const d=v41D,rows=v41Pick('ytd'),by=v41Sum(rows,'adv'),ms=v41
  // 카드 위치: 점 둘레 여러 방향·거리 중 다른 카드·점과 안 겹치는 곳 — 점이 몰리면 멀리 두고 선으로 잇기 (11-06 10:12)
  pts.forEach((p,i)=>{p.px=X(p.eq);p.py=p.r&&p.r.r3!=null?Y(p.r.r3):T+PH-14});
  const cards=[],cw=178,ch=40,ov=(a,b,pad)=>!(a.x+a.w+pad<b.x||a.x>b.x+b.w+pad||a.y+a.h+pad<b.y||a.y>b.y+b.h+pad);
- const ANG=[-45,-135,45,135,-90,90,0,180,-20,-160,20,160].map(a=>a*Math.PI/180),RAD=[22,60,105,150,200,260];
- [...pts].sort((a,b)=>(b.a==='코웨이')-(a.a==='코웨이')||b.eq-a.eq).forEach(p=>{let best=null,bs=1e9;
-  for(const rd of RAD){for(const an of ANG){const dx=Math.cos(an)*rd,dy=Math.sin(an)*rd;
-    const x=p.px+dx-(Math.abs(dx)<1?cw/2:dx<0?cw:0),y=p.py+dy-(Math.abs(dy)<1?ch/2:dy<0?ch:0),c={x,y,w:cw,h:ch};
-    if(x<L+4||x+cw>L+PW-2||y<T+2||y+ch>T+PH-4)continue;
-    let sc=cards.filter(o=>ov(c,o,6)).length*100+pts.filter(q=>q.px>c.x-14&&q.px<c.x+cw+14&&q.py>c.y-14&&q.py<c.y+ch+14).length*60+rd*.05;
-    if(sc<bs){bs=sc;best=c}if(sc<1)break}if(bs<1)break}
+ const near=(c,x,y)=>[Math.max(c.x,Math.min(x,c.x+c.w)),Math.max(c.y,Math.min(y,c.y+c.h))],rd2=(c,x,y)=>{const [nx,ny]=near(c,x,y);return Math.hypot(nx-x,ny-y)};
+ const segPt=(x1,y1,x2,y2,px,py)=>{const dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/l));return Math.hypot(x1+t*dx-px,y1+t*dy-py)};
+ const segX=(a,b,c,d)=>{const o=(p,q,r)=>Math.sign((q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]));return o(a,b,c)!==o(a,b,d)&&o(c,d,a)!==o(c,d,b)};
+ const segRect=(a,b,c)=>{if(b[0]>=c.x&&b[0]<=c.x+c.w&&b[1]>=c.y&&b[1]<=c.y+c.h)return false;const E=[[[c.x,c.y],[c.x+c.w,c.y]],[[c.x+c.w,c.y],[c.x+c.w,c.y+c.h]],[[c.x,c.y+c.h],[c.x+c.w,c.y+c.h]],[[c.x,c.y],[c.x,c.y+c.h]]];return E.some(([u,v])=>segX(a,b,u,v))};
+ const ANG=Array.from({length:24},(_,k)=>k*15*Math.PI/180),RAD=[16,34,58,86,120,160,210,270,340];
+ // 카드 자리: 다른 카드·점과 안 겹치고, 선이 다른 점·카드·선을 지나지 않고, 카드가 자기 점에 가장 가깝게 — 몰린 곳은 멀리 빼서 선으로 (11-06 10:24)
+ [...pts].sort((a,b)=>(b.a==='코웨이')-(a.a==='코웨이')||b.eq-a.eq).forEach(p=>{let best=null,bs=1e12;
+  for(const rd of RAD)for(const an of ANG){const cs=Math.cos(an),sn=Math.sin(an),qx=p.px+cs*rd,qy=p.py+sn*rd;
+   const c={x:qx-(cs<-.35?cw:cs>.35?0:cw/2),y:qy-(sn<-.35?ch:sn>.35?0:ch/2),w:cw,h:ch};
+   if(c.x<L+4||c.x+cw>L+PW-2||c.y<T+2||c.y+ch>T+PH-4)continue;
+   const [nx,ny]=near(c,p.px,p.py),own=Math.hypot(nx-p.px,ny-p.py),A=[p.px,p.py],B=[nx,ny];let sc=own*.35;
+   cards.forEach(o=>{if(ov(c,o,6))sc+=5000;if(own>12&&segRect(A,B,o))sc+=900;if(o.ln&&own>12&&segX(A,B,o.ln[0],o.ln[1]))sc+=400});
+   pts.forEach(q=>{if(q===p)return;if(q.px>c.x-12&&q.px<c.x+cw+12&&q.py>c.y-12&&q.py<c.y+ch+12)sc+=3000;if(own>12&&segPt(A[0],A[1],B[0],B[1],q.px,q.py)<14)sc+=1500;if(rd2(c,q.px,q.py)<own+14)sc+=1200});
+   if(sc<bs){bs=sc;best=c;best.ln=[A,B]}}
   if(!best)best={x:Math.min(L+PW-cw-2,Math.max(L+4,p.px+14)),y:Math.max(T+2,p.py-ch-14),w:cw,h:ch};best.p=p;cards.push(best)});
  // 연결선(점 → 카드의 가장 가까운 테두리)
  cards.forEach(c=>{const p=c.p,nx=Math.max(c.x,Math.min(p.px,c.x+c.w)),ny=Math.max(c.y,Math.min(p.py,c.y+c.h)),dd=Math.hypot(nx-p.px,ny-p.py);

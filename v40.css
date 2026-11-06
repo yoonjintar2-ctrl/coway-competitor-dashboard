@@ -1,0 +1,49 @@
+/* v40 — 2026-11-06 월별 통합 분석 하단 */
+/* 매체표: 대분류 펼침/접힘 */
+.v38-tbox tr.grp td{cursor:pointer}
+.v38-names tr.grp td.h .cv{display:inline-block;width:0;height:0;border-left:4px solid #8a96a3;border-top:3.5px solid transparent;border-bottom:3.5px solid transparent;margin:0 6px 1px -4px;transition:transform .18s}
+.v38-names tr.grp.open td.h .cv{transform:rotate(90deg)}
+.v38-tbox tr.grp:hover td{background:rgba(222,236,244,.8)}
+.v38-tbox tr.sub td{background:rgba(246,249,251,.9);color:#7d8a96;font-size:11.5px}
+.v38-names tr.sub td.h{padding-left:30px;font-weight:500;color:#7d8a96}
+/* 섹션 */
+.v40-sec{padding:20px 22px 18px!important;margin-top:14px}
+.v40-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 12px}
+.v40-h h2{margin:0;font-size:16px;font-weight:900;color:#102b45}
+.v40-h p{margin:0;font-size:11.5px;color:#8a96a3}
+.v40-need{padding:26px 20px;text-align:center;font-size:13px;color:#6b7c88;background:rgba(255,255,255,.7);border:1px dashed #cfdbe3;border-radius:14px}
+.v40-need b{color:#1a8cc2}
+.v40-empty{margin:18px 0;text-align:center;font-size:12.5px;color:#8a96a3}
+/* 광고주표 */
+.v40-tbl{overflow-x:auto;scrollbar-width:thin;border-radius:14px}
+table.v40-pt{border-collapse:separate;border-spacing:0;font-size:12px;font-variant-numeric:tabular-nums;min-width:100%}
+.v40-pt th,.v40-pt td{height:32px;padding:0 9px;text-align:right;white-space:nowrap;border-top:1px solid rgba(255,255,255,.9);background:rgba(236,242,246,.55);color:#5b6874}
+.v40-pt thead th{background:rgba(226,234,240,.8);font-size:11.5px;font-weight:800;color:#4d5964;text-align:center;line-height:1.1}
+.v40-pt thead th small{display:block;font-size:9.5px;font-weight:500;color:#9aa6b1}
+.v40-pt th[scope=row],.v40-pt thead th:first-child{position:sticky;left:0;z-index:2;text-align:left;background:#eef3f6;min-width:118px;max-width:150px}
+.v40-pt th[scope=row] button{border:0;background:none;padding:0;font:inherit;font-weight:700;color:#34414d;cursor:pointer;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+.v40-pt th[scope=row] button:hover{color:#1a8cc2;text-decoration:underline}
+.v40-pt tr.cw th[scope=row] button{color:#1d4f91}
+.v40-pt tr.me td,.v40-pt tr.me th{background:rgba(219,236,247,.9)}
+.v40-pt td.z{color:#cdd8df}
+.v40-pt td.cur,.v40-pt th.cur{background:rgba(214,236,248,.7)}
+.v40-pt .tot{position:sticky;right:0;z-index:1;background:#e7eef3!important;font-weight:800;color:#34414d}
+.v40-pt tfoot th,.v40-pt tfoot td{background:rgba(222,231,238,.95);font-weight:800;color:#34414d;border-top:1px solid rgba(16,43,69,.1)}
+/* 그래프 두 개 */
+.v40-two{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+@media (max-width:1100px){.v40-two{grid-template-columns:1fr}}
+.v40-pane{padding:14px 16px 12px;display:flex;flex-direction:column}
+#v40-mix{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0}
+#v40-sos{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.v40-ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.v40-ph h3{margin:0;font-size:13.5px;font-weight:900;color:#102b45}
+html.nd .v40-sec select.chip.v40-per,.v40-sec select.v40-per{height:32px!important;min-height:0!important;padding:0 30px 0 12px!important;line-height:30px!important;font-size:12px!important;box-sizing:border-box}
+.v40-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:#5b6874;margin:2px 0 6px}
+.v40-legend span{display:flex;align-items:center;gap:5px}.v40-legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.v40-mixsc{overflow-x:auto;scrollbar-width:thin}
+.v40-mixsc svg{display:block;margin:0}
+.v40-seg{cursor:default;transition:opacity .15s}.v40-seg:hover{opacity:.82}
+.v40-donut{display:block;margin:0 auto}
+/* 기본 svg 규칙(20px·외곽선) 무시 */
+.v40-sec svg{width:auto;height:auto;stroke:none;max-width:none}
+.v40-sec svg.v40-donut{width:100%;height:auto;max-width:560px}

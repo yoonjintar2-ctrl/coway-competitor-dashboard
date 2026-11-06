@@ -24,7 +24,7 @@ function v38Controls(show){let box=document.querySelector('main>header .v38-ctrl
  box.innerHTML=`<label>세부 품목<select id="v38-cat" class="chip"><option value="">전체</option>${(o?o.categories:[]).map(c=>`<option value="${esc(c)}" ${c===v38Cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label>광고주<select id="v38-adv" class="chip">${(v38Opt||[]).map(x=>`<option value="${esc(x.advertiser)}" ${x.advertiser===v38Adv?'selected':''}>${esc(x.advertiser)}</option>`).join('')}</select></label>`}
 function v38Sum(s){return Object.values(s||{}).reduce((a,b)=>a+(b||0),0)}
 function v38Cv(s){return Object.fromEntries(V38_CATS.map(([k,,,subs])=>[k,subs.reduce((a,[sk])=>a+(s[sk]||0),0)]))}
-var V38_TG=10,V38_ADJ=0,V38_FIX=0;
+var V38_TG=10,V38_ADJ=0,V38_FIX=0,v38Open=new Set();
 function v38View(d){
  const M=d.months,N=M.length,CUR=d.current,VIEW=Math.min(12,N),VIS0=N-VIEW;
  const host=$('#content');const VW=Math.max(900,(host.clientWidth||1200)-72-V38_ADJ),GUT=56,TW=66,slot=(VW-GUT-TW)/VIEW,CW=N*slot+TW,PW=N*slot,bw=slot*.39,ybw=bw*.86;
@@ -96,7 +96,10 @@ function v38View(d){
  let cap='';if(CAP){const x1=GUT+slot/2-23,tw=Math.min(72,x1-4),x0=x1-tw;cap=`<g id="v38-cap" data-y="${CAP[1]}" style="transition:transform .28s ease"><rect x="${x0}" y="${CAP[1]-10}" width="${tw}" height="20" rx="10" fill="${V38_G}"/><text x="${x0+tw/2}" y="${CAP[1]+3.8}" text-anchor="middle" font-size="10.5" font-weight="800" fill="#fff">네이버 쿼리</text></g>`}
  // 표(대분류) + 게시물(유튜브·인스타 세로)
  const vis=(arr)=>arr.slice(VIS0).reduce((a,b)=>a+(b||0),0);let names='',t='';
- V38_CATS.forEach(([k,n,c])=>{if(!CV.some(z=>z[k]))return;names+=`<tr><td class="h"><i style="background:${c}"></i>${n}</td></tr>`;t+=`<tr>${CV.map((z,i)=>`<td class="${z[k]?'':'z'}${M[i]===CUR?' cur':''}">${v38Money(z[k])}</td>`).join('')}<td class="tot"><b>${v38Money(vis(CV.map(z=>z[k])))}</b></td></tr>`});
+ // 매체 대분류 행을 누르면 세부 매체(예: TV → 지상파·종편/케이블) 펼침/접힘 (11-06)
+ V38_CATS.forEach(([k,n,c,subs])=>{if(!CV.some(z=>z[k]))return;const sb=subs.filter(([sk])=>S.some(z=>z[sk])),can=subs.length>1&&sb.length>0,op=can&&v38Open.has(k);
+  names+=`<tr class="${can?'grp':''}${op?' open':''}" data-v38-grp="${can?k:''}"><td class="h">${can?'<b class="cv"></b>':''}<i style="background:${c}"></i>${n}</td></tr>`;t+=`<tr class="${can?'grp':''}${op?' open':''}" data-v38-grp="${can?k:''}">${CV.map((z,i)=>`<td class="${z[k]?'':'z'}${M[i]===CUR?' cur':''}">${v38Money(z[k])}</td>`).join('')}<td class="tot"><b>${v38Money(vis(CV.map(z=>z[k])))}</b></td></tr>`;
+  if(can)sb.forEach(([sk,sn])=>{names+=`<tr class="sub" data-v38-sub="${k}"${op?'':' hidden'}><td class="h">${sn}</td></tr>`;t+=`<tr class="sub" data-v38-sub="${k}"${op?'':' hidden'}>${S.map((z,i)=>`<td class="${z[sk]?'':'z'}${M[i]===CUR?' cur':''}">${v38Money(z[sk])}</td>`).join('')}<td class="tot">${v38Money(vis(S.map(z=>z[sk]||0)))}</td></tr>`})});
  names+=`<tr class="sum"><td class="h">합계</td></tr><tr class="post"><td class="h">게시물</td></tr>`;
  t+=`<tr class="sum">${TOT.map((v,i)=>`<td class="${M[i]===CUR?'cur':''}">${v38Money(v)}</td>`).join('')}<td class="tot">${v38Money(vis(TOT))}</td></tr>`;
  t+=`<tr class="post">${M.map((m,i)=>{const y=(d.yt[m]||[]).length,g=(d.ig[m]||[]).length;return `<td class="${m===CUR?'cur':''}"><span class="v38-pill yt${y?'':' zero'}" data-v38-post="yt:${m}"><i>▶</i>${y}</span><span class="v38-pill ig${g?'':' zero'}" data-v38-post="ig:${m}"><i>◎</i>${g}</span></td>`}).join('')}<td class="tot"></td></tr>`;
@@ -149,10 +152,13 @@ document.addEventListener('mousemove',e=>{if(route!=='monthly'){return}const v=w
  const q=e.target.closest&&e.target.closest('.v38-q');if(q){const i=+q.dataset.v38I,m=d.months[i],v1=v.Q[i],v0=v.QY[i];return v38Tip(`<b class="h">${m.slice(2,4)}.${m.slice(5)} · 네이버 쿼리 ${Math.round(v1).toLocaleString()}회</b><div class="s">전년 같은 달 ${v0!=null?Math.round(v0).toLocaleString()+'회':'자료 없음'}${v0?` (${v1>=v0?'+':''}${Math.round((v1/v0-1)*100)}%)`:''} · 자료 ${d.query_days[m]||0}일/${v38Days(m)}일</div>`,e.clientX,e.clientY)}
  const c=e.target.closest&&e.target.closest('[data-v38-camp]');if(c){const x=d.camps.find(z=>z.id===c.dataset.v38Camp);if(x)return v38Tip(`<b class="h">${esc(x.name)}</b><div class="s">${x.s.replace(/-/g,'.')} ~ ${x.e.replace(/-/g,'.')} · ${v38Money(x.amount)}${x.category?' · '+esc(x.category):''}</div><div class="s">누르면 캠페인 분석으로 이동</div>`,e.clientX,e.clientY)}
  v38Tip(null)},{passive:true});
-var v38SyncLock=0;document.addEventListener('scroll',e=>{const id=e.target&&e.target.id;if(id!=='v38-scroller'&&id!=='v38-tscroller')return;if(!v38SyncLock){const o=document.getElementById(id==='v38-scroller'?'v38-tscroller':'v38-scroller');if(o&&Math.abs(o.scrollLeft-e.target.scrollLeft)>.5){v38SyncLock=1;o.scrollLeft=e.target.scrollLeft;setTimeout(()=>v38SyncLock=0,30)}}v38Btns()},true);
+var V38_SYNC=['v38-scroller','v38-tscroller','v40-pscroller'];  // 차트·매체표·광고주표 가로 스크롤 함께 (11-06)
+var v38SyncLock=0;document.addEventListener('scroll',e=>{const id=e.target&&e.target.id;if(!V38_SYNC.includes(id))return;if(!v38SyncLock){v38SyncLock=1;V38_SYNC.forEach(o=>{const el=o!==id&&document.getElementById(o);if(el&&Math.abs(el.scrollLeft-e.target.scrollLeft)>.5)el.scrollLeft=e.target.scrollLeft});setTimeout(()=>v38SyncLock=0,30)}v38Btns()},true);
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('tr[data-v38-grp]');if(!g||!g.dataset.v38Grp||route!=='monthly')return;const k=g.dataset.v38Grp,op=!v38Open.has(k);if(op)v38Open.add(k);else v38Open.delete(k);
+ document.querySelectorAll(`.v38-tbox tr[data-v38-grp="${k}"]`).forEach(r=>r.classList.toggle('open',op));document.querySelectorAll(`.v38-tbox tr[data-v38-sub="${k}"]`).forEach(r=>r.hidden=!op)});
 
 // ---------- 설정 > 디지털 자료 규칙 ----------
-if(typeof v7Tabs!=='undefined')v7Tabs.push(['digitalrules','디지털 자료 규칙']);
+if(typeof v7Tabs!=='undefined')v7Tabs.push(['researchad','디지털 자료 규칙']);
 var v38Rules=null,v38RaStatus=null,v38RaFilter='';
 function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  const tbl=(cols,rows,lim=400)=>`<div class="v38-tw"><table class="v32-rn"><thead><tr>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${rows.slice(0,lim).map(r=>`<tr>${cols.map(c=>`<td>${esc(String(r[c[0]]??''))}</td>`).join('')}</tr>`).join('')}</tbody></table>${rows.length>lim?`<small>앞 ${lim}줄만 보여요(전체 ${rows.length}줄)</small>`:''}</div>`;
@@ -166,9 +172,9 @@ function v38RulesView(){const R=v38Rules||{},st=v38RaStatus||{},ro=v32Static();
  <section class="glass section">${header('index · 경쟁사 선별 규칙','업종(소)+브랜드 마다 포함 여부·품목(업종수정)·광고주명 수정·주요 경쟁을 정해요. 포함=O 인 브랜드만 디지털 광고비에 들어가요(품목이 없는 브랜드 광고는 \'브랜드\').')}
   <input type="search" id="v38-ra-filter" class="v38-filter" placeholder="광고주·브랜드·업종으로 찾기" value="${esc(v38RaFilter)}">${tbl([['industry_m','업종(중)'],['industry_s','업종(소)'],['advertiser','광고주'],['brand','브랜드'],['include','포함'],['category','업종수정(품목)'],['display','광고주명 수정'],['competitor','주요경쟁']],idx,300)}${paste('index')}</section>
  <section class="glass section">${header('매체 구분','유튜브·메타로 따로 보는 매체예요(나머지는 기타).')}${tbl([['media','매체'],['group','구분']],(R.media_groups||[]).filter(m=>m.group!=='기타'))}</section>`}
-if(typeof v7Draw==='function'){var v38BaseDraw=v7Draw;v7Draw=function(){if(v7Tab!=='digitalrules')return v38BaseDraw();
+if(typeof v7Draw==='function'){var v38BaseDraw=v7Draw;v7Draw=function(){if(v7Tab!=='researchad')return v38BaseDraw();
  $('#content').innerHTML=`<div class="v7-layout">${v7Menu()}<div class="v38-rules">${v38Rules?v38RulesView():empty('규칙을 불러오는 중이에요.')}</div></div>`;
- if(!v38Rules)Promise.all([api('/api/ra/rules'),api('/api/ra/status')]).then(([r,s])=>{v38Rules=r;v38RaStatus=s;if(v7Tab==='digitalrules'&&route==='settings')v7Draw()}).catch(e=>{const el=document.querySelector('.v38-rules');if(el)el.innerHTML=empty('디지털 자료 규칙을 불러오지 못했어요.',e.message)})}}
+ if(!v38Rules)Promise.all([api('/api/ra/rules'),api('/api/ra/status')]).then(([r,s])=>{v38Rules=r;v38RaStatus=s;if(v7Tab==='researchad'&&route==='settings')v7Draw()}).catch(e=>{const el=document.querySelector('.v38-rules');if(el)el.innerHTML=empty('디지털 자료 규칙을 불러오지 못했어요.',e.message)})}}
 document.addEventListener('input',e=>{if(e.target.id==='v38-ra-filter'){v38RaFilter=e.target.value;clearTimeout(window.__v38f);window.__v38f=setTimeout(()=>{const p=e.target.selectionStart;v7Draw();const i=document.getElementById('v38-ra-filter');if(i){i.focus();i.setSelectionRange(p,p)}},250)}});
 var V38_COLS={advertisers:['ra_name','nielsen','display','competitor','note'],industry_map:['industry_s','category','note'],index:['industry_m','industry_s','advertiser','brand','include','category','display','competitor']};
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-v38-save]');if(!b)return;const k=b.dataset.v38Save,ta=document.querySelector(`[data-v38-paste="${k}"]`);const lines=(ta.value||'').split(/\r?\n/).filter(l=>l.trim());

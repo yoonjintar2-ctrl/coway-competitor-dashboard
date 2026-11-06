@@ -1,0 +1,37 @@
+/* v41 — 2026-11-06 도달률 비교 */
+.v41-card-wrap{padding:20px 24px 14px!important}
+.v41-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.v41-head h2{margin:0;font-size:17px;font-weight:900;color:#102b45}.v41-head h2 small{font-size:12px;font-weight:700;color:#1a8cc2;margin-left:6px}
+.v41-head p{margin:4px 0 0;font-size:12px;color:#8a96a3}
+.v41-plot{position:relative;margin-top:8px}
+.v41-plot svg{display:block;width:auto!important;height:auto!important;stroke:none}
+.v41-card{position:absolute;text-align:left;border:1px solid #e3eaef;background:rgba(255,255,255,.94);border-radius:12px;padding:6px 10px;box-shadow:0 4px 14px rgba(20,60,90,.08);cursor:pointer;font:inherit;line-height:1.35}
+.v41-card:hover{border-color:#b8d3e3;box-shadow:0 6px 18px rgba(20,60,90,.14)}
+.v41-card b{display:block;font-size:12.5px;font-weight:800;color:#3c4a56;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v41-card b em{font-style:normal;font-weight:700;color:#55697a}
+.v41-card span{display:block;font-size:11px;color:#8a96a3;white-space:nowrap}
+.v41-card.me{border-color:#c5d0ec;background:#f4f6fc}.v41-card.me b,.v41-card.me b em{color:#3550a0}
+.v41-note{margin-top:6px}
+dialog.v41-dialog{width:min(1080px,96vw)}
+.v41-pop{padding:4px 4px 2px}
+.v41-ph{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.v41-ph h2{margin:6px 0 4px;font-size:18px;color:#102b45}.v41-ph p{margin:0;font-size:12px;color:#6b7c88}
+.v41-tag{display:inline-block;background:#1a8cc2;color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:3px 10px}
+.v41-pop h3{font-size:14px;font-weight:900;color:#102b45;margin:18px 0 8px;padding-left:9px;border-left:3px solid #4c66b2}
+.v41-tw{overflow-x:auto}
+table.v41-t{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+.v41-t th,.v41-t td{border:1px solid #e1e8ed;padding:6px 8px;text-align:center;white-space:nowrap}
+.v41-t thead th{background:#4c66b2;color:#fff;font-weight:700}
+.v41-t tbody th{background:#f4f6f8;color:#34414d;font-weight:700;text-align:left}
+.v41-t td.t{font-weight:800;color:#102b45;background:#fafbfc}
+.v41-ct td{text-align:right}.v41-ct tfoot th,.v41-ct tfoot td{background:#e7ecf0;font-weight:800}
+.v41-ct td.g,.v41-ct th.g{width:170px;text-align:left}
+.v41-hb{display:block;height:7px;border-radius:4px;background:#eef2f5;overflow:hidden;margin:2px 0}.v41-hb b{display:block;height:100%;background:#4c66b2}.v41-hb.e b{background:#7fc4e4}
+.v41-lg2{font-size:10.5px;color:#55697a;font-weight:600}.v41-lg2 i{display:inline-block;width:9px;height:9px;border-radius:2px;background:#4c66b2;margin:0 3px 0 6px;vertical-align:-1px}.v41-lg2 i.e{background:#7fc4e4}
+.v41-charts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+@media (max-width:900px){.v41-charts{grid-template-columns:repeat(2,1fr)}}
+.v41-ch{background:#f7f9fb;border-radius:12px;padding:9px 10px}.v41-ch>b{font-size:11.5px;color:#34414d}
+.v41-ch .r{display:grid;grid-template-columns:44px 1fr;align-items:center;gap:6px;margin-top:6px;font-size:10.5px;color:#7d8a96}
+.v41-bar,.v41-bar0{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#eef2f5}.v41-bar b{display:block;height:100%}
+.v41-ch .lg{display:flex;flex-wrap:wrap;gap:3px 8px;margin-top:7px}.v41-ch .lg em{font-style:normal;font-size:10px;color:#55697a;display:flex;align-items:center;gap:3px}.v41-ch .lg i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.v41-none{font-size:12.5px;color:#8a96a3;margin:6px 0 0}
+.v41-pop select.v41-per,html.nd .v41-pop select.chip.v41-per{height:32px!important;padding:0 30px 0 12px!important;line-height:30px!important;font-size:12px!important}

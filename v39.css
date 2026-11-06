@@ -107,3 +107,8 @@ dialog.v39-evdialog{width:min(560px,94vw)}
 .v39-kwok{margin:0;align-self:center;font-size:11px;color:#2e8a57}
 .v39-kwadv{border:0;background:none;padding:0;font:inherit;font-weight:800;color:#102b45;cursor:pointer}.v39-kwadv:hover{color:#1a8cc2}
 .v39-kwnone{font-size:11.5px;color:#9aa7b1}
+/* 전체 화면 */
+#content:fullscreen{background:linear-gradient(180deg,#eef5fa,#e4eef5);padding:28px 32px;overflow:auto;box-sizing:border-box}
+#content:fullscreen .v39-card{margin:0;min-height:calc(100vh - 56px);box-sizing:border-box}
+body.v39-max #content{position:fixed;inset:0;z-index:900;background:linear-gradient(180deg,#eef5fa,#e4eef5);padding:28px 32px;overflow:auto;box-sizing:border-box;margin:0;max-width:none;width:auto}
+body.v39-max #content .v39-card{margin:0;min-height:calc(100vh - 56px);box-sizing:border-box}

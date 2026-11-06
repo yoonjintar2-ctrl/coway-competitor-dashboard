@@ -119,7 +119,7 @@ function v39View(){const d=v39D,m=v39Model(d);
  if(!m.me)return `<section class="glass section">${empty(`${v39Adv} · ${v39Cat||'전체'} ${d.year}년 자료가 없어요.`,'다른 품목이나 연도를 골라 보세요.')}</section>`;
  const b=v39Build(m);v39Last={...b,today:m.today,m};
  return `<section class="glass section v39-card"><div class="v39-ch"><div><h2>${esc(v39Adv||((v39Cat||'전체')+' 업종 전체'))} — ${d.year}년</h2><p class="v39-kw">${v39Adv?'검색 키워드 · ':''}${esc(b.kw)}<button type="button" class="v39-kwbtn" data-v39-kwopen>${v39Adv?'키워드 보기·수정 요청':'광고주별 키워드'}</button></p></div>
-  <div class="v39-icons">${v39Years()}<button type="button" class="v39-ic" data-v39-png title="이미지로 저장(1월~12월 전체)" aria-label="이미지로 저장">${V39_IMG}</button><button type="button" class="v39-ic" data-v39-xls title="엑셀 원본 내려받기" aria-label="엑셀 원본 내려받기">${V39_XLS}</button></div></div>
+  <div class="v39-icons">${v39Years()}<button type="button" class="v39-ic" data-v39-png title="이미지로 저장(1월~12월 전체)" aria-label="이미지로 저장">${V39_IMG}</button><button type="button" class="v39-ic" data-v39-xls title="엑셀 원본 내려받기" aria-label="엑셀 원본 내려받기">${V39_XLS}</button><button type="button" class="v39-ic" data-v39-full title="${v39IsFull()?'전체 화면 끝내기(Esc)':'전체 화면으로 보기'}" aria-label="전체 화면">${v39IsFull()?V39_SHRINK:V39_GROW}</button></div></div>
   <div class="v39-vp"><div class="v39-sc" id="v39-sc"><svg id="v39-svg" width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}">${b.svg}</svg></div>
   <svg class="v39-stick" width="360" height="${b.H}">${b.stick}</svg>
   <button type="button" class="v39-arr l" data-v39-scroll="-1" aria-label="이전">‹</button><button type="button" class="v39-arr r" data-v39-scroll="1" aria-label="다음">›</button><div class="v39-tip" id="v39-tip" hidden></div></div>
@@ -271,3 +271,14 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
   ${advs.map(a=>{const L=info[a]||(kw[a]||[]).map(k=>({keyword:k}));return `<div class="v38-kwgrp"><b><button type="button" class="v39-kwadv" data-v39-kwadv="${esc(a)}">${esc(a)} ›</button></b>${L.length?L.map(k=>`<span class="v38-kwchip">${esc(k.keyword)}<em>${v39KwStatus(k)}</em></span>`).join(''):'<span class="v39-kwnone">키워드 없음 · 광고비만 표시</span>'}</div>`}).join('')}</div>`;
  if(!dialog.open)dialog.showModal()});
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v39-kwadv]');if(!b)return;e.preventDefault();v38KwOpen(b.dataset.v39Kwadv,v39Cat||'')});
+
+// 전체 화면 보기 (11-06 10:15) — 엑셀 단추 오른쪽
+var V39_GROW='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>';
+var V39_SHRINK='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/></svg>';
+function v39IsFull(){return !!document.fullscreenElement||document.body.classList.contains('v39-max')}
+function v39Max(on){document.body.classList.toggle('v39-max',on);if(route==='heatmap'&&v39D)try{v39Draw(false)}catch(e){}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v39-full]');if(!b)return;e.preventDefault();
+ if(document.fullscreenElement){document.exitFullscreen().catch(()=>{});return}if(document.body.classList.contains('v39-max')){v39Max(false);return}
+ const c=document.getElementById('content');if(c&&c.requestFullscreen)c.requestFullscreen().catch(()=>v39Max(true));else v39Max(true)});  // 브라우저가 막으면 화면 꽉 채우기로
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('v39-max')&&!document.querySelector('dialog[open]'))v39Max(false)});
+document.addEventListener('fullscreenchange',()=>{if(route!=='heatmap'||!v39D)return;try{v39Draw(false)}catch(e){}});

@@ -17,7 +17,5 @@ function v22Scene(){
  const ring=v22Iso(23,6,0);
  return `<svg class="v22-scene" viewBox="-320 -190 740 580" aria-hidden="true"><polygon class="v22-plate" points="${plate}"/><g class="v22-grid">${grid}</g>${hm}${lows}${bars}<polyline class="v22-line" points="${line}"/><ellipse class="v22-ring" cx="${ring[0]}" cy="${ring[1]}" rx="46" ry="26"/><ellipse class="v22-ring2" cx="${ring[0]}" cy="${ring[1]}" rx="46" ry="26"/></svg>`;
 }
-function v17Loader(node){if(node.dataset.v22)return;node.dataset.v22='1';node.dataset.v17='1';const text=node.textContent.trim();node.classList.add('v22-loading');
- node.innerHTML=`${v22Scene()}<div class="v22-card"><span>COWAY COMPETITIVE INTELLIGENCE</span><b>데이터 집계 중<i></i><i></i><i></i></b><p>${esc(text||'자료를 집계하고 있습니다.')}</p><em><u></u></em></div>`}
-document.querySelectorAll('#content .loading').forEach(n=>{delete n.dataset.v17;v17Loader(n)});
+/* 로딩 그림은 v00.js 한 곳에서만 그림 (11-06 15:34 정리) */
 v17IsNew=function(c){return c.review_status!=="evergreen"&&c.review_status!=="yt_candidate"&&v3Day(listing.period.end)-v3Day(c.first_seen)<=60};

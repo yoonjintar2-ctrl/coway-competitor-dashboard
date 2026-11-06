@@ -47,7 +47,7 @@ render=async function(...a){
  if(typeof v32Controls==='function')v32Controls(false);
  document.querySelectorAll('.sidebar [data-route]').forEach(n=>n.classList.toggle('active',n.dataset.route==='news'));
  $('#page-title').textContent=V37_TITLE;$('#subtitle').textContent='';
- if(!v37Data)$('#content').innerHTML=`<section class="glass section">${empty('뉴스를 불러오는 중이에요.')}</section>`;
+ if(!v37Data)$('#content').innerHTML='<div class="loading glass">뉴스를 불러오는 중이에요.</div>';
  try{v37Data=await api('/api/news-clips')}catch(e){$('#content').innerHTML=`<section class="glass section">${empty('뉴스를 불러오지 못했어요.',e.message)}</section>`;return}
  if(route!=='news')return;v37Draw()};
 document.addEventListener('click',e=>{const g=e.target.closest('[data-v37-go]');if(!g)return;const nav=document.querySelector(`.sidebar [data-route="${g.dataset.v37Go}"]`);if(nav)nav.click()});

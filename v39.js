@@ -148,7 +148,7 @@ render=async function(...a){
  document.querySelectorAll('.sidebar [data-route]').forEach(n=>n.classList.toggle('active',n.dataset.route==='heatmap'));
  try{document.documentElement.dataset.ndRoute='heatmap'}catch(e){}
  $('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';
- if(!v39D)$('#content').innerHTML=`<section class="glass section">${empty('연간 히트맵을 그리는 중이에요.')}</section>`;
+ if(!v39D)$('#content').innerHTML='<div class="loading glass">연간 히트맵을 그리는 중이에요.</div>';
  const req=++v39Req;
  try{const o=await v39Opts();if(v39Adv&&!o.some(x=>x.advertiser===v39Adv)&&o.length)v39Adv=o[0].advertiser;const d=await v39Load();if(req!==v39Req||route!=='heatmap')return;v39D=d;v39Year=d.year}
  catch(e){$('#content').innerHTML=`<section class="glass section">${empty('연간 히트맵을 불러오지 못했어요.',e.message)}</section>`;return}

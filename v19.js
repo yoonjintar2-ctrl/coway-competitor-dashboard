@@ -1,7 +1,5 @@
 /* v19 — 2026-11-03: 단색 선형 로딩, YouTube 신규 후보 팝업 카드(자세히 보기 → 영상 목록) */
-function v17Loader(node){if(node.dataset.v17)return;node.dataset.v17='1';const text=node.textContent.trim();
- node.innerHTML=`<svg class="v19-loader" viewBox="0 0 260 110" aria-hidden="true"><path class="v19-axis" d="M14 92H246"/><path class="v19-area" d="M14 92 L14 70 C40 66 52 48 78 52 S118 78 142 60 S186 22 210 30 S238 40 246 34 L246 92 Z"/><path class="v19-line" d="M14 70 C40 66 52 48 78 52 S118 78 142 60 S186 22 210 30 S238 40 246 34"/><circle class="v19-dot" r="4" cx="246" cy="34"/></svg><p>${esc(text||'자료를 집계하고 있습니다.')}</p>`}
-document.querySelectorAll('#content .loading').forEach(n=>{delete n.dataset.v17;v17Loader(n)});
+/* 로딩 그림은 v00.js 한 곳에서만 그림 (11-06 15:34 정리) */
 // YouTube 신규 후보: 아덱스 광고비·소재가 아직 없어 캠페인 분석 대신 영상 목록 팝업
 document.addEventListener('click',e=>{const b=e.target.closest('[data-campaign^="ytc-"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const box=$('#campaign-hover');if(box)box.hidden=true;v16OpenCandidate(b.dataset.campaign)},true);
 var v19BaseShow=v5Show;

@@ -61,7 +61,7 @@ render=async function(...a){
  if(route!=='daily'){v32Controls(false);const r=await v32BaseRender.apply(this,a);if(route==='analysis'){v32Pen();v32AnalysisVideos()}return r}
  document.querySelectorAll('.sidebar [data-route]').forEach(n=>n.classList.toggle('active',n.dataset.route==='daily'));
  $('#page-title').textContent=V32_TITLE;$('#subtitle').textContent='불러오는 중…';
- $('#content').innerHTML=`<section class="glass section v32-loading">${empty('소재를 모으는 중이에요.')}</section>`;
+ $('#content').innerHTML='<div class="loading glass v32-loading">소재를 모으는 중이에요.</div>';
  try{v32Data=await api('/api/daily-creatives'+(v32Day?'?day='+encodeURIComponent(v32Day):''))}
  catch(e){$('#content').innerHTML=`<section class="glass section">${empty('소재를 불러오지 못했어요.',e.message)}</section>`;$('#subtitle').textContent='';return}
  if(route!=='daily')return;

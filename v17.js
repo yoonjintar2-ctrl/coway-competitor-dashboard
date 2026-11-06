@@ -74,10 +74,8 @@ v5Show=function(id,target){
 };
 
 /* 4. 로딩: 단색 그래프가 그려지는 애니메이션 */
-function v17Loader(node){if(node.dataset.v17)return;node.dataset.v17='1';const text=node.textContent.trim();
- node.innerHTML=`<svg class="v17-loader" viewBox="0 0 240 90" aria-hidden="true">${[0,1,2,3,4,5,6,7].map(i=>`<rect x="${12+i*28}" y="18" width="16" height="62" rx="3" style="animation-delay:${i*0.09}s"/>`).join('')}<polyline points="20,64 48,50 76,56 104,34 132,40 160,24 188,30 216,14"/></svg><p>${esc(text||'자료를 집계하고 있습니다.')}</p>`}
-new MutationObserver(()=>{document.querySelectorAll('#content .loading').forEach(v17Loader)}).observe(document.body,{childList:true,subtree:true});
-document.querySelectorAll('#content .loading').forEach(v17Loader);
+// 로딩 그림은 v19의 선 그래프 하나로 통일 (11-06 15:34) — 예전 막대 로딩이 잠깐 보이던 문제
+/* 로딩 그림은 v00.js 한 곳에서만 그림 (11-06 15:34 정리) */
 
 /* 5. 캠페인 분석 */
 // YouTube 버튼: 위 '소재 확인하기', 아래 작은 글씨 'N개 버전' / 아래 중복 문구 제거

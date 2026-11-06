@@ -134,7 +134,7 @@ render=async function(...a){
  if(typeof v37Controls==='function')v37Controls(false);if(typeof v32Controls==='function')v32Controls(false);
  document.querySelectorAll('.sidebar [data-route]').forEach(n=>n.classList.toggle('active',n.dataset.route==='monthly'));
  $('#page-title').textContent=V38_TITLE;$('#subtitle').textContent='';
- if(!v38D)$('#content').innerHTML=`<section class="glass section">${empty('월별 자료를 불러오는 중이에요.')}</section>`;
+ if(!v38D)$('#content').innerHTML='<div class="loading glass">월별 자료를 불러오는 중이에요.</div>';
  try{const d=await v38Load();if(!d||route!=='monthly')return}catch(e){$('#content').innerHTML=`<section class="glass section">${empty('월별 자료를 불러오지 못했어요.',e.message)}</section>`;return}
  v38Draw()};
 window.addEventListener('change',async e=>{if(e.target.id==='v38-adv'||e.target.id==='v38-cat'){e.stopPropagation();if(e.target.id==='v38-adv'){v38Adv=e.target.value;v38Cat=''}else v38Cat=e.target.value;

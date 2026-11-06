@@ -1,11 +1,14 @@
 /* v41 — 2026-11-06 도달률 비교
    품목 안 광고주별 TV 광고비 · 15초 환산 노출량(Eq GRP) · 유효도달률(R3+) 버블 차트.
    자료: 아리아나(닐슨) TV 집행 — 먼슬리 리포트 Raw_04 집계(data/arianna). 카드를 누르면 지상파·케이블 세부 운영 내역. */
-var V41_TITLE='도달률 비교',v41Meta=null,v41Cat='',v41Year=null,v41D=null,v41Req=0,v41Per='ytd';
+var V41_TITLE='TV 통합 분석',v41Meta=null,v41Cat='',v41Year=null,v41D=null,v41Req=0,v41Per='ytd';
 var V41_TYPE={PR:'일반프로',SP:'스팟',TJ:'특집/재방',YG:'예고'};
 function v41Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="reach"]'))return;const b=document.createElement('button');b.className='nav';b.dataset.route='reach';b.textContent=V41_TITLE;
  const after=nav.querySelector('[data-route="heatmap"]')||nav.querySelector('[data-route="monthly"]');if(after)after.after(b);else nav.appendChild(b)}
-v41Nav();document.addEventListener('DOMContentLoaded',v41Nav);setTimeout(v41Nav,1500);
+// 메뉴 순서: … 월별 통합 분석 → TV 통합 분석 → 연간 히트맵 …, 뉴스 클리핑은 맨 아래 (11-06 15:26)
+function v41Order(){const nav=document.querySelector('.sidebar nav');if(!nav)return;const g=r=>nav.querySelector(`[data-route="${r}"]`),m=g('monthly'),rc=g('reach'),nw=g('news');
+ if(m&&rc&&m.nextElementSibling!==rc)m.after(rc);if(nw&&nav.lastElementChild!==nw)nav.appendChild(nw)}
+v41Nav();v41Order();document.addEventListener('DOMContentLoaded',()=>{v41Nav();v41Order()});[400,1500,3000].forEach(t=>setTimeout(()=>{v41Nav();v41Order()},t));
 async function v41Get(path){if(v32Static()){const r=await fetch('data/reach/'+path,{cache:'no-cache'});if(!r.ok)throw new Error('자료 없음');return r.json()}return api('/api/reach/'+path)}
 async function v41Load(){if(!v41Meta)v41Meta=v32Static()?await v41Get('meta.json'):await api('/api/reach/meta');
  const cats=v41Meta.categories||[];if(!cats.length)return null;if(!v41Cat||!cats.find(c=>c.label===v41Cat))v41Cat=(cats.find(c=>c.label==='정수기')||cats[0]).label;
@@ -104,7 +107,7 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
  const line=(nm,tot,fn)=>`<tr><th>${nm}</th><td class="t">${tot}</td>${dims.map(d=>d.keys.length?d.keys.map(z=>`<td>${fn(d.s[z])}</td>`).join(''):'<td>-</td>').join('')}</tr>`;
  const terrHtml=terr.length?`<div class="v41-tw"><table class="v41-t v41-tt">${cw}<thead><tr><th rowspan="2">구분</th><th rowspan="2">합계</th>${head}</tr><tr>${sub}</tr></thead><tbody>
   ${line('모니터링 광고비 (천원)',num(T.inv),x=>pct(x.inv,T.inv))}${line('Eq GRP',num(T.eq),x=>pct(x.eq,T.eq))}${line('횟수',num(T.ins),x=>pct(x.ins,T.ins))}${line('A.R',ar(T),x=>ar(x))}${line('모니터링 CPRP (천원)',cprp(T),x=>cprp(x))}</tbody></table></div>
-  <div class="v41-charts">${dims.map(d=>`<div class="v41-ch"><b>${d.n}</b><div class="r"><span>광고비</span>${v41Bar(d.keys.map(z=>[d.f(z),d.s[z].inv]),T.inv,COL)}</div><div class="r"><span>Eq GRP</span>${v41Bar(d.keys.map(z=>[d.f(z),d.s[z].eq]),T.eq,COL)}</div><div class="lg">${d.keys.map((z,i)=>`<em><i style="background:${COL[i%COL.length]}"></i>${esc(d.f(z))}</em>`).join('')}</div></div>`).join('')}</div>`:'<p class="v41-none">이 기간 지상파 집행이 없어요.</p>';
+  <div class="v41-charts">${dims.map(d=>`<div class="v41-ch"><b>${d.n}</b><div class="r"><span>광고비</span>${v41Bar(d.keys.map(z=>[d.f(z),d.s[z].inv]),T.inv,COL)}</div><div class="r"><span>Eq GRP</span>${v41Bar(d.keys.map(z=>[d.f(z),d.s[z].eq]),T.eq,COL)}</div><div class="lg">${d.keys.map((z,i)=>`<em><i style="background:${COL[i%COL.length]}"></i>${esc(d.f(z))}</em>`).join('')}</div></div>`).join('')}</div>`:`<p class="v41-none">${v41Pick(v41Per).some(r=>r.adv===adv)?'이 기간 지상파 집행이 없어요.':'이 달 아리아나(닐슨) 세부 자료가 아직 없어요. 위 요약표는 먼슬리 리포트 기준이에요.'}</p>`;
  // ③ 케이블 MPP — 모니터링 광고비 기준만, 표 아래 MPP·채널 그래프
  const ms2=v41Sum(cab,'mpp');let mk=Object.keys(ms2).sort((a,b)=>ms2[b].inv-ms2[a].inv);const top=mk.filter(z=>ms2[z].inv/C.inv>=.01).slice(0,10),rest=mk.filter(z=>!top.includes(z));
  if(rest.length){const o={inv:0,net:0,ins:0,grp:0,eq:0,adj:0};rest.forEach(z=>{for(const k in o)o[k]+=ms2[z][k]});ms2['기타']=o;top.push('기타')}
@@ -112,7 +115,7 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
  const cabHtml=cab.length?`<div class="v41-tw"><table class="v41-t v41-ct"><colgroup><col class="c0"><col><col><col><col><col><col></colgroup><thead><tr><th>MPP</th><th>모니터링 광고비 (천원)</th><th>집행 비중</th><th>횟수</th><th>Eq GRP</th><th>Eq GRP 비중</th><th>모니터링 CPRP (천원)</th></tr></thead><tbody>
   ${top.map(z=>{const x=ms2[z];return `<tr><th>${esc(z||'(미분류)')}</th><td>${num(x.inv)}</td><td>${pct(x.inv,C.inv)}</td><td>${num(x.ins)}</td><td>${num(x.eq)}</td><td>${pct(x.eq,C.eq)}</td><td>${cprp(x)}</td></tr>`}).join('')}</tbody>
   <tfoot><tr><th>Total</th><td>${num(C.inv)}</td><td>100%</td><td>${num(C.ins)}</td><td>${num(C.eq)}</td><td>100%</td><td>${cprp(C)}</td></tr></tfoot></table></div>
-  <div class="v41-ch v41-mppc"><b>MPP별 광고비</b><div class="v41-hbars">${top.map(z=>`<div class="hb"><span title="${esc(z)}">${esc(z||'(미분류)')}</span><i><b style="width:${mmax?ms2[z].inv/mmax*100:0}%"></b></i><em>${v41Won(ms2[z].inv)}</em></div>`).join('')}</div></div>`:'<p class="v41-none">이 기간 케이블·종편 집행이 없어요.</p>';
+  <div class="v41-ch v41-mppc"><b>MPP별 광고비</b><div class="v41-hbars">${top.map(z=>`<div class="hb"><span title="${esc(z)}">${esc(z||'(미분류)')}</span><i><b style="width:${mmax?ms2[z].inv/mmax*100:0}%"></b></i><em>${v41Won(ms2[z].inv)}</em></div>`).join('')}</div></div>`:`<p class="v41-none">${v41Pick(v41Per).some(r=>r.adv===adv)?'이 기간 케이블·종편 집행이 없어요.':'이 달 아리아나(닐슨) 세부 자료가 아직 없어요.'}</p>`;
  const me=adv==='코웨이',hd=[];if(headAct!=null)hd.push(`${me?'광고비(실집행)':'실집행 추정'} ${v41Won(headAct)}원`);if(headInv!=null)hd.push(`모니터링 ${v41Won(headInv)}원`);hd.push(`Eq GRP ${num(headEq!=null?headEq:T.eq+C.eq)}`);hd.push(`R3+ ${headR3!=null?Math.round(headR3)+'%':'-'}`);
  return `<div class="v41-pop"><div class="v41-ph"><div><span class="v41-tag">${esc(v41Cat)}</span><h2>${esc(adv)} · TV 세부 운영 내역</h2><p>${per==='ytd'?v41Year+'년 누적':per.replace('-','년 ')+'월'} · ${hd.join(' · ')}</p></div>
   <select class="chip v41-per" data-v41-per>${[['ytd',v41Year+'년 누적'],...ms.slice().reverse().map(m=>[m,m.slice(2,4)+'.'+m.slice(5)])].map(([v,l])=>`<option value="${v}" ${v===per?'selected':''}>${l}</option>`).join('')}</select></div>
@@ -123,12 +126,13 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
 function v41Open(adv){const dl=$('#detail');dl.className='v41-dialog';$('#detail-body').innerHTML=v41Detail(adv);v41Cur=adv;if(!dl.open)dl.showModal();v41DnMount(adv,v41Per)}
 var v41Cur='';
 var v41BaseRender=render;
-render=async function(...a){if(route!=='reach'){v41Controls(false);return v41BaseRender.apply(this,a)}
+render=async function(...a){try{v41Order()}catch(e){}if(route!=='reach'){v41Controls(false);return v41BaseRender.apply(this,a)}
  if(typeof v38Hist!=='undefined'){const pop=v38Hist.pop;v38Hist.pop=false;if(typeof v12Pop!=='undefined')v12Pop=true;v38Sync(pop||!v38Hist.ready);v38Hist.ready=true}
  ['v37Controls','v32Controls','v38Controls','v39Controls'].forEach(f=>{try{if(typeof window[f]==='function')window[f](false)}catch(e){}});try{v38Tip&&v38Tip(null)}catch(e){}
  document.querySelectorAll('.sidebar [data-route]').forEach(n=>n.classList.toggle('active',n.dataset.route==='reach'));$('#page-title').textContent=V41_TITLE;$('#subtitle').textContent='';
- if(!v41D)$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료를 불러오는 중이에요.')}</section>`;
- try{await v41Load();if(route!=='reach')return}catch(e){$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료를 불러오지 못했어요.',e.message)}</section>`;return}v41Draw();if(typeof v38Sync==='function')v38Sync(true)};
+ if(v41D&&v41D._cat===v41Cat&&Date.now()-v41D._t<6e5){v41Draw();if(typeof v38Sync==='function')v38Sync(true);return}  // 다시 들어올 때는 받아 둔 자료로 바로 그림(이전 화면이 잠깐 남아 보이지 않게)
+ $('#content').innerHTML='<div class="loading glass">TV 통합 분석 자료를 불러오는 중이에요.</div>';
+ try{await v41Load();if(route!=='reach')return;if(v41D){v41D._cat=v41Cat;v41D._t=Date.now()}}catch(e){$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료를 불러오지 못했어요.',e.message)}</section>`;return}v41Draw();if(typeof v38Sync==='function')v38Sync(true)};
 document.addEventListener('click',async e=>{if(route!=='reach')return;const y=e.target.closest&&e.target.closest('[data-v41-year]');if(y){v41Year=+y.dataset.v41Year;v41Per='ytd';v41Draw();if(typeof v38Sync==='function')v38Sync(false);return}
  const c=e.target.closest&&e.target.closest('.v41-card[data-v41-adv]');if(c){v41Per=v41Latest(c.dataset.v41Adv);v41Open(c.dataset.v41Adv)}});
 document.addEventListener('change',async e=>{if(e.target.id==='v41-cat'){e.stopPropagation();v41Cat=e.target.value;v41Year=null;v41Per='ytd';try{await v41Load();v41Draw();if(typeof v38Sync==='function')v38Sync(false)}catch(err){toast('불러오지 못했어요: '+err.message)}return}
@@ -156,18 +160,22 @@ function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[
  const tn=D.t.length;D.t.map((x,i)=>[x,i]).reverse().forEach(([[nm,v],i],j)=>{const sp=v/tot*TAU*T;S.push({k:'t'+i,n:nm,v,g:'t',col:V41_BL[Math.min(i,2)],ox:-GAP,a0:a+(j===0?sep:0),a1:a+sp-(j===tn-1?sep:0)});a+=sp});  // 지상파는 큰 채널이 위쪽에 오게(카드 순서와 맞춰 선이 덜 엇갈리게)
  a=-(1-fT)*Math.PI;D.c.forEach(([nm,v],i)=>{const sp=v/tot*TAU*T;S.push({k:'c'+i,n:nm,v,g:'c',col:nm==='기타'?'#d4d9de':V41_GR[Math.min(i,5)],ox:GAP,a0:a+(i===0?sep:0),a1:a+sp-(i===D.c.length-1?sep:0)});a+=sp});
  if(!(tT&&tC)){  // 한 덩어리뿐: 큰 순서대로 오른쪽(위→아래, 시계 방향)부터 채우고 나머지는 왼쪽(위→아래, 반시계 방향) — 카드 순서와 조각 순서를 맞춤 (11-06 15:04)
-  const G=S.splice(0);let acc=0,ra=-Math.PI/2,la=-Math.PI/2;G.forEach(z=>{const sp=z.a1-z.a0;z.ox=0;if(acc<.5||z===G[0]){z.side=1;z.a0=ra;z.a1=ra+sp;ra+=sp;acc+=z.v/tot}else{z.side=-1;z.a1=la;z.a0=la-sp;la-=sp}S.push(z)})}
+  const G=S.splice(0);let acc=0,ra=-Math.PI/2,la=-Math.PI/2;if(G.length===1){const z=G[0],sp=z.a1-z.a0;z.ox=0;z.side=1;z.a0=-sp/2;z.a1=sp/2;S.push(z);G.length=0}  // 조각이 하나뿐(100%)이면 카드 쪽(오른쪽 가운데)을 중심으로
+  G.forEach(z=>{const sp=z.a1-z.a0;z.ox=0;if(acc<.5||z===G[0]){z.side=1;z.a0=ra;z.a1=ra+sp;ra+=sp;acc+=z.v/tot}else{z.side=-1;z.a1=la;z.a0=la-sp;la-=sp}S.push(z)})}
  S.forEach(s=>{if(s.a1<s.a0)s.a1=s.a0});
- const arc=(s,rr,b0,b1,dz,rev)=>{const [x0,y0]=P(rev?b1:b0,rr,s.ox,dz),[x1,y1]=P(rev?b0:b1,rr,s.ox,dz),lg=Math.abs(b1-b0)>Math.PI?1:0;return [`${x0.toFixed(1)},${y0.toFixed(1)}`,`A${rr},${(rr*K).toFixed(1)} 0 ${lg} ${rev?0:1} ${x1.toFixed(1)},${y1.toFixed(1)}`]};
+ const arc=(s,rr,b0,b1,dz,rev)=>{const st=rev?b1:b0,en=rev?b0:b1,mid=(b0+b1)/2,[x0,y0]=P(st,rr,s.ox,dz),[xm,ym]=P(mid,rr,s.ox,dz),[x1,y1]=P(en,rr,s.ox,dz),sw=rev?0:1,ry=(rr*K).toFixed(1);  // 두 번에 나눠 그림(한 바퀴 전체도 그려지게)
+  return [`${x0.toFixed(1)},${y0.toFixed(1)}`,`A${rr},${ry} 0 0 ${sw} ${xm.toFixed(1)},${ym.toFixed(1)} A${rr},${ry} 0 0 ${sw} ${x1.toFixed(1)},${y1.toFixed(1)}`]};
  const clips=(b0,b1,lo,hi)=>{const o=[];for(const k of [-1,0,1,2]){const x=Math.max(b0,lo+k*TAU),y=Math.min(b1,hi+k*TAU);if(y>x+1e-6)o.push([x,y])}return o};
  const wallD=(s,rr,c)=>{const [m,aa]=arc(s,rr,c[0],c[1],0),[mb,ab]=arc(s,rr,c[0],c[1],DEP,true);return `M${m} ${aa} L${mb} ${ab} Z`};
- let back='',walls='',tops='',caps='';
- S.forEach(s=>{if(s.a1-s.a0<1e-4)return;clips(s.a0,s.a1,Math.PI,TAU).forEach(c=>{const d=wallD(s,r,c);back+=`<g class="sl" data-v41-k="${s.k}"><path d="${d}" fill="${v41Shade(s.col,.58)}"/></g>`});
+ let back={t:'',c:''},walls='',tops='',caps='',bcap={t:'',c:''};
+ S.forEach(s=>{if(s.a1-s.a0<1e-4)return;clips(s.a0,s.a1,Math.PI,TAU).forEach(c=>{const d=wallD(s,r,c);back[s.g]+=`<g class="sl" data-v41-k="${s.k}"><path d="${d}" fill="${v41Shade(s.col,.58)}" stroke="${v41Shade(s.col,.58)}" stroke-width=".8" stroke-linejoin="round"/></g>`});
   const fw=clips(s.a0,s.a1,0,Math.PI).map(c=>wallD(s,R,c));s.fw=fw;fw.forEach(d=>walls+=`<g class="sl" data-v41-k="${s.k}"><path d="${d}" fill="${v41Shade(s.col,.8)}"/><path d="${d}" fill="url(#v41wd)"/></g>`);
-  const [m,aa]=arc(s,R,s.a0,s.a1,0),[mi,ai]=arc(s,r,s.a0,s.a1,0,true);s.td=`M${m} ${aa} L${mi} ${ai} Z`;tops+=`<g class="sl" data-v41-k="${s.k}"><path d="${s.td}" fill="${s.col}"/><path d="${s.td}" fill="url(#v41hl)"/></g>`});
+  const [m,aa]=arc(s,R,s.a0,s.a1,0),[mi,ai]=arc(s,r,s.a0,s.a1,0,true);s.td=`M${m} ${aa} L${mi} ${ai} Z`;tops+=`<g class="sl" data-v41-k="${s.k}"><path d="${s.td}" fill="${s.col}" stroke="${s.col}" stroke-width=".6" stroke-linejoin="round"/><path d="${s.td}" fill="url(#v41hl)"/></g>`});
  // 두 덩어리 사이 잘린 단면
  const cap=(s,ang,start)=>{const vis=start?Math.cos(ang)<0:Math.cos(ang)>0;if(!vis)return '';const p=[P(ang,r,s.ox),P(ang,R,s.ox),P(ang,R,s.ox,DEP),P(ang,r,s.ox,DEP)];return `<g class="sl" data-v41-k="${s.k}"><path d="M${p.map(q=>q.map(z=>z.toFixed(1)).join(',')).join(' L')} Z" fill="${v41Shade(s.col,.68)}"/></g>`};
- const gT=S.filter(s=>s.g==='t'),gC=S.filter(s=>s.g==='c');if(!(tT&&tC)){if(T<1){const Rs=S.filter(z=>z.side>0),Ls=S.filter(z=>z.side<0);if(Rs.length)caps+=cap(Rs.at(-1),Rs.at(-1).a1,false);if(Ls.length)caps+=cap(Ls.at(-1),Ls.at(-1).a0,true)}}else if(GAP||T<1){if(gT.length)caps+=cap(gT[0],gT[0].a0,true)+cap(gT.at(-1),gT.at(-1).a1,false);if(gC.length)caps+=cap(gC[0],gC[0].a0,true)+cap(gC.at(-1),gC.at(-1).a1,false)}
+ const gT=S.filter(s=>s.g==='t'),gC=S.filter(s=>s.g==='c');const addCap=(s,ang,start)=>{const h=cap(s,ang,start);if(!h)return;if(Math.sin(ang)<0)bcap[s.g]+=h;else caps+=h};if(!(tT&&tC)){if(T<1){const Rs=S.filter(z=>z.side>0),Ls=S.filter(z=>z.side<0);if(Rs.length)addCap(Rs.at(-1),Rs.at(-1).a1,false);if(Ls.length)addCap(Ls.at(-1),Ls.at(-1).a0,true)}}else if(GAP||T<1){if(gT.length){addCap(gT[0],gT[0].a0,true);addCap(gT.at(-1),gT.at(-1).a1,false)}if(gC.length){addCap(gC[0],gC[0].a0,true);addCap(gC.at(-1),gC.at(-1).a1,false)}}
+ // 뒤쪽 이음매 단면은 자기 덩어리 안쪽 벽 바로 위, 다른 덩어리 안쪽 벽보다는 아래에 그림 — 다른 덩어리(예: 맨 위 SBS) 안쪽 벽을 덮어 이상해 보이던 문제 (11-06 15:50)
+ const bOrd=bcap.t&&!bcap.c?['t','c']:bcap.c&&!bcap.t?['c','t']:['t','c'],backH=bOrd.map(g=>back[g]+bcap[g]).join('');
  // 카드 + 연결선 (다 펼쳐진 뒤에만)
  let lab='';if(T>=1){
   // 카드 열: 두 덩어리면 지상파 왼쪽·케이블 오른쪽, 한 덩어리뿐이면 조각 위치(왼쪽 반/오른쪽 반)로 나눔. 열마다 광고비 순, 기타는 맨 아래 (11-06 15:04)
@@ -189,9 +197,9 @@ function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[
    const run=seq=>{const segs=[...ALLSEG],used=new Set(),out=new Array(ord.length);let total=0;
     for(const i of seq){const s=ord[i],y=ys[i];let best=null,bs=1e12;
      for(const f of [.5,.35,.65,.2,.8,.1,.9,.03,.97]){const {A,E}=rim(s,f);const back=Math.sin(s.a0+(s.a1-s.a0)*f)<0,drops=[0,12,24,36,48];if(back)drops.push(-12,-24,-36,-48);else for(const z of [0,12,24,36,48])drops.push(Math.max(0,Math.round(bot+12+z-E[1])));
-      for(const d of new Set(drops))for(let k=0;k<=maxK;k++){if(used.has(k))continue;const x=X0+side*k*GAPL,Dp=[E[0],E[1]+d],B1=[x,Dp[1]],B2=[x,y],C=[colx,y];
+      for(const d of new Set(drops))for(let k=0;k<=Math.max(maxK,ord.length-1);k++){const ku=used.has(k)||k>maxK?3000:0;const x=X0+side*k*GAPL,Dp=[E[0],E[1]+d],B1=[x,Dp[1]],B2=[x,y],C=[colx,y];
        const pts=d?[A,E,Dp,B1,B2,C]:[A,E,B1,B2,C],sg=[];for(let z=1;z<pts.length;z++)if(Math.hypot(pts[z][0]-pts[z-1][0],pts[z][1]-pts[z-1][1])>.5)sg.push([pts[z-1],pts[z]]);
-       let pen=Math.abs(f-.5)*4+k*.5+Math.abs(d)*.2;for(const [p1,p2] of sg)for(const [p3,p4] of segs){const g=segD(p1,p2,p3,p4);if(g<MIN)pen+=1000+(MIN-g)*50}
+       let pen=ku+Math.abs(f-.5)*60+k*.5+Math.abs(d)*.2;for(const [p1,p2] of sg)for(const [p3,p4] of segs){const g=segD(p1,p2,p3,p4);if(g<MIN)pen+=1000+(MIN-g)*50}
        if(pen>=bs)continue;sg.slice(1).forEach(([p1,p2])=>{for(let t=.1;t<1;t+=.1){if(inDn(p1[0]+(p2[0]-p1[0])*t,p1[1]+(p2[1]-p1[1])*t))pen+=60}});
        if(pen<bs){bs=pen;best={s,A,y,k,sg,pts}}}}
      used.add(best.k);segs.push(...best.sg);out[i]=best;total+=bs}
@@ -205,9 +213,9 @@ function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[
     <text x="${bx0+29}" y="${y-3}" font-size="12.5" font-weight="800" fill="#34414d">${esc(s.n)}</text><text x="${bx0+29}" y="${y+13}" font-size="11.5" font-weight="700" fill="#7d8a96">${v41Eok(s.v)} · ${Math.round(s.v/tot*100)}%</text>${s.n==='기타'&&(D.etc||[]).length?`<text x="${bx0+BW-12}" y="${y+4}" text-anchor="end" font-size="10.5" font-weight="800" fill="#1a8cc2">${D.etc.length}개 보기 ›</text>`:''}</g>`})})}
  if(T>=1)v41DnEtc={list:D.etc||[],tot};if(T>=1)v41DnLast=S.map(s=>({k:s.k,col:s.col,fw:s.fw,td:s.td,m:(s.a0+s.a1)/2}));const hov='';
  const defs=`<defs><linearGradient id="v41hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="v41wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#0c2236" stop-opacity=".18"/></linearGradient><filter id="v41gl" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0c2236" flood-opacity=".22"/></filter><radialGradient id="v41sh"><stop offset="0" stop-color="#0c2236" stop-opacity=".14"/><stop offset="1" stop-color="#0c2236" stop-opacity="0"/></radialGradient></defs>`;
- return `<svg class="v41-dn${T>=1?' done':''}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" data-cx="${cx}" data-rc="${rc}">${defs}<g class="dn" transform="rotate(${ROT} ${cx} ${rc})"><ellipse cx="${cx}" cy="${cy+DEP+14}" rx="${R*1.2}" ry="${R*K*.8}" fill="url(#v41sh)" opacity="${Math.min(1,T*1.5).toFixed(2)}"/>${back}${caps}${walls}${tops}<g class="hlov"></g></g>${lab}${hov}</svg>`}
+ return `<svg class="v41-dn${T>=1?' done':''}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" data-cx="${cx}" data-rc="${rc}">${defs}<g class="dn" transform="rotate(${ROT} ${cx} ${rc})"><ellipse cx="${cx}" cy="${cy+DEP+14}" rx="${R*1.2}" ry="${R*K*.8}" fill="url(#v41sh)" opacity="${Math.min(1,T*1.5).toFixed(2)}"/>${backH}${caps}${walls}${tops}<g class="hlov"></g></g>${lab}${hov}</svg>`}
 function v41DnMount(adv,per){const box=document.getElementById('v41-donut-slot');if(!box)return;const D=v41DnData(adv,per);if(!D.t.length&&!D.c.length){box.innerHTML='';return}
- const W=Math.max(760,Math.min(1040,(box.clientWidth||1000)));box.innerHTML=`<h3>채널별 광고비 구성</h3><div class="v41-dnw"></div><p class="v41-sub">아리아나(닐슨) 모니터링 광고비 기준 · 케이블&종편은 MPP 기준, 상위 5개와 기타 · 카드나 조각에 마우스를 올리면 강조돼요</p>`;
+ const W=Math.max(860,Math.min(1040,(box.clientWidth||1000)));const only=!D.t.length?'케이블 Only':!D.c.length?'지상파 Only':'';box.innerHTML=`<h3>채널별 광고비 구성</h3>${only?`<p class="v41-only">${only}</p>`:''}<div class="v41-dnw"></div><p class="v41-sub">아리아나(닐슨) 모니터링 광고비 기준 · 케이블&종편은 MPP 기준, 상위 5개와 기타 · 카드나 조각에 마우스를 올리면 강조돼요</p>`;
  const host=box.querySelector('.v41-dnw'),id=(box._a=(box._a||0)+1),t0=performance.now(),DUR=1000,ease=x=>1-Math.pow(1-x,3);
  if(matchMedia('(prefers-reduced-motion: reduce)').matches){host.innerHTML=v41DnSvg(D,1,W);return}
  const fr=now=>{if(box._a!==id)return;const x=Math.min(1,(now-t0)/DUR);host.innerHTML=v41DnSvg(D,x<1?ease(x):1,W);if(x<1)requestAnimationFrame(fr)};requestAnimationFrame(fr)}

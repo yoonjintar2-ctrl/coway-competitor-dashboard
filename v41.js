@@ -143,17 +143,17 @@ if(typeof v38ApplyHash==='function'){var v41BaseApply=v38ApplyHash;v38ApplyHash=
 if(v41FromHash()&&typeof listing!=='undefined'&&listing){render()}
 // ---------- 팝업 맨 위: 지상파(왼쪽·파랑) · 케이블&종편(오른쪽·무채색) 3D 도넛 (11-06 14:33) ----------
 // 모니터링 광고비 기준, 케이블은 상위 5개 채널 + 기타. 카드(양쪽 같은 행 높이)와 연결선, 마우스 올리면 그 조각 강조, 열 때·기간 바꿀 때 펼침 애니메이션
-var v41DnLast=null;const V41_BL=['#2a4fa8','#4a6fcf','#8fb0f0'],V41_GR=['#56616c','#6d7883','#858f99','#9ca5ae','#b3bbc2','#c9cfd5'];
+var v41DnLast=null,v41DnEtc=null;const V41_BL=['#2a4fa8','#4a6fcf','#8fb0f0'],V41_GR=['#56616c','#6d7883','#858f99','#9ca5ae','#b3bbc2','#c9cfd5'];
 function v41Eok(k){const e=(k||0)/1e5;return e>=10?Math.round(e).toLocaleString()+'억':e>=.1?e.toFixed(1)+'억':Math.round((k||0)/10)+'만'}
 function v41Shade(h,k){const n=parseInt(h.slice(1),16),f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return `rgb(${f(n>>16&255)},${f(n>>8&255)},${f(n&255)})`}
 function v41DnData(adv,per){const rows=v41Pick(per).filter(r=>r.adv===adv);const by=(f)=>{const o={};rows.filter(f).forEach(r=>o[r.ch]=(o[r.ch]||0)+r.inv);return Object.entries(o).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])};
- const t=by(r=>r.media==='지상파');let c=by(r=>r.media!=='지상파');if(c.length>6){const rest=c.slice(5).reduce((s,[,v])=>s+v,0);c=c.slice(0,5).concat([['기타',rest]])}return {t,c}}
+ const t=by(r=>r.media==='지상파');let c=by(r=>r.media!=='지상파');let etc=[];if(c.length>6){etc=c.slice(5);const rest=etc.reduce((s,[,v])=>s+v,0);c=c.slice(0,5).concat([['기타',rest]])}return {t,c,etc}}
 function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[,v])=>s+v,0),tot=tT+tC;if(!tot)return '';
- const R=148,K=.56,r=R*.5,DEP=32,ROT=13,TAU=Math.PI*2,GAP=(tT&&tC)?20:0,BW=168,BH=42,PITCH=50,top0=34;
+ const R=148,K=.56,r=R*.5,DEP=32,ROT=13,TAU=Math.PI*2,GAP=(tT&&tC)?10:0,BW=168,BH=42,PITCH=50,top0=34;
  const n=Math.max(D.t.length,D.c.length),cy=top0+18+R*.9,H=Math.max(top0+n*PITCH+4,cy+R*K+DEP+30),cx=W/2,rc=cy+DEP/2,cs=Math.cos(ROT*Math.PI/180),sn=Math.sin(ROT*Math.PI/180);
  const rot=([x,y])=>[cx+(x-cx)*cs-(y-rc)*sn,rc+(x-cx)*sn+(y-rc)*cs],P=(a,rr,ox,dz)=>[cx+(ox||0)+Math.cos(a)*rr,cy+Math.sin(a)*rr*K+(dz||0)];
- const fT=tT/tot,S=[];let a=Math.PI-fT*Math.PI;const sep=GAP?.035:0;  // 두 덩어리 사이 각도 틈도 조금
- D.t.forEach(([nm,v],i)=>{const sp=v/tot*TAU*T;S.push({k:'t'+i,n:nm,v,g:'t',col:V41_BL[Math.min(i,2)],ox:-GAP,a0:a+sep,a1:a+sp-(i===D.t.length-1?sep:0)});a+=sp});
+ const fT=tT/tot,S=[];let a=Math.PI-fT*Math.PI;const sep=GAP?.018:0;  // 두 덩어리 사이 각도 틈도 조금
+ const tn=D.t.length;D.t.map((x,i)=>[x,i]).reverse().forEach(([[nm,v],i],j)=>{const sp=v/tot*TAU*T;S.push({k:'t'+i,n:nm,v,g:'t',col:V41_BL[Math.min(i,2)],ox:-GAP,a0:a+(j===0?sep:0),a1:a+sp-(j===tn-1?sep:0)});a+=sp});  // 지상파는 큰 채널이 위쪽에 오게(카드 순서와 맞춰 선이 덜 엇갈리게)
  a=-(1-fT)*Math.PI;D.c.forEach(([nm,v],i)=>{const sp=v/tot*TAU*T;S.push({k:'c'+i,n:nm,v,g:'c',col:nm==='기타'?'#d4d9de':V41_GR[Math.min(i,5)],ox:GAP,a0:a+(i===0?sep:0),a1:a+sp-(i===D.c.length-1?sep:0)});a+=sp});
  S.forEach(s=>{if(s.a1<s.a0)s.a1=s.a0});
  const arc=(s,rr,b0,b1,dz,rev)=>{const [x0,y0]=P(rev?b1:b0,rr,s.ox,dz),[x1,y1]=P(rev?b0:b1,rr,s.ox,dz),lg=Math.abs(b1-b0)>Math.PI?1:0;return [`${x0.toFixed(1)},${y0.toFixed(1)}`,`A${rr},${(rr*K).toFixed(1)} 0 ${lg} ${rev?0:1} ${x1.toFixed(1)},${y1.toFixed(1)}`]};
@@ -165,18 +165,18 @@ function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[
   const [m,aa]=arc(s,R,s.a0,s.a1,0),[mi,ai]=arc(s,r,s.a0,s.a1,0,true);s.td=`M${m} ${aa} L${mi} ${ai} Z`;tops+=`<g class="sl" data-v41-k="${s.k}"><path d="${s.td}" fill="${s.col}"/><path d="${s.td}" fill="url(#v41hl)"/></g>`});
  // 두 덩어리 사이 잘린 단면
  const cap=(s,ang,start)=>{const vis=start?Math.cos(ang)<0:Math.cos(ang)>0;if(!vis)return '';const p=[P(ang,r,s.ox),P(ang,R,s.ox),P(ang,R,s.ox,DEP),P(ang,r,s.ox,DEP)];return `<path d="M${p.map(q=>q.map(z=>z.toFixed(1)).join(',')).join(' L')} Z" fill="${v41Shade(s.col,.68)}"/>`};
- const gT=S.filter(s=>s.g==='t'),gC=S.filter(s=>s.g==='c');if(T>=1&&GAP){caps+=cap(gT[0],gT[0].a0,true)+cap(gT.at(-1),gT.at(-1).a1,false)+cap(gC[0],gC[0].a0,true)+cap(gC.at(-1),gC.at(-1).a1,false)}
+ const gT=S.filter(s=>s.g==='t'),gC=S.filter(s=>s.g==='c');if(GAP||T<1){if(gT.length)caps+=cap(gT[0],gT[0].a0,true)+cap(gT.at(-1),gT.at(-1).a1,false);if(gC.length)caps+=cap(gC[0],gC[0].a0,true)+cap(gC.at(-1),gC.at(-1).a1,false)}
  // 카드 + 연결선 (다 펼쳐진 뒤에만)
  let lab='';if(T>=1){[[-1,gT,'지상파',tT,'#2a4fa8'],[1,gC,'케이블&종편',tC,'#56616c']].forEach(([side,grp,tl,tv,tc])=>{if(!grp.length)return;
-  const L=grp.map(s=>{const m=(s.a0+s.a1)/2,fr=Math.sin(m)>0,[ax,ay]=rot(P(m,R,s.ox,fr?DEP*.5:0)),[bx,by]=rot(P(m,R+22,s.ox,fr?DEP*.5+Math.sin(m)*14:0));return {s,ax,ay,bx,by}}).sort((p,q)=>p.by-q.by);
+  const L=[...grp].sort((p,q)=>q.v-p.v).map(s=>{const m=(s.a0+s.a1)/2,fr=Math.sin(m)>0,[ax,ay]=rot(P(m,R,s.ox,fr?DEP*.5:0)),[bx,by]=rot(P(m,R+22,s.ox,fr?DEP*.5+Math.sin(m)*14:0));return {s,ax,ay,bx,by}});  // 카드는 광고비 많은 순(위→아래)
   const colx=side<0?BW:W-BW,bx0=side<0?0:W-BW;
   lab+=`<text x="${bx0}" y="${top0-12}" font-size="14.5" font-weight="900" fill="${tc}">${tl} <tspan fill="#102b45">${v41Eok(tv)}</tspan> <tspan font-size="12" font-weight="700" fill="#8a96a3">${Math.round(tv/tot*100)}%</tspan></text>`;
   L.forEach((q,i)=>{const s=q.s,y=top0+i*PITCH+BH/2,mx=cx+side*Math.max(Math.abs(q.bx-cx)+8,R+GAP+50),st=s.g==='t'?'#8fa0d4':'#b3bcc4';
-   lab+=`<g class="cd" data-v41-k="${s.k}"><path class="ln" d="M${q.ax.toFixed(1)},${q.ay.toFixed(1)} L${q.bx.toFixed(1)},${q.by.toFixed(1)} L${mx.toFixed(1)},${y} L${colx},${y}" fill="none" stroke="${st}" stroke-width="1.3" stroke-linejoin="round"/><circle cx="${q.ax.toFixed(1)}" cy="${q.ay.toFixed(1)}" r="2.6" fill="${st}"/>
+   lab+=`<g class="cd${s.n==='기타'&&(D.etc||[]).length?' etc':''}" data-v41-k="${s.k}"><path class="ln" d="M${q.ax.toFixed(1)},${q.ay.toFixed(1)} L${q.bx.toFixed(1)},${q.by.toFixed(1)} L${mx.toFixed(1)},${y} L${colx},${y}" fill="none" stroke="${st}" stroke-width="1.3" stroke-linejoin="round"/><circle cx="${q.ax.toFixed(1)}" cy="${q.ay.toFixed(1)}" r="2.6" fill="${st}"/>
     <rect class="bx" x="${bx0+.5}" y="${y-BH/2}" width="${BW-1}" height="${BH}" rx="10" fill="#fff" stroke="${s.g==='t'?'#cdd7ef':'#dfe4e8'}"/><rect x="${bx0+11}" y="${y-5}" width="10" height="10" rx="2.5" fill="${s.col}"/>
-    <text x="${bx0+29}" y="${y-3}" font-size="12.5" font-weight="800" fill="#34414d">${esc(s.n)}</text><text x="${bx0+29}" y="${y+13}" font-size="11.5" font-weight="700" fill="#7d8a96">${v41Eok(s.v)} · ${Math.round(s.v/tot*100)}%</text></g>`})})}
- if(T>=1)v41DnLast=S.map(s=>({k:s.k,col:s.col,fw:s.fw,td:s.td,m:(s.a0+s.a1)/2}));const hov='';
- const defs=`<defs><linearGradient id="v41hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="v41wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#0c2236" stop-opacity=".18"/></linearGradient><radialGradient id="v41sh"><stop offset="0" stop-color="#0c2236" stop-opacity=".14"/><stop offset="1" stop-color="#0c2236" stop-opacity="0"/></radialGradient></defs>`;
+    <text x="${bx0+29}" y="${y-3}" font-size="12.5" font-weight="800" fill="#34414d">${esc(s.n)}</text><text x="${bx0+29}" y="${y+13}" font-size="11.5" font-weight="700" fill="#7d8a96">${v41Eok(s.v)} · ${Math.round(s.v/tot*100)}%</text>${s.n==='기타'&&(D.etc||[]).length?`<text x="${bx0+BW-12}" y="${y+4}" text-anchor="end" font-size="10.5" font-weight="800" fill="#1a8cc2">${D.etc.length}개 보기 ›</text>`:''}</g>`})})}
+ if(T>=1)v41DnEtc={list:D.etc||[],tot};if(T>=1)v41DnLast=S.map(s=>({k:s.k,col:s.col,fw:s.fw,td:s.td,m:(s.a0+s.a1)/2}));const hov='';
+ const defs=`<defs><linearGradient id="v41hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="v41wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#0c2236" stop-opacity=".18"/></linearGradient><filter id="v41gl" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0c2236" flood-opacity=".22"/></filter><radialGradient id="v41sh"><stop offset="0" stop-color="#0c2236" stop-opacity=".14"/><stop offset="1" stop-color="#0c2236" stop-opacity="0"/></radialGradient></defs>`;
  return `<svg class="v41-dn${T>=1?' done':''}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" data-cx="${cx}" data-rc="${rc}">${defs}<g class="dn" transform="rotate(${ROT} ${cx} ${rc})"><ellipse cx="${cx}" cy="${cy+DEP+14}" rx="${R*1.2}" ry="${R*K*.8}" fill="url(#v41sh)" opacity="${Math.min(1,T*1.5).toFixed(2)}"/><g class="bk">${back}${caps}</g>${walls}${tops}<g class="hlov"></g></g>${lab}${hov}</svg>`}
 function v41DnMount(adv,per){const box=document.getElementById('v41-donut-slot');if(!box)return;const D=v41DnData(adv,per);if(!D.t.length&&!D.c.length){box.innerHTML='';return}
  const W=Math.max(760,Math.min(1040,(box.clientWidth||1000)));box.innerHTML=`<h3>채널별 광고비 구성</h3><div class="v41-dnw"></div><p class="v41-sub">아리아나(닐슨) 모니터링 광고비 기준 · 케이블은 상위 5개 채널과 기타 · 카드나 조각에 마우스를 올리면 강조돼요</p>`;
@@ -186,6 +186,14 @@ function v41DnMount(adv,per){const box=document.getElementById('v41-donut-slot')
 // 강조: 같은 조각·카드만 진하게, 조각은 바깥으로 살짝
 function v41DnHot(svg,k){if(!svg)return;const ov=svg.querySelector('.hlov');if(!ov)return;svg.classList.toggle('hot',!!k);svg.querySelectorAll('[data-v41-k]').forEach(e=>e.classList.toggle('on',e.dataset.v41K===k));ov.innerHTML='';if(!k)return;
  const s=(v41DnLast||[]).find(z=>z.k===k);if(!s)return;const dx=Math.cos(s.m)*10,dy=Math.sin(s.m)*10*.56-4;
- ov.setAttribute('transform',`translate(${dx.toFixed(1)},${dy.toFixed(1)})`);ov.innerHTML=(s.fw||[]).map(d=>`<path d="${d}" fill="${v41Shade(s.col,.8)}"/><path d="${d}" fill="url(#v41wd)"/>`).join('')+`<path d="${s.td}" fill="${s.col}"/><path d="${s.td}" fill="url(#v41hl)"/><path d="${s.td}" fill="none" stroke="#fff" stroke-width="1.4" stroke-opacity=".9"/>`}
+ ov.setAttribute('transform',`translate(${dx.toFixed(1)},${dy.toFixed(1)})`);ov.setAttribute('filter','url(#v41gl)');ov.innerHTML=(s.fw||[]).map(d=>`<path d="${d}" fill="${v41Shade(s.col,.8)}"/><path d="${d}" fill="url(#v41wd)"/>`).join('')+`<path d="${s.td}" fill="${s.col}"/><path d="${s.td}" fill="url(#v41hl)"/>`}
 document.addEventListener('mouseover',e=>{const g=e.target.closest&&e.target.closest('svg.v41-dn.done [data-v41-k]');const svg=e.target.closest&&e.target.closest('svg.v41-dn.done');if(!svg)return;v41DnHot(svg,g?g.dataset.v41K:null)});
 document.addEventListener('mouseout',e=>{const svg=e.target.closest&&e.target.closest('svg.v41-dn.done');if(svg&&!(e.relatedTarget&&svg.contains(e.relatedTarget)))v41DnHot(svg,null)});
+
+// 기타 채널 목록 (카드·조각 누르면)
+document.addEventListener('click',e=>{const old=document.querySelector('.v41-etcpop');const g=e.target.closest&&e.target.closest('svg.v41-dn.done [data-v41-k]');
+ if(old&&!(e.target.closest&&e.target.closest('.v41-etcpop'))){old.remove();if(!g)return}
+ if(!g)return;const k=g.dataset.v41K,J=(v41DnLast||[]).find(z=>z.k===k);const card=document.querySelector(`svg.v41-dn .cd[data-v41-k="${k}"]`);if(!card||!card.classList.contains('etc')||!v41DnEtc)return;
+ const box=document.getElementById('v41-donut-slot'),rb=card.querySelector('.bx').getBoundingClientRect(),rp=box.getBoundingClientRect();const L=v41DnEtc.list,t=v41DnEtc.tot,sum=L.reduce((s,[,v])=>s+v,0);
+ const pop=document.createElement('div');pop.className='v41-etcpop';pop.innerHTML=`<b>기타 ${L.length}개 채널 · ${v41Eok(sum)}</b><div class="ls">${L.map(([n,v])=>`<div><span>${esc(n)}</span><em>${v41Eok(v)}</em><i>${(v/t*100).toFixed(v/t>=.01?0:1)}%</i></div>`).join('')}</div>`;
+ box.style.position='relative';box.appendChild(pop);const pw=pop.offsetWidth,ph=pop.offsetHeight;let x=rb.left-rp.left-pw-10;if(x<0)x=Math.min(rp.width-pw,rb.right-rp.left+10);pop.style.left=x+'px';pop.style.top=Math.max(0,Math.min(rb.top-rp.top-ph/2+rb.height/2,box.offsetHeight-ph))+'px'});

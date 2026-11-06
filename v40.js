@@ -28,7 +28,7 @@ function v40MixChart(d,wid){wid=wid||(document.getElementById('v40-mix')||{}).cl
 // 쉐어 오브 스펜딩 도넛
 // 쉐어 오브 스펜딩: 3D 도넛(기울인 타원 + 옆면), 코웨이 조각만 살짝 띄움, 1% 미만은 기타로 묶고 마우스 올리면 세부 (11-06 10:24)
 function v40Shade(hex,k){const n=parseInt(hex.slice(1),16),f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return `rgb(${f(n>>16&255)},${f(n>>8&255)},${f(n&255)})`}
-function v40Donut(d){const ps=d.peer_spend||{},ms=v40Range(d,v40Per),all=v40Order(d).map(a=>[a,v40Tot(ps,a,ms)]).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+function v40Donut(d,tt){const T=tt==null?1:tt;const ps=d.peer_spend||{},ms=v40Range(d,v40Per),all=v40Order(d).map(a=>[a,v40Tot(ps,a,ms)]).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
  const tot=all.reduce((s,[,v])=>s+v,0);if(!tot)return `<p class="v40-empty">이 기간에는 광고비 자료가 없어요.</p>`;
  const big=all.filter(([a,v])=>v/tot>=.01||a==='코웨이'),small=all.filter(x=>!big.includes(x)),etc=small.reduce((s,[,v])=>s+v,0);
  const list=big.map(([a,v])=>({a,v}));if(etc>0)list.push({a:'기타',v:etc,etc:small});
@@ -37,24 +37,24 @@ function v40Donut(d){const ps=d.peer_spend||{},ms=v40Range(d,v40Per),all=v40Orde
  const rc=cy+DEP/2,cs=Math.cos(ROT*Math.PI/180),sn=Math.sin(ROT*Math.PI/180),rot=([x,y])=>[cx+(x-cx)*cs-(y-rc)*sn,rc+(x-cx)*sn+(y-rc)*cs];
  const P=(a,rr,ox,oy,dz)=>[cx+ox+Math.cos(a)*rr,cy+oy+Math.sin(a)*rr*K+(dz||0)];
  const mi=list.findIndex(z=>z.a==='코웨이');if(mi>0)list.unshift(list.splice(mi,1)[0]);
- const CM=Math.PI/2+.55;let a0=mi>=0?CM-list[0].v/tot*Math.PI:-Math.PI/2,gi=0;
- list.forEach(z=>{z.f=z.v/tot;z.a0=a0;z.a1=a0+z.f*TAU;a0=z.a1;z.me=z.a==='코웨이';z.col=z.me?'#4c66b2':z.a==='기타'?'#d5dade':G[gi++%G.length];const m=(z.a0+z.a1)/2;z.m=m;z.ox=z.me?Math.cos(m)*EX:0;z.oy=z.me?Math.sin(m)*EX*K:0});
+ const CM=Math.PI/2+.55;let a0=mi>=0?CM-list[0].v/tot*Math.PI*T:-Math.PI/2,gi=0;
+ list.forEach(z=>{z.f=z.v/tot;z.a0=a0;z.a1=a0+z.f*TAU*T;a0=z.a1;z.me=z.a==='코웨이';z.col=z.me?'#4c66b2':z.a==='기타'?'#d5dade':G[gi++%G.length];const m=(z.a0+z.a1)/2;z.m=m;z.ox=0;z.oy=0;z.R=z.me?R+EX*T:R;z.lift=z.me?9*T:0;if(z.me&&list.length>1){const g=.018*T;z.a0+=g;z.a1-=g}});
  const arc=(z,rr,s0,s1,dz,rev)=>{const [x0,y0]=P(rev?s1:s0,rr,z.ox,z.oy,dz),[x1,y1]=P(rev?s0:s1,rr,z.ox,z.oy,dz),lg=Math.abs(s1-s0)>Math.PI?1:0;return {m:`${x0},${y0}`,a:`A${rr},${rr*K} 0 ${lg} ${rev?0:1} ${x1},${y1}`}};
  const clips=(s0,s1,lo,hi)=>{const out=[];for(const k of [-1,0,1,2]){const a=Math.max(s0,lo+k*TAU),b=Math.min(s1,hi+k*TAU);if(b>a+1e-6)out.push([a,b])}return out};
  const tip=z=>z.etc?`data-v40-etc="${esc(JSON.stringify(z.etc.map(([a,v])=>[a,v])))}|${tot}"`:`data-v40-tip="${esc(z.a)}|sos|${z.v}|${tot}"`;
- const wall=(z,rr,c,shade,cls)=>{const t=arc(z,rr,c[0],c[1],0),b=arc(z,rr,c[0],c[1],DEP,true),dd=`M${t.m} ${t.a} L${b.m} ${b.a} Z`;return `<path ${cls?`class="v40-seg" ${tip(z)}`:''} d="${dd}" fill="${v40Shade(z.col,shade)}"/><path d="${dd}" fill="url(#v40-wd)" pointer-events="none"/>`};
+ const wall=(z,rr,c,shade,cls)=>{const t=arc(z,rr,c[0],c[1],-(z.lift||0)),b=arc(z,rr,c[0],c[1],DEP,true),dd=`M${t.m} ${t.a} L${b.m} ${b.a} Z`;return `<path ${cls?`class="v40-seg" ${tip(z)}`:''} d="${dd}" fill="${v40Shade(z.col,shade)}"/><path d="${dd}" fill="url(#v40-wd)" pointer-events="none"/>`};
  let back='',caps='',walls='',wallMe='',tops='',topMe='';
- list.forEach(z=>{clips(z.a0,z.a1,Math.PI,TAU).forEach(c=>back+=wall(z,r,c,.6,false));
-  const w=clips(z.a0,z.a1,0,Math.PI).map(c=>wall(z,R,c,.78,true)).join('');if(z.me)wallMe+=w;else walls+=w;
-  if(list.length===1){tops+=`<path d="M${P(0,R,0,0)} A${R},${R*K} 0 1 1 ${P(Math.PI,R,0,0)} A${R},${R*K} 0 1 1 ${P(0,R,0,0)} M${P(0,r,0,0)} A${r},${r*K} 0 1 0 ${P(Math.PI,r,0,0)} A${r},${r*K} 0 1 0 ${P(0,r,0,0)} Z" fill="${z.col}" fill-rule="evenodd"/>`;return}
-  const o=arc(z,R,z.a0,z.a1,0),i=arc(z,r,z.a0,z.a1,0,true),td=`M${o.m} ${o.a} L${i.m} ${i.a} Z`,t=`<path class="v40-seg" ${tip(z)} d="${td}" fill="${z.col}"/><path d="${td}" fill="url(#v40-hl)" pointer-events="none"/>`;if(z.me)topMe+=t;else tops+=t});
- // 떨어진 코웨이 조각 양 끝 단면 + 그 틈으로 보이는 이웃 조각 단면
- if(mi>=0&&list.length>1){const me=list[0],nb=[list[list.length-1],list[1]];
-  const cap=(z,a,start)=>{const vis=start?Math.cos(a)<0:Math.cos(a)>0;if(!vis)return '';const p=[P(a,r,z.ox,z.oy,0),P(a,R,z.ox,z.oy,0),P(a,R,z.ox,z.oy,DEP),P(a,r,z.ox,z.oy,DEP)];
+ let backMe='';list.forEach(z=>{clips(z.a0,z.a1,Math.PI,TAU).forEach(c=>{const w=wall(z,r,c,.6,false);if(z.me)backMe+=w;else back+=w});
+  const w=clips(z.a0,z.a1,0,Math.PI).map(c=>wall(z,z.R,c,.78,true)).join('');if(z.me)wallMe+=w;else walls+=w;
+  if(list.length===1&&T>=1){tops+=`<path d="M${P(0,R,0,0)} A${R},${R*K} 0 1 1 ${P(Math.PI,R,0,0)} A${R},${R*K} 0 1 1 ${P(0,R,0,0)} M${P(0,r,0,0)} A${r},${r*K} 0 1 0 ${P(Math.PI,r,0,0)} A${r},${r*K} 0 1 0 ${P(0,r,0,0)} Z" fill="${z.col}" fill-rule="evenodd"/>`;return}
+  const o=arc(z,z.R,z.a0,z.a1,-z.lift),i=arc(z,r,z.a0,z.a1,-z.lift,true),td=`M${o.m} ${o.a} L${i.m} ${i.a} Z`,t=`<path class="v40-seg" ${tip(z)} d="${td}" fill="${z.col}"/><path d="${td}" fill="url(#v40-hl)" pointer-events="none"/>`;if(z.me)topMe+=t;else tops+=t});
+ // 코웨이 조각: 바깥으로 조금 더 두껍고(반지름+) 살짝 높게 — 안쪽 구멍 쪽에 틈이 생기지 않음. 양 옆 얇은 틈으로 이웃 조각 단면이 보임 (11-06 12:0x)
+ if(mi>=0&&list.length>1&&T>=1){const me=list[0],nb=[list[list.length-1],list[1]];
+  const cap=(z,a,start)=>{const vis=start?Math.cos(a)<0:Math.cos(a)>0;if(!vis)return '';const p=[P(a,r,0,0,0),P(a,R,0,0,0),P(a,R,0,0,DEP),P(a,r,0,0,DEP)];
    const dd=`M${p.map(q=>q.join(',')).join(' L')} Z`;return `<path d="${dd}" fill="${v40Shade(z.col,.7)}"/><path d="${dd}" fill="url(#v40-wd)" pointer-events="none"/>`};
-  caps+=cap(nb[0],me.a0+TAU,false)+cap(nb[1],me.a1,true);wallMe=cap(me,me.a0,true)+cap(me,me.a1,false)+wallMe}
+  caps+=cap(nb[0],me.a0-.018+TAU,false)+cap(nb[1],me.a1+.018,true)}
  // 이름표: 기울인 뒤의 화면 좌표로 계산 — 조각 테두리 → 바깥 꺾임 → 세로로 줄 세운 이름표, 선끼리 순서 유지
- const labs=list.map(z=>{const s=Math.sin(z.m),front=s>0,[ax,ay]=rot(P(z.m,R,z.ox,z.oy,front?DEP*.55:0)),[bx,by]=rot(P(z.m,R+18,z.ox,z.oy,front?DEP*.55+s*16:0));return {z,side:bx<cx?-1:1,ax,ay,bx,by,y:by,h:z.me?46:36}});
+ const labs=list.map(z=>{const s=Math.sin(z.m),front=s>0,lf=z.lift||0,[ax,ay]=rot(P(z.m,z.R,0,0,front?DEP*.55-lf/2:-lf)),[bx,by]=rot(P(z.m,z.R+18,0,0,front?DEP*.55+s*16:-lf));return {z,side:bx<cx?-1:1,ax,ay,bx,by,y:by,h:z.me?46:36}});
  {const me=labs.find(q=>q.z.me);if(me)me.side=me.bx<cx+R*.35?-1:1}
  [-1,1].forEach(sd=>{const L=labs.filter(q=>q.side===sd).sort((p,q)=>p.by-q.by);for(let k=1;k<L.length;k++){const g=(L[k-1].h+L[k].h)/2;if(L[k].y-L[k-1].y<g)L[k].y=L[k-1].y+g}
   const lo=L.length?L.at(-1).y+L.at(-1).h/2-(H-6):0;if(lo>0)L.forEach(q=>q.y-=lo);for(let k=L.length-2;k>=0;k--){const g=(L[k+1].h+L[k].h)/2;if(L[k+1].y-L[k].y<g)L[k].y=L[k+1].y-g}
@@ -66,7 +66,16 @@ function v40Donut(d){const ps=d.peer_spend||{},ms=v40Range(d,v40Per),all=v40Orde
   :`<text x="${tx}" y="${q.y-2}" text-anchor="${an}" font-size="14.5" font-weight="800" fill="#4a5764">${esc(z.a)} ${pc}</text><text x="${tx}" y="${q.y+13}" text-anchor="${an}" font-size="12" font-weight="600" fill="#97a3ad">${v38Money(z.v)}${z.etc?` · ${z.etc.length}곳`:''}</text>`}</g>`});
  const defs=`<defs><linearGradient id="v40-hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="v40-wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#0c2236" stop-opacity=".18"/></linearGradient><radialGradient id="v40-sh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#0c2236" stop-opacity=".13"/><stop offset="1" stop-color="#0c2236" stop-opacity="0"/></radialGradient></defs>`;
  const shadow=`<ellipse cx="${cx}" cy="${cy+DEP+10}" rx="${R*1.12}" ry="${R*K*.9}" fill="url(#v40-sh)"/>`;
- return `<svg class="v40-donut" viewBox="0 0 ${W} ${H}" width="100%">${defs}<g transform="rotate(${ROT} ${cx} ${rc})">${shadow}${back}${caps}${walls}${wallMe}${tops}${topMe}</g>${lb}</svg>`}
+ return `<svg class="v40-donut${T<1?'':' v40-done'}" viewBox="0 0 ${W} ${H}" width="100%">${defs}<g transform="rotate(${ROT} ${cx} ${rc})"><g opacity="${Math.min(1,T*1.6).toFixed(3)}">${shadow}</g>${back}${caps}${walls}${tops}${backMe}${wallMe}${topMe}</g>${T<1?'':`<g class="v40-lbs">${lb}</g>`}</svg>`}
+// 11-06 12:0x — Share of Spending 펼침 애니메이션: 화면에 들어올 때·기간/연도를 바꿀 때마다 조각이 시계 방향으로 스르륵 펼쳐짐
+var v40SosObs=null;
+function v40SosAnim(d){const el=document.getElementById('v40-sos');if(!el||!d||!d.category)return;
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.innerHTML=v40Donut(d);return}
+ const id=(el._v40a=(el._v40a||0)+1),t0=performance.now(),D=1100,ease=x=>1-Math.pow(1-x,3);
+ const fr=now=>{if(el._v40a!==id)return;const x=Math.min(1,(now-t0)/D);el.innerHTML=v40Donut(d,x<1?ease(x):1);if(x<1)requestAnimationFrame(fr)};requestAnimationFrame(fr)}
+function v40SosArm(d){const el=document.getElementById('v40-sos');if(!el||!d||!d.category)return;el.innerHTML=v40Donut(d,0);el.dataset.v40Wait='1';
+ if(!('IntersectionObserver' in window)){v40SosAnim(d);return}
+ if(v40SosObs)v40SosObs.disconnect();v40SosObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&e.target.dataset.v40Wait){delete e.target.dataset.v40Wait;v40SosObs.disconnect();v40SosAnim(v38D)}})},{threshold:.35});v40SosObs.observe(el)}
 var V40_CHEV=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="${d<0?'M15 5l-7 7 7 7':'M9 5l7 7-7 7'}"/></svg>`;
 function v40MixBtns(){const sc=document.querySelector('#v40-mix .v40-mixsc');document.querySelectorAll('[data-v40-mscroll]').forEach(b=>{if(!sc){b.hidden=true;return}const over=sc.scrollWidth>sc.clientWidth+2,dir=+b.dataset.v40Mscroll;b.hidden=!over;b.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
 function v40After(){const d=v38D,card=document.querySelector('#content .v38-card');if(!d||!card||route!=='monthly')return;document.querySelectorAll('#content .v40-sec').forEach(x=>x.remove());
@@ -75,15 +84,15 @@ function v40After(){const d=v38D,card=document.querySelector('#content .v38-card
  const sec=(title,body,note,ctrl)=>`<section class="glass section v40-sec"><div class="v40-h"><h2>${title}</h2>${d.category&&ctrl?ctrl:''}</div>${d.category?body:need}${d.category&&note?`<p class="footnote v40-foot">${note}</p>`:''}</section>`;
  card.insertAdjacentHTML('afterend',
   sec('품목 내 광고주별 월별 광고비',`<div class="v38-glass">${d.category?v40PeerTable(d):''}</div>`,`${unit} · 광고주 이름을 누르면 그 광고주 화면으로 넘어가요`)+
-  sec('품목 내 매체 믹스',`<div class="v38-glass v40-pane"><div class="v40-mixwrap"><div id="v40-mix">${d.category?v40MixChart(d):''}</div><button type="button" class="v38-fbtn v40-mbtn l" data-v40-mscroll="-1" aria-label="왼쪽으로" hidden>${V40_CHEV(-1)}</button><button type="button" class="v38-fbtn v40-mbtn r" data-v40-mscroll="1" aria-label="오른쪽으로" hidden>${V40_CHEV(1)}</button></div></div>`,`${unit} · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):'')+
-  sec('품목 내 Share of Spending',`<div class="v38-glass v40-pane"><div id="v40-sos">${d.category?v40Donut(d):''}</div></div>`,`${unit} · 1% 미만 광고주는 기타로 묶었어요(마우스를 올리면 세부) · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):''));
- const sc=document.getElementById('v40-pscroll');if(sc)sc.scrollLeft=sc.scrollWidth;const mx=document.getElementById('v40-mix');if(mx&&d.category)mx.innerHTML=v40MixChart(d,mx.clientWidth);v40MixBtns()}
+  sec('품목 내 Share of Spending',`<div class="v38-glass v40-pane"><div id="v40-sos">${d.category?v40Donut(d):''}</div></div>`,`${unit} · 1% 미만 광고주는 기타로 묶었어요(마우스를 올리면 세부) · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):'')+
+  sec('품목 내 매체 믹스',`<div class="v38-glass v40-pane"><div class="v40-mixwrap"><div id="v40-mix">${d.category?v40MixChart(d):''}</div><button type="button" class="v38-fbtn v40-mbtn l" data-v40-mscroll="-1" aria-label="왼쪽으로" hidden>${V40_CHEV(-1)}</button><button type="button" class="v38-fbtn v40-mbtn r" data-v40-mscroll="1" aria-label="오른쪽으로" hidden>${V40_CHEV(1)}</button></div></div>`,`${unit} · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):''));
+ const sc=document.getElementById('v40-pscroll');if(sc)sc.scrollLeft=sc.scrollWidth;const mx=document.getElementById('v40-mix');if(mx&&d.category)mx.innerHTML=v40MixChart(d,mx.clientWidth);v40MixBtns();v40SosArm(d)}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-v40-mscroll]');if(!b)return;const sc=document.querySelector('#v40-mix .v40-mixsc');if(sc){sc.scrollBy({left:+b.dataset.v40Mscroll*sc.clientWidth*.7,behavior:'smooth'});setTimeout(v40MixBtns,450)}});
 document.addEventListener('scroll',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('v40-mixsc'))v40MixBtns()},true);
 window.addEventListener('resize',()=>{if(route==='monthly'&&v38D&&v38D.category){const mx=document.getElementById('v40-mix');if(mx){mx.innerHTML=v40MixChart(v38D,mx.clientWidth);v40MixBtns()}}});
 if(typeof v38Draw==='function'){var v40BaseDraw=v38Draw;v38Draw=function(...a){const r=v40BaseDraw.apply(this,a);try{v40After()}catch(e){console.error(e)}return r}}
 document.addEventListener('change',e=>{const s=e.target.closest&&e.target.closest('[data-v40-per]');if(!s||!v38D)return;v40Per=s.value;document.querySelectorAll('[data-v40-per]').forEach(x=>x.value=v40Per);
- const a=document.getElementById('v40-mix'),b=document.getElementById('v40-sos');if(a)a.innerHTML=v40MixChart(v38D);if(b)b.innerHTML=v40Donut(v38D);v40MixBtns()});
+ const a=document.getElementById('v40-mix'),b=document.getElementById('v40-sos');if(a)a.innerHTML=v40MixChart(v38D);if(b)v40SosAnim(v38D);v40MixBtns()});
 document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-v40-adv]');if(!b||route!=='monthly')return;const a=b.dataset.v40Adv;if(a===v38Adv)return;
  const o=(v38Opt||[]).find(x=>x.advertiser===a);if(!o){toast('이 광고주는 월별 통합 분석 목록에 없어요.');return}v38Adv=a;if(!(o.categories||[]).includes(v38Cat))v38Cat='';
  document.querySelector('#content .v38-card')?.classList.add('loading');try{await v38Load();v38Draw();if(typeof v38Sync==='function')v38Sync();window.scrollTo({top:0,behavior:'smooth'})}catch(err){toast('불러오지 못했어요: '+err.message)}});

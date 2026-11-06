@@ -53,7 +53,7 @@ function v39Build(m){
  // 카메라: v39K 0 = 비스듬한 3D, 1 = 위에서 내려다본 2D(스크롤에 따라, 11-06 13:25)
  const cam=Math.max(0,Math.min(1,v39K||0)),ce=cam*cam*(3-2*cam),{CW,pad,OX,ML,MR}=V39_V,DX=V39_V.DX*(1-ce),DY=V39_V.DY+(-CW-V39_V.DY)*ce,T=V39_V.T*(1-ce),h0=V39_V.h0*(1-ce),hk=V39_V.hk*(1-ce),cw=CW-pad,dx=DX*.86,dy=DY*.86;
  const wd=x=>(new Date(x+'T00:00:00').getDay()+6)%7,wd0=wd(m.days[0]),col=i=>Math.floor((i+wd0)/7),NCOL=col(m.days.length-1)+1;
- const H=Math.max(400,Math.min(780,(window.innerHeight||900)-330)),OY=H-V39_V.T-14,W=OX+NCOL*CW+MR+8*V39_V.DX+20;
+ const H=v39H||Math.max(400,Math.min(780,(window.innerHeight||900)-330)),OY=H-V39_V.T-14,W=OX+NCOL*CW+MR+8*V39_V.DX+20;
  const Hh=v=>h0+Math.sqrt(Math.min(1,(v||0)/m.smax))*hk;
  const F=(u,t)=>[OX+u+t*DX,OY+t*DY];  // 팔레트 윗면 좌표(u: 가로 px, t: 줄 깊이)
  const lie=(u,t,k=.936/Math.abs(DY))=>`matrix(1,0,${(-DX*k).toFixed(3)},${(-DY*k).toFixed(3)},${F(u,t)})`;  // 바닥에 누운 글자
@@ -73,15 +73,17 @@ function v39Build(m){
  // 요일: 팔레트 양쪽 여백에 누운 글자
  WK.forEach((t,r)=>{const tt=r+.2;s+=`<text transform="${lie(-20,tt)}" text-anchor="end" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text><text transform="${lie(NCOL*CW-pad+16,tt)}" font-size="10.5" font-weight="800" fill="#8d9aa5">${t}</text>`});
  // 이슈: 풍선 자리
- const zoneTop=4,zoneBot=OY+7*DY-hk-26,lanes=Math.max(2,Math.min(8,Math.floor((zoneBot-zoneTop)/34))),LH=(zoneBot-zoneTop-26)/Math.max(1,lanes-1);
+ const zoneTop=4,zoneBot=OY+7*DY-hk-26,lanes=Math.max(1,Math.min(3,Math.floor((zoneBot-zoneTop)/34))),LH=Math.min(40,(zoneBot-zoneTop-26)/Math.max(1,lanes-1));  // 풍선은 3줄까지 (11-06 14:13)
  const used=Array.from({length:lanes},()=>[]);let bal='';const pins={};
  const cellXY=(i,r)=>{const [x,y]=F(col(i)*CW,r);return [x,y]};  // 월요일이 앞(가까운 쪽), 일요일이 맨 뒤(위)
  m.ev.forEach((e,k)=>{const i=m.days.indexOf(e.d);if(i<0)return;const r=wd(e.d),[x,y]=cellXY(i,r),live=src.q[e.d]!=null||(src.s[e.d]||0)>0,h=live?Hh(src.s[e.d]||0):0,ax=x+cw/2+dx/2,ay=y+dy/2-h;
   const [lab]=V39_EVT[e.type]||['이슈'];const txt=v39Short((v39Adv?'':(e.adv||'')+' ')+(e.title||''),v39Adv?13:15),w=Math.min(210,26+lab.length*10.5+txt.length*11.2+14);
-  let bx=Math.max(4,Math.min(W-w-4,ax-w/2)),lane=-1,best=1e9;for(let L=0;L<lanes;L++){if(!used[L].every(([a,b])=>bx+w<a-6||bx>b+6))continue;const sc=used[L].length*10+Math.abs(L-((k*3)%lanes));if(sc<best){best=sc;lane=L}}if(lane<0)return;used[lane].push([bx,bx+w]);
-  const by=zoneTop+lane*LH,ly=by+26,len=Math.max(4,ay-ly),mc=V39_EVM[e.type]||'#b3bbc2',dl=(.15+ax/W*.9).toFixed(2);
+  // 자리: 3줄 안에서 막대 바로 위가 막히면 옆으로 비켜 두고 선을 살짝 꺾어 잇기 (11-06 14:13)
+  let bx=0,lane=-1,best=1e9;for(const off of [0,-1,1,-2,2,-3,3,-4,4,-5,5,-6,6])for(let L=0;L<lanes;L++){const x=Math.max(4,Math.min(W-w-4,ax-w/2+off*w*.42));if(!used[L].every(([a,b])=>x+w<a-6||x>b+6))continue;const sc=Math.abs(off)*14+used[L].length*6+Math.abs(L-((k*3)%lanes))*2;if(sc<best){best=sc;lane=L;bx=x}}if(lane<0)return;used[lane].push([bx,bx+w]);
+  const by=zoneTop+lane*LH,ly=by+26,mc=V39_EVM[e.type]||'#b3bbc2',dl=(.15+ax/W*.9).toFixed(2),tx=Math.max(bx+14,Math.min(bx+w-14,ax)),ky=Math.min(ay-6,ly+Math.min(22,Math.max(8,(ay-ly)*.25)));
+  const lp=tx===ax?`M${ax},${ay} L${ax},${ly}`:`M${ax},${ay} L${ax},${ky} L${tx},${ly}`,len=Math.max(4,(ay-ky)+Math.hypot(tx-ax,ky-ly));
   // 선·닿는 점은 그 막대 바로 뒤에 그려서 앞 막대에 가려지게
-  (pins[e.d]=pins[e.d]||[]).push(`<g class="v39-evp" data-v39-ev="${k}" style="transition-delay:${dl}s"><line class="v39-evl" x1="${ax}" x2="${ax}" y1="${ly}" y2="${ay}" stroke="#8a96a0" stroke-opacity=".26" stroke-width="1.1" style="stroke-dasharray:${len};stroke-dashoffset:${len};transition-delay:${dl}s"/><circle r="4.2" transform="matrix(1,0,${(DX*.05).toFixed(3)},${(DY*.05).toFixed(3)},${ax},${ay})" fill="#8a96a0" fill-opacity=".3"/></g>`);
+  (pins[e.d]=pins[e.d]||[]).push(`<g class="v39-evp" data-v39-ev="${k}" style="transition-delay:${dl}s"><path class="v39-evl" d="${lp}" fill="none" stroke="#8a96a0" stroke-opacity=".3" stroke-width="1.1" stroke-linejoin="round" style="stroke-dasharray:${len};stroke-dashoffset:${len};transition-delay:${dl}s"/><circle r="4.2" transform="matrix(1,0,${(DX*.05).toFixed(3)},${(DY*.05).toFixed(3)},${ax},${ay})" fill="#8a96a0" fill-opacity=".3"/></g>`);
   bal+=`<g class="v39-ev" data-v39-ev="${k}" style="transition-delay:${dl}s"><rect x="${bx}" y="${by}" width="${w}" height="26" rx="13" fill="rgba(255,255,255,.8)" stroke="rgba(200,212,222,.8)" stroke-width=".8"/><circle cx="${bx+13}" cy="${by+13}" r="3.6" fill="${mc}"/><text x="${bx+22}" y="${by+17.2}" font-size="10.5" font-weight="700" fill="#9aa5ae">${lab}</text><text x="${bx+26+lab.length*10}" y="${by+17.2}" font-size="11" font-weight="600" fill="#6b7782">${esc(txt)}</text></g>`});
  const order=m.days.map((x,i)=>({x,i,r:wd(x)})).sort((a,b)=>(b.r-a.r)||(a.i-b.i));
  for(const o of order){const [x,y]=cellXY(o.i,o.r),q=src.q[o.x],sp=src.s[o.x]||0,fut=o.x>m.today,live=!fut&&(q!=null||sp>0),hq=q!=null,p=hq?pct(q):0;
@@ -104,7 +106,7 @@ function v39Today(){const b=v39Last;if(!b)return '';const c=b.cells.find(z=>z.d=
 // ---------- 화면 ----------
 const V39_IMG='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="m21 15-4.5-4.5L6 21"/></svg>';
 const V39_XLS='<svg width="18" height="18" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="3.5" fill="#1f7a45" stroke="none"/><path d="M8 8l3 4-3 4M16 8l-3 4 3 4" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>';
-function v39Controls(show){let box=document.querySelector('main>header .v39-ctrl');
+function v39Controls(show){if(!show)v39Lock(false);let box=document.querySelector('main>header .v39-ctrl');
  if(!show){if(box)box.remove();return}
  const head=document.querySelector('main>header');if(!head)return;
  if(!box){box=document.createElement('div');box.className='v32-ctrl v39-ctrl';head.appendChild(box)}
@@ -124,8 +126,7 @@ function v39View(){const d=v39D,m=v39Model(d);
   <div class="v39-vp"><div class="v39-sc" id="v39-sc"><svg id="v39-svg" width="${b.W}" height="${b.H}" viewBox="0 0 ${b.W} ${b.H}">${b.svg}</svg></div>
   <svg class="v39-stick" width="360" height="${b.H}">${b.stick}</svg>
   <button type="button" class="v39-arr l" data-v39-scroll="-1" aria-label="이전">‹</button><button type="button" class="v39-arr r" data-v39-scroll="1" aria-label="다음">›</button><div class="v39-tip" id="v39-tip" hidden></div></div>
-  <div class="v39-below">${v39Legend()}<p class="footnote">칸 = 하루 · 색 = 네이버 검색수 순위(그해 기준) · 높이 = 그날 광고비 · 풍선 = 캠페인 시작·신규 소재·주요 기사(누르면 자세히) · 좌우로 넘겨 1월~12월</p>
-  <p class="footnote">${esc(d.note||'')}${v39Adv?'':' · 업종 전체는 같은 품목 경쟁사(인덱스 경쟁사=O)와 코웨이의 합계'}</p></div></section></div>`}
+  <div class="v39-below one">${v39Legend()}<span class="fn" title="${esc((d.note||'')+(v39Adv?'':' · 업종 전체는 같은 품목 경쟁사(인덱스 경쟁사=O)와 코웨이의 합계'))}">칸=하루 · 색=검색수 순위 · 높이=광고비 · 풍선=캠페인·신규 소재·기사 · 마우스 휠로 3D↔위에서 본 2D · ${esc(d.note||'')}</span></div></section></div>`}
 function v39Animate(full){const b=v39Last;if(!b)return;v39Hot(null);const els=[...document.querySelectorAll('#v39-svg>.v39-c')];const id=++v39Anim;const N=b.cells.length;
  const ncol=Math.max(...b.cells.map(c=>c.x));const t0=performance.now(),D0=650,DUR=750;
  const ease=t=>1-Math.pow(1-t,3);
@@ -136,7 +137,7 @@ function v39Animate(full){const b=v39Last;if(!b)return;v39Hot(null);const els=[.
 function v39Scroll0(){const sc=document.getElementById('v39-sc'),b=v39Last;if(!sc||!b)return;const c=b.cells.find(z=>z.d===b.today);
  sc.scrollLeft=c?Math.max(0,c.x-sc.clientWidth*.72):(b.m.Y<new Date().getFullYear()?0:sc.scrollWidth);v39Arrows()}
 function v39Arrows(){const sc=document.getElementById('v39-sc');if(!sc)return;document.querySelectorAll('[data-v39-scroll]').forEach(btn=>{const dir=+btn.dataset.v39Scroll;btn.classList.toggle('off',dir<0?sc.scrollLeft<=2:sc.scrollLeft>=sc.scrollWidth-sc.clientWidth-2)})}
-function v39Draw(anim){v39HotCol=null;$('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';v39Controls(true);v39K=0;$('#content').innerHTML=v39View();v39Track();v39Scroll0();v39Animate(!anim);setTimeout(()=>{const k=v39ScrollK();if(k>0){v39K=k;v39Recam()}},50);
+function v39Draw(anim){v39HotCol=null;$('#page-title').textContent=V39_TITLE;$('#subtitle').textContent='';v39Controls(true);v39K=0;v39Lock(!v39IsFull());$('#content').innerHTML=v39View();{const H=v39FitH();if(H&&v39Last&&Math.abs(H-v39Last.H)>3){v39H=H;$('#content').innerHTML=v39View()}}v39Scroll0();v39Animate(!anim);
  const sc=document.getElementById('v39-sc');if(sc)sc.addEventListener('scroll',()=>{v39Arrows();v39Hot(null)},{passive:true})}
 
 var v39BaseRender=render;
@@ -285,18 +286,21 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('v39-max')&&!document.querySelector('dialog[open]'))v39Max(false)});
 document.addEventListener('fullscreenchange',()=>{v39FullCls();if(route!=='heatmap'||!v39D)return;try{v39Draw(false)}catch(e){}});
 
-// ---------- 스크롤에 따라 카메라 각도: 내리면 위에서 본 2D, 올리면 3D (11-06 13:25) ----------
-var v39K=0,v39KRaf=0;const V39_RUN=380;
+// ---------- 마우스 휠로 카메라 각도: 아래로 굴리면 위에서 본 2D, 위로 굴리면 3D · 페이지 자체는 스크롤 없이 화면에 맞춤 (11-06 14:13) ----------
+var v39K=0,v39KRaf=0,v39H=null;
 function v39Recam(){const sv=document.getElementById('v39-svg');if(!sv||!v39Last||route!=='heatmap')return;v39Hot(null);++v39Anim;
  const m=v39Last.m,b=v39Build(m);v39Last={...b,today:m.today,m};sv.setAttribute('width',b.W);sv.setAttribute('height',b.H);sv.setAttribute('viewBox',`0 0 ${b.W} ${b.H}`);sv.innerHTML=b.svg;
+ const st=document.querySelector('.v39-stick');if(st)st.setAttribute('height',b.H);
  const els=[...sv.querySelectorAll(':scope>.v39-c')];b.cells.forEach((c,k)=>v39Paint(els[k],c,1));const t=document.getElementById('v39-today');if(t)t.innerHTML=v39Today();
- sv.classList.toggle('v39-top',v39K>.5)}
-function v39Track(){const tr=document.querySelector('#content .v39-track'),card=tr&&tr.querySelector('.v39-card');if(!tr||!card)return;
- if(v39IsFull()){tr.style.height='';card.classList.remove('v39-pin');return}card.classList.add('v39-pin');tr.style.height=(card.offsetHeight+V39_RUN)+'px'}
-function v39ScrollK(){const tr=document.querySelector('#content .v39-track');if(!tr||route!=='heatmap'||v39IsFull())return 0;
- const top=parseFloat(getComputedStyle(tr.querySelector('.v39-card')).top)||0,par=tr.offsetParent;let base=0;
- let el=tr.parentElement;while(el&&el!==document.body){const o=getComputedStyle(el).overflowY;if(o==='auto'||o==='scroll'){base=el.getBoundingClientRect().top;break}el=el.parentElement}
- return Math.max(0,Math.min(1,(base+top-tr.getBoundingClientRect().top)/V39_RUN))}
-function v39OnScroll(){if(v39KRaf)return;v39KRaf=requestAnimationFrame(()=>{v39KRaf=0;const k=v39ScrollK();if(Math.abs(k-v39K)<.004&&!(k===0&&v39K>0)&&!(k===1&&v39K<1))return;v39K=k;v39Recam()})}
-document.addEventListener('scroll',e=>{if(route==='heatmap'&&!(e.target&&e.target.id==='v39-sc'))v39OnScroll()},{capture:true,passive:true});
-window.addEventListener('resize',()=>{if(route==='heatmap')v39Track()});
+ sv.classList.add('v39-on','v39-ready')}
+function v39Lock(on){document.documentElement.classList.toggle('v39-lock',!!on)}
+function v39Track(){}
+function v39FitH(){if(route!=='heatmap'||v39IsFull())return null;const sv=document.getElementById('v39-svg'),card=document.querySelector('#content .v39-card');if(!sv||!card)return null;
+ const below=card.querySelector('.v39-below'),foot=document.querySelector('main>footer');const top=sv.getBoundingClientRect().top+window.scrollY;
+ const need=(below?below.offsetHeight+10:30)+parseFloat(getComputedStyle(card).paddingBottom||0)+(foot?foot.offsetHeight+14:20)+18;
+ return Math.max(300,Math.floor(innerHeight-top-need))}
+function v39Fit(){const H=v39FitH();if(H&&v39Last&&Math.abs(H-v39Last.H)>3){v39H=H;v39Recam();v39Scroll0()}}
+document.addEventListener('wheel',e=>{if(route!=='heatmap'||!v39Last)return;if(e.ctrlKey||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+ if(e.target.closest&&e.target.closest('dialog,.v39-tip,select,.v39-ev-pop,[data-v39-pop]'))return;const dl=document.querySelector('dialog[open]');if(dl)return;
+ e.preventDefault();v39K=Math.max(0,Math.min(1,v39K+e.deltaY/(e.deltaMode===1?12:700)));if(!v39KRaf)v39KRaf=requestAnimationFrame(()=>{v39KRaf=0;v39Recam()})},{passive:false});
+window.addEventListener('resize',()=>{if(route==='heatmap'&&v39Last){v39H=null;setTimeout(v39Fit,60)}});

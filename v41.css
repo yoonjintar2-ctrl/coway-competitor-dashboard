@@ -41,3 +41,23 @@ table.v41-t{border-collapse:collapse;width:100%;font-size:12px;font-variant-nume
 .v41-card:hover{z-index:5}.v41-card:hover .go{opacity:1;transform:none}
 /* 11-06 11:3x — 그래프 영역을 다른 화면(월별 통합 분석 등)과 같은 흰 유리판 위에 올림: 고정 배경(물방울 사진 아래쪽 푸른 기)이 비쳐 보이던 문제 */
 .v41-plot{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,.8));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.95);border-radius:18px;box-shadow:0 8px 24px rgba(20,60,90,.05),inset 0 1px 0 #fff}
+/* 11-06 14:04 — 팝업: 드롭다운과 X 띄우기 · 열 너비 통일 · 구분/MPP 가운데 · 집행 요약 표 · 케이블 그래프 */
+dialog.v41-dialog .v41-ph .v41-per{margin-right:58px;margin-top:2px;flex:none}
+.v41-t tbody th,.v41-t tfoot th{text-align:center!important}
+table.v41-tt,table.v41-ct,table.v41-st{table-layout:fixed}
+.v41-tt col.c0{width:150px}.v41-tt col.c1{width:96px}
+.v41-ct col.c0{width:150px}
+.v41-ct td{text-align:right}
+.v41-st td{text-align:right}.v41-st th.sec{background:#eef2f6}
+.v41-st tr.tot th,.v41-st tr.tot td{background:#e7ecf0;font-weight:800}
+.v41-st tr.all th,.v41-st tr.all td{background:#dde5ec;color:#102b45}
+.v41-st thead th{font-size:11.5px;white-space:normal;line-height:1.25}
+
+.v41-sub{font-size:11.5px;color:#8a96a3;margin:6px 0 0}
+.v41-charts.c2{grid-template-columns:1fr 1.25fr}
+@media (max-width:900px){.v41-charts.c2{grid-template-columns:1fr}}
+.v41-hbars{display:grid;gap:5px;margin-top:8px}
+.v41-hbars .hb{display:grid;grid-template-columns:92px 1fr 58px;align-items:center;gap:8px;font-size:10.5px;color:#55697a}
+.v41-hbars .hb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;font-weight:700;color:#34414d}
+.v41-hbars .hb i{display:block;height:10px;border-radius:5px;background:#eef2f5;overflow:hidden}.v41-hbars .hb i b{display:block;height:100%;background:linear-gradient(90deg,#9aa6b2,#6f7c89);border-radius:5px}
+.v41-hbars .hb em{font-style:normal;font-weight:700;color:#3c4a56;text-align:right}

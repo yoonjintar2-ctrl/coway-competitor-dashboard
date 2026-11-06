@@ -21,9 +21,17 @@ function v41Months(){return [...new Set(v41D.R.filter(r=>r.y===v41Year).map(r=>v
 function v41Controls(show){let box=document.querySelector('main>header .v41-ctrl');if(!show){if(box)box.remove();return}const head=document.querySelector('main>header');if(!head)return;
  if(!box){box=document.createElement('div');box.className='v32-ctrl v41-ctrl';head.appendChild(box)}
  box.innerHTML=`<label>품목<select id="v41-cat" class="chip">${(v41Meta.categories||[]).map(c=>`<option value="${esc(c.label)}" ${c.label===v41Cat?'selected':''}>${esc(c.name||c.label)}</option>`).join('')}</select></label>`}
+// 먼슬리 리포트 기준 자료(2026년) — 카드·팝업 맨 위 표 (11-06 14:04)
+function v41Rep(){const r=v41D&&v41D.report;return r&&r.year===v41Year&&Object.keys(r.bubbles||{}).length?r:null}
+function v41RepPts(rep){const by={};Object.entries(rep.bubbles).forEach(([k,v])=>{const [sec,a]=k.split('|');const o=by[a]||(by[a]={a,secs:[],won:0,eq:0,r3:null});o.secs.push(sec);o.won+=v.won/1000;o.eq+=v.eq;o.r3=v.r3});
+ // 코웨이 광고비는 월별 표의 실집행 합계(버블은 억 단위 반올림)
+ const act=rep.rows.filter(x=>x.brand==='코웨이'&&x.media==='Total').reduce((t,x)=>t+(x.act||0),0);if(by['코웨이']&&act)by['코웨이'].won=act;
+ return Object.values(by).map(o=>{let r=o.secs.length>1?v41Reach(o.a,'ytd'):{r3:o.r3};return {a:o.a,eq:o.eq,won:o.won,inv:0,ins:0,r,secs:o.secs}})}
+function v41RepRows(adv,per){const r=v41Rep();if(!r)return null;const rows=r.rows.filter(x=>x.brand===adv&&(per==='ytd'||v41M(v41Year,x.m)===per));return rows.length?rows:null}
 function v41View(){const d=v41D,rows=v41Pick('ytd'),by=v41Sum(rows,'adv'),ms=v41Months();
  const advs=Object.keys(by).filter(a=>by[a].inv>0||by[a].eq>0).sort((a,b)=>(b==='코웨이')-(a==='코웨이')||by[b].adj-by[a].adj);
- const pts=advs.map(a=>({a,eq:by[a].eq,won:by[a].adj,inv:by[a].inv,ins:by[a].ins,r:v41Reach(a,'ytd')}));const hasR=pts.some(p=>p.r&&p.r.r3!=null);
+ let pts=advs.map(a=>({a,eq:by[a].eq,won:by[a].adj,inv:by[a].inv,ins:by[a].ins,r:v41Reach(a,'ytd')}));
+ const rep=v41Rep();if(rep)pts=v41RepPts(rep);const hasR=pts.some(p=>p.r&&p.r.r3!=null);
  const host=$('#content'),W=Math.max(900,(host.clientWidth||1200)-60),H=Math.max(460,Math.min(640,innerHeight-260)),L=62,R=40,T=26,B=46,PW=W-L-R,PH=H-T-B;
  const xmax=(()=>{const m=Math.max(1,...pts.map(p=>p.eq))*1.15;const st=[100,200,250,500,1000,2000,2500,5000];const s=st.find(v=>m/v<=9)||10000;return Math.ceil(m/s)*s})();
  const XST=(()=>{for(const s of [50,100,200,250,500,1000,2000,2500,5000,10000])if(xmax/s<=10)return s;return 20000})(),YMAX=hasR?Math.max(70,Math.ceil(Math.max(...pts.map(p=>p.r&&p.r.r3||0))/10)*10+10):70;
@@ -61,31 +69,59 @@ function v41View(){const d=v41D,rows=v41Pick('ytd'),by=v41Sum(rows,'adv'),ms=v41
  return `<section class="glass section v41-card-wrap"><div class="v41-head"><div><h2>${v41Year}년 누적 경쟁사 TV 노출량 · R3+ <small>${esc(v41Cat)}</small></h2><p>카드를 누르면 지상파·케이블 세부 운영 내역을 볼 수 있어요</p></div>
   <div class="v39-years v41-years">${d.years.map(y=>`<button type="button" class="y${y===v41Year?' on':''}" data-v41-year="${y}">${y}</button>`).join('')}</div></div>
   <div class="v41-plot" style="height:${H}px"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}</svg>${html}</div>
-  <p class="footnote v41-note">광고비: 아리아나 TV(지상파·케이블&종편) 모니터링 광고비에 SM C&C 실집행 추정 요율(설정 &gt; 광고비 보정)을 적용 · Eq GRP: 15초 환산 GRP, 타깃 ${esc(src.target||'')}(${esc(d.reach_target||'')}) · 자료 ${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(0,1)[0]||'')}~${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(-1)[0]||'')} · 포함=O·경쟁사=O 광고주 · ${hasR?'R3+: 아리아나 도달 분석':'R3+: 자료 준비 중'}</p></section>`}
+  ${rep?`<p class="footnote v41-note">${v41Year}년은 SM C&C 먼슬리 리포트(1~${Math.max(...rep.months)}월) 기준과 같게 맞췄어요 · 광고비: 코웨이는 실집행 금액(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사는 리포트 표기 금액 · Eq GRP·R3+: 닐슨, 타깃 F30-45 수도권, PR·SP·TJ·YG(시보 제외)${(v41Cat==='정수기')?' · 정수기는 리포트의 일반·얼음을 합친 값(광고비·Eq GRP는 합계, R3+는 정수기 전체로 다시 산출한 아리아나 도달률)':''}</p>`:`<p class="footnote v41-note">광고비: 아리아나 TV(지상파·케이블&종편) 모니터링 광고비에 SM C&C 실집행 추정 요율(설정 &gt; 광고비 보정)을 적용 · Eq GRP: 15초 환산 GRP, 타깃 ${esc(src.target||'')}(${esc(d.reach_target||'')}) · 자료 ${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(0,1)[0]||'')}~${esc((src.months||[]).filter(m=>m.startsWith(String(v41Year))).slice(-1)[0]||'')} · 포함=O·경쟁사=O 광고주 · ${hasR?'R3+: 아리아나 도달 분석':'R3+: 자료 준비 중'}${v41Year<2026?' · 이 해는 먼슬리 리포트가 없어 아리아나 원본 기준':''}</p>`}</section>`}
 function v41Draw(){if(!v41D){$('#content').innerHTML=`<section class="glass section">${empty('도달률 자료가 없어요.','아리아나 자료(data/arianna)를 넣으면 보여요.')}</section>`;return}v41Controls(true);$('#content').innerHTML=v41View()}
 // 팝업: 지상파·케이블 세부 운영 내역
 function v41Bar(parts,total,cols){if(!total)return '<i class="v41-bar0"></i>';return `<i class="v41-bar">${parts.map(([k,v],i)=>`<b style="width:${v/total*100}%;background:${cols[i%cols.length]}" title="${esc(k)} ${Math.round(v/total*100)}%"></b>`).join('')}</i>`}
-function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv),ms=v41Months();
- const terr=rows.filter(r=>r.media==='지상파'),cab=rows.filter(r=>r.media!=='지상파'),T=v41Sum(terr).all||{inv:0,net:0,ins:0,grp:0,eq:0,adj:0},C=v41Sum(cab).all||{inv:0,net:0,ins:0,grp:0,eq:0,adj:0};
- const pct=(v,t)=>t?Math.round(v/t*100)+'%':'-',num=v=>Math.round(v||0).toLocaleString(),cprp=x=>x.eq?num(x.inv/x.eq):'-',ar=x=>x.ins?(x.grp/x.ins).toFixed(1):'-';
+function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv),rep=v41Rep();
+ const repMs=rep?[...new Set(rep.rows.filter(x=>x.brand===adv).map(x=>v41M(v41Year,x.m)))]:[],ms=[...new Set([...v41Months(),...repMs])].sort();
+ const terr=rows.filter(r=>r.media==='지상파'),cab=rows.filter(r=>r.media!=='지상파'),Z={inv:0,net:0,ins:0,grp:0,eq:0,adj:0},T=v41Sum(terr).all||Z,C=v41Sum(cab).all||Z;
+ const pct=(v,t)=>t?Math.round(v/t*100)+'%':'-',num=v=>v==null||v===''?'-':Math.round(v).toLocaleString(),f1=v=>v==null?'-':(+v).toFixed(1).replace(/\.0$/,''),cprp=x=>x.eq?num(x.inv/x.eq):'-',ar=x=>x.ins?(x.grp/x.ins).toFixed(1):'-';
+ // ① 지상파 / 케이블&종편 요약(먼슬리 리포트 표와 같은 모양)
+ const RR=v41RepRows(adv,per),bub=rep?Object.fromEntries(Object.entries(rep.bubbles).filter(([k])=>k.split('|')[1]===adv).map(([k,v])=>[k.split('|')[0],v])):{};
+ let sumHtml='',headAct=null,headInv=null,headEq=null,headR3=null;
+ const MED=['지상파','케이블&종편','Total'],cols=`<tr><th>매체</th><th>모니터링 금액 (천원)</th><th>실집행금액 (천원)</th><th>횟수</th><th>GRP</th><th>Eq GRP</th><th>모니터링 CPRP (천원)</th><th>실집행 CPRP (천원)</th><th>R1+ (%)</th><th>R3+ (%)</th><th>A.F</th></tr>`;
+ const rowH=(x,tot)=>`<tr class="${tot?'tot':''}"><th>${esc(x.media)}</th><td>${num(x.inv)}</td><td>${num(x.act)}</td><td>${num(x.ins)}</td><td>${num(x.grp)}</td><td>${num(x.eq)}</td><td>${num(x.cprp)}</td><td>${num(x.acprp)}</td><td>${f1(x.r1)}</td><td>${f1(x.r3)}</td><td>${f1(x.af)}</td></tr>`;
+ if(RR){const secs=[...new Set(RR.map(x=>x.sec))],multi=secs.length>1,blocks=[];const all={};
+  secs.forEach(sec=>{const by={};RR.filter(x=>x.sec===sec).forEach(x=>{const o=by[x.media]||(by[x.media]={media:x.media,inv:0,act:0,ins:0,grp:0,eq:0,r1:null,r3:null,af:null,n:0});['inv','act','ins','grp','eq'].forEach(k=>o[k]+=x[k]||0);o.n++;if(per!=='ytd'){o.r1=x.r1;o.r3=x.r3;o.af=x.af;o.rc=x.cprp;o.ra=x.acprp}});
+   MED.forEach(m=>{const o=by[m];if(!o)return;o.cprp=o.rc!=null?o.rc:o.eq?o.inv/o.eq:null;o.acprp=o.ra!=null?o.ra:o.eq?o.act/o.eq:null;if(per==='ytd'&&m==='Total'&&bub[sec])o.r3=bub[sec].r3;
+    if(m==='Total'){['inv','act','ins','grp','eq'].forEach(k=>all[k]=(all[k]||0)+o[k])}});
+   blocks.push([sec,MED.filter(m=>by[m]).map(m=>by[m])])});
+  const lab=s=>s.replace(v41Cat,'').trim()||s;
+  sumHtml=`<div class="v41-tw"><table class="v41-t v41-st"><thead>${multi?cols.replace('<tr><th>매체</th>','<tr><th>구분</th><th>매체</th>'):cols}</thead><tbody>${blocks.map(([sec,ls])=>ls.map((x,i)=>(multi?rowH(x,x.media==='Total').replace('<tr class="'+(x.media==='Total'?'tot':'')+'">','<tr class="'+(x.media==='Total'?'tot':'')+'">'+(i===0?`<th rowspan="${ls.length}" class="sec">${esc(lab(sec))}</th>`:'')):rowH(x,x.media==='Total'))).join('')).join('')}
+   ${multi?(()=>{const o={media:'합계',...all};o.cprp=o.eq?o.inv/o.eq:null;o.acprp=o.eq?o.act/o.eq:null;const rr=per==='ytd'?v41Reach(adv,'ytd'):null;o.r3=rr&&rr.r3!=null?rr.r3:null;return rowH(o,true).replace('<tr class="tot"><th>합계</th>','<tr class="tot all"><th colspan="2">합계</th>')})():''}</tbody></table></div>`;
+  const tot=multi?all:blocks[0][1].find(x=>x.media==='Total')||{};headAct=tot.act;headInv=tot.inv;headEq=tot.eq;
+  headR3=per==='ytd'?(multi?(v41Reach(adv,'ytd')||{}).r3:(bub[secs[0]]||{}).r3):(multi?null:(blocks[0][1].find(x=>x.media==='Total')||{}).r3)}
+ else if(rows.length){const mk=(m,x)=>({media:m,inv:x.inv,act:null,ins:x.ins,grp:x.grp,eq:x.eq,cprp:x.eq?x.inv/x.eq:null,acprp:null,r1:null,r3:null,af:null}),A={inv:T.inv+C.inv,ins:T.ins+C.ins,grp:T.grp+C.grp,eq:T.eq+C.eq};
+  const r=v41Reach(adv,per),tt=mk('Total',A);if(r){tt.r1=r.r1;tt.r3=r.r3}
+  sumHtml=`<div class="v41-tw"><table class="v41-t v41-st"><thead>${cols}</thead><tbody>${terr.length?rowH(mk('지상파',T)):''}${cab.length?rowH(mk('케이블&종편',C)):''}${rowH(tt,true)}</tbody></table></div><p class="v41-sub">이 광고주·기간은 먼슬리 리포트 표가 없어 아리아나(닐슨) 원본으로 보여요.</p>`;
+  headInv=A.inv;headEq=A.eq;headR3=r&&r.r3}
+ // ② 지상파 세부(채널·시급·광고유형·초수) — 모니터링 광고비 기준
  const dimDef=[['ch','채널별',x=>x,['KBS2','MBC','SBS']],['tb','시급별',x=>x,['SS','SA','A','B','C','PS']],['type','광고유형별',x=>V41_TYPE[x]||x,['PR','SP','TJ','YG']],['sec','초수별',x=>x+'"',null]];
  const dims=dimDef.map(([k,n,f,ord])=>{const s=v41Sum(terr,k);let keys=Object.keys(s).filter(z=>s[z].inv||s[z].ins);keys.sort((a,b)=>ord?((ord.indexOf(a)+99)%99)-((ord.indexOf(b)+99)%99)||s[b].inv-s[a].inv:+a-+b);return {k,n,f,s,keys}});
- const COL=['#4c66b2','#7fc4e4','#9fd6c8','#c3c8cd','#8a97ab','#6ea7a3'];
+ const COL=['#4c66b2','#7fc4e4','#9fd6c8','#c3c8cd','#8a97ab','#6ea7a3','#b7a6d6','#e3b98c','#9bb6d8','#d3dbe1'];
  const head=dims.map(d=>`<th colspan="${d.keys.length||1}">${d.n}</th>`).join(''),sub=dims.map(d=>d.keys.length?d.keys.map(z=>`<th>${esc(d.f(z))}</th>`).join(''):'<th>-</th>').join('');
+ const nc=dims.reduce((t,d)=>t+(d.keys.length||1),0),cw=`<colgroup><col class="c0"><col class="c1">${'<col>'.repeat(nc)}</colgroup>`;
  const line=(nm,tot,fn)=>`<tr><th>${nm}</th><td class="t">${tot}</td>${dims.map(d=>d.keys.length?d.keys.map(z=>`<td>${fn(d.s[z])}</td>`).join(''):'<td>-</td>').join('')}</tr>`;
- const terrHtml=terr.length?`<div class="v41-tw"><table class="v41-t"><thead><tr><th rowspan="2">구분</th><th rowspan="2">합계</th>${head}</tr><tr>${sub}</tr></thead><tbody>
-  ${line('광고비(실집행 추정)',v41Won(T.adj),x=>pct(x.adj,T.adj))}${line('모니터링 광고비 (천원)',num(T.inv),x=>pct(x.inv,T.inv))}${line('Eq GRP',num(T.eq),x=>pct(x.eq,T.eq))}${line('횟수',num(T.ins),x=>pct(x.ins,T.ins))}${line('A.R',ar(T),x=>ar(x))}${line('모니터링 CPRP (천원)',cprp(T),x=>cprp(x))}</tbody></table></div>
+ const terrHtml=terr.length?`<div class="v41-tw"><table class="v41-t v41-tt">${cw}<thead><tr><th rowspan="2">구분</th><th rowspan="2">합계</th>${head}</tr><tr>${sub}</tr></thead><tbody>
+  ${line('모니터링 광고비 (천원)',num(T.inv),x=>pct(x.inv,T.inv))}${line('Eq GRP',num(T.eq),x=>pct(x.eq,T.eq))}${line('횟수',num(T.ins),x=>pct(x.ins,T.ins))}${line('A.R',ar(T),x=>ar(x))}${line('모니터링 CPRP (천원)',cprp(T),x=>cprp(x))}</tbody></table></div>
   <div class="v41-charts">${dims.map(d=>`<div class="v41-ch"><b>${d.n}</b><div class="r"><span>광고비</span>${v41Bar(d.keys.map(z=>[d.f(z),d.s[z].inv]),T.inv,COL)}</div><div class="r"><span>Eq GRP</span>${v41Bar(d.keys.map(z=>[d.f(z),d.s[z].eq]),T.eq,COL)}</div><div class="lg">${d.keys.map((z,i)=>`<em><i style="background:${COL[i%COL.length]}"></i>${esc(d.f(z))}</em>`).join('')}</div></div>`).join('')}</div>`:'<p class="v41-none">이 기간 지상파 집행이 없어요.</p>';
+ // ③ 케이블 MPP — 모니터링 광고비 기준만, 표 아래 MPP·채널 그래프
  const ms2=v41Sum(cab,'mpp');let mk=Object.keys(ms2).sort((a,b)=>ms2[b].inv-ms2[a].inv);const top=mk.filter(z=>ms2[z].inv/C.inv>=.01).slice(0,10),rest=mk.filter(z=>!top.includes(z));
  if(rest.length){const o={inv:0,net:0,ins:0,grp:0,eq:0,adj:0};rest.forEach(z=>{for(const k in o)o[k]+=ms2[z][k]});ms2['기타']=o;top.push('기타')}
- const cabHtml=cab.length?`<div class="v41-tw"><table class="v41-t v41-ct"><thead><tr><th>MPP</th><th>모니터링 광고비 (천원)</th><th>광고비(실집행 추정)</th><th>닐슨 NET (천원)</th><th>집행 비중</th><th>Eq GRP</th><th>모니터링 CPRP (천원)</th><th class="g">광고비 · Eq GRP 비중</th></tr></thead><tbody>
-  ${top.map(z=>{const x=ms2[z];return `<tr><th>${esc(z||'(미분류)')}</th><td>${num(x.inv)}</td><td>${v41Won(x.adj)}</td><td>${num(x.net)}</td><td>${pct(x.inv,C.inv)}</td><td>${num(x.eq)}</td><td>${cprp(x)}</td><td class="g"><i class="v41-hb"><b style="width:${C.inv?x.inv/C.inv*100:0}%"></b></i><i class="v41-hb e"><b style="width:${C.eq?x.eq/C.eq*100:0}%"></b></i></td></tr>`}).join('')}</tbody>
-  <tfoot><tr><th>Total</th><td>${num(C.inv)}</td><td>${v41Won(C.adj)}</td><td>${num(C.net)}</td><td>100%</td><td>${num(C.eq)}</td><td>${cprp(C)}</td><td class="g"><span class="v41-lg2"><i></i>광고비 <i class="e"></i>Eq GRP</span></td></tr></tfoot></table></div>`:'<p class="v41-none">이 기간 케이블·종편 집행이 없어요.</p>';
- const r=v41Reach(adv,per);
- return `<div class="v41-pop"><div class="v41-ph"><div><span class="v41-tag">${esc(v41Cat)}</span><h2>${esc(adv)} · TV 세부 운영 내역</h2><p>${per==='ytd'?v41Year+'년 누적':per.replace('-','년 ')+'월'} · 광고비(실집행 추정) ${v41Won(T.adj+C.adj)}원 · Eq GRP ${num(T.eq+C.eq)} · R3+ ${r&&r.r3!=null?Math.round(r.r3)+'%':'준비 중'}</p></div>
+ const chs=v41Sum(cab,'ch'),ck=Object.keys(chs).filter(z=>chs[z].inv>0).sort((a,b)=>chs[b].inv-chs[a].inv),ctop=ck.slice(0,12),cmax=ctop.length?chs[ctop[0]].inv:1;
+ const cabHtml=cab.length?`<div class="v41-tw"><table class="v41-t v41-ct"><colgroup><col class="c0"><col><col><col><col><col><col></colgroup><thead><tr><th>MPP</th><th>모니터링 광고비 (천원)</th><th>집행 비중</th><th>횟수</th><th>Eq GRP</th><th>Eq GRP 비중</th><th>모니터링 CPRP (천원)</th></tr></thead><tbody>
+  ${top.map(z=>{const x=ms2[z];return `<tr><th>${esc(z||'(미분류)')}</th><td>${num(x.inv)}</td><td>${pct(x.inv,C.inv)}</td><td>${num(x.ins)}</td><td>${num(x.eq)}</td><td>${pct(x.eq,C.eq)}</td><td>${cprp(x)}</td></tr>`}).join('')}</tbody>
+  <tfoot><tr><th>Total</th><td>${num(C.inv)}</td><td>100%</td><td>${num(C.ins)}</td><td>${num(C.eq)}</td><td>100%</td><td>${cprp(C)}</td></tr></tfoot></table></div>
+  <div class="v41-charts c2"><div class="v41-ch"><b>MPP별</b><div class="r"><span>광고비</span>${v41Bar(top.map(z=>[z,ms2[z].inv]),C.inv,COL)}</div><div class="r"><span>Eq GRP</span>${v41Bar(top.map(z=>[z,ms2[z].eq]),C.eq,COL)}</div><div class="lg">${top.map((z,i)=>`<em><i style="background:${COL[i%COL.length]}"></i>${esc(z)}</em>`).join('')}</div></div>
+  <div class="v41-ch"><b>채널별 광고비 ${ck.length>12?'TOP 12':''}</b><div class="v41-hbars">${ctop.map(z=>`<div class="hb"><span title="${esc(z)}">${esc(z)}</span><i><b style="width:${chs[z].inv/cmax*100}%"></b></i><em>${v41Won(chs[z].inv)}</em></div>`).join('')}</div></div></div>`:'<p class="v41-none">이 기간 케이블·종편 집행이 없어요.</p>';
+ const me=adv==='코웨이',hd=[];if(headAct!=null)hd.push(`${me?'광고비(실집행)':'실집행 추정'} ${v41Won(headAct)}원`);if(headInv!=null)hd.push(`모니터링 ${v41Won(headInv)}원`);hd.push(`Eq GRP ${num(headEq!=null?headEq:T.eq+C.eq)}`);hd.push(`R3+ ${headR3!=null?Math.round(headR3)+'%':'-'}`);
+ return `<div class="v41-pop"><div class="v41-ph"><div><span class="v41-tag">${esc(v41Cat)}</span><h2>${esc(adv)} · TV 세부 운영 내역</h2><p>${per==='ytd'?v41Year+'년 누적':per.replace('-','년 ')+'월'} · ${hd.join(' · ')}</p></div>
   <select class="chip v41-per" data-v41-per>${[['ytd',v41Year+'년 누적'],...ms.slice().reverse().map(m=>[m,m.slice(2,4)+'.'+m.slice(5)])].map(([v,l])=>`<option value="${v}" ${v===per?'selected':''}>${l}</option>`).join('')}</select></div>
+  <div id="v41-donut-slot"></div>
+  <h3>지상파 · 케이블&종편 집행 요약</h3>${sumHtml||'<p class="v41-none">이 기간 집행이 없어요.</p>'}
   <h3>지상파TV 세부 운영 내역</h3>${terrHtml}<h3>케이블TV 세부 운영 내역</h3>${cabHtml}
-  <p class="footnote">모니터링 광고비·NET·GRP·Eq GRP는 아리아나(닐슨) 자료, 타깃 ${esc((v41D.source||{}).target||'')} · 광고비(실집행 추정)는 설정의 SM C&C 요율 적용 · A.R = GRP ÷ 횟수 · CPRP = 모니터링 광고비 ÷ Eq GRP · 광고유형: PR 일반프로, SP 스팟, TJ 특집/재방</p></div>`}
+  <p class="footnote">집행 요약: ${rep?'SM C&C 먼슬리 리포트 경쟁사 TV set Performance 표 기준 — 코웨이 실집행금액은 실집행(지상파 CM지정·연계 포함 총액, 홍보팀 정책성 예산 포함), 경쟁사 실집행금액은 보너스율 반영 추정 · 누적의 R1+·A.F는 월별 값을 더할 수 없어 비워 두고 R3+는 누적 도달률':'아리아나(닐슨) 원본'} · 세부 운영 내역: 아리아나(닐슨) 모니터링 광고비·GRP·Eq GRP, 타깃 ${esc((v41D.source||{}).target||'')} · A.R = GRP ÷ 횟수 · CPRP = 모니터링 광고비 ÷ Eq GRP · 광고유형: PR 일반프로, SP 스팟, TJ 특집/재방</p></div>`}
 function v41Open(adv){const dl=$('#detail');dl.className='v41-dialog';$('#detail-body').innerHTML=v41Detail(adv);v41Cur=adv;if(!dl.open)dl.showModal()}
 var v41Cur='';
 var v41BaseRender=render;

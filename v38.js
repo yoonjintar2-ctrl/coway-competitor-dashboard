@@ -13,7 +13,8 @@ function v38K(v){if(v==null)return '';if(v>=1e6)return [(v/1e6).toFixed(1).repla
 function v38Smooth(p){if(p.length<2)return p.length?`M${p[0][0]},${p[0][1]}`:'';let d=`M${p[0][0]},${p[0][1]}`;for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c,t=.18;d+=` C${b[0]+(c[0]-a[0])*t},${b[1]+(c[1]-a[1])*t} ${c[0]-(e[0]-b[0])*t},${c[1]-(e[1]-b[1])*t} ${c[0]},${c[1]}`}return d}
 function v38Days(m){return new Date(+m.slice(0,4),+m.slice(5,7),0).getDate()}
 async function v38Load(){if(!v38Opt){v38Opt=(await api('/api/monthly/options')).options||[];if(!v38Adv&&v38Opt.length){const cw=v38Opt.find(o=>o.advertiser==='코웨이');if(cw){v38Adv='코웨이';if((cw.categories||[]).includes('정수기'))v38Cat='정수기'}else v38Adv=v38Opt[0].advertiser}}
- const o=v38Opt.find(x=>x.advertiser===v38Adv);if(o&&v38Cat&&!o.categories.includes(v38Cat))v38Cat='';
+ let o=v38Opt.find(x=>x.advertiser===v38Adv);if(!o&&v38Opt.length){o=v38Opt.find(x=>x.advertiser==='코웨이')||v38Opt[0];v38Adv=o.advertiser;v38Cat=''}  // 목록에 없는 광고주(예전 주소·다른 화면에서 넘어온 값)면 코웨이로 (11-06)
+ if(o&&v38Cat&&!o.categories.includes(v38Cat))v38Cat='';
  const req=++v38Req;let d;
  if(o&&o.files){d=await api('/api/monthly-file/'+encodeURIComponent(o.files[v38Cat||'']||''))}
  else d=await api('/api/monthly?advertiser='+encodeURIComponent(v38Adv)+'&category='+encodeURIComponent(v38Cat));

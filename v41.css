@@ -80,3 +80,4 @@ table.v41-tt,table.v41-ct,table.v41-st{table-layout:fixed}
 .v41-etcpop>b{display:block;font-size:12px;font-weight:900;color:#102b45;margin-bottom:6px}
 .v41-etcpop .ls div{display:grid;grid-template-columns:1fr auto 34px;gap:8px;padding:3px 0;border-top:1px solid #f0f3f6}
 .v41-etcpop .ls span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}.v41-etcpop .ls em{font-style:normal;font-weight:700;color:#55697a;text-align:right}.v41-etcpop .ls i{font-style:normal;color:#8a96a3;text-align:right}
+.v41-mppc{margin-top:10px}.v41-mppc .v41-hbars .hb{grid-template-columns:120px 1fr 64px}

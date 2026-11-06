@@ -108,12 +108,11 @@ function v41Detail(adv){const per=v41Per,rows=v41Pick(per).filter(r=>r.adv===adv
  // ③ 케이블 MPP — 모니터링 광고비 기준만, 표 아래 MPP·채널 그래프
  const ms2=v41Sum(cab,'mpp');let mk=Object.keys(ms2).sort((a,b)=>ms2[b].inv-ms2[a].inv);const top=mk.filter(z=>ms2[z].inv/C.inv>=.01).slice(0,10),rest=mk.filter(z=>!top.includes(z));
  if(rest.length){const o={inv:0,net:0,ins:0,grp:0,eq:0,adj:0};rest.forEach(z=>{for(const k in o)o[k]+=ms2[z][k]});ms2['기타']=o;top.push('기타')}
- const chs=v41Sum(cab,'ch'),ck=Object.keys(chs).filter(z=>chs[z].inv>0).sort((a,b)=>chs[b].inv-chs[a].inv),ctop=ck.slice(0,12),cmax=ctop.length?chs[ctop[0]].inv:1;
+ const mmax=Math.max(1,...top.map(z=>ms2[z].inv));
  const cabHtml=cab.length?`<div class="v41-tw"><table class="v41-t v41-ct"><colgroup><col class="c0"><col><col><col><col><col><col></colgroup><thead><tr><th>MPP</th><th>모니터링 광고비 (천원)</th><th>집행 비중</th><th>횟수</th><th>Eq GRP</th><th>Eq GRP 비중</th><th>모니터링 CPRP (천원)</th></tr></thead><tbody>
   ${top.map(z=>{const x=ms2[z];return `<tr><th>${esc(z||'(미분류)')}</th><td>${num(x.inv)}</td><td>${pct(x.inv,C.inv)}</td><td>${num(x.ins)}</td><td>${num(x.eq)}</td><td>${pct(x.eq,C.eq)}</td><td>${cprp(x)}</td></tr>`}).join('')}</tbody>
   <tfoot><tr><th>Total</th><td>${num(C.inv)}</td><td>100%</td><td>${num(C.ins)}</td><td>${num(C.eq)}</td><td>100%</td><td>${cprp(C)}</td></tr></tfoot></table></div>
-  <div class="v41-charts c2"><div class="v41-ch"><b>MPP별</b><div class="r"><span>광고비</span>${v41Bar(top.map(z=>[z,ms2[z].inv]),C.inv,COL)}</div><div class="r"><span>Eq GRP</span>${v41Bar(top.map(z=>[z,ms2[z].eq]),C.eq,COL)}</div><div class="lg">${top.map((z,i)=>`<em><i style="background:${COL[i%COL.length]}"></i>${esc(z)}</em>`).join('')}</div></div>
-  <div class="v41-ch"><b>채널별 광고비 ${ck.length>12?'TOP 12':''}</b><div class="v41-hbars">${ctop.map(z=>`<div class="hb"><span title="${esc(z)}">${esc(z)}</span><i><b style="width:${chs[z].inv/cmax*100}%"></b></i><em>${v41Won(chs[z].inv)}</em></div>`).join('')}</div></div></div>`:'<p class="v41-none">이 기간 케이블·종편 집행이 없어요.</p>';
+  <div class="v41-ch v41-mppc"><b>MPP별 광고비</b><div class="v41-hbars">${top.map(z=>`<div class="hb"><span title="${esc(z)}">${esc(z||'(미분류)')}</span><i><b style="width:${mmax?ms2[z].inv/mmax*100:0}%"></b></i><em>${v41Won(ms2[z].inv)}</em></div>`).join('')}</div></div>`:'<p class="v41-none">이 기간 케이블·종편 집행이 없어요.</p>';
  const me=adv==='코웨이',hd=[];if(headAct!=null)hd.push(`${me?'광고비(실집행)':'실집행 추정'} ${v41Won(headAct)}원`);if(headInv!=null)hd.push(`모니터링 ${v41Won(headInv)}원`);hd.push(`Eq GRP ${num(headEq!=null?headEq:T.eq+C.eq)}`);hd.push(`R3+ ${headR3!=null?Math.round(headR3)+'%':'-'}`);
  return `<div class="v41-pop"><div class="v41-ph"><div><span class="v41-tag">${esc(v41Cat)}</span><h2>${esc(adv)} · TV 세부 운영 내역</h2><p>${per==='ytd'?v41Year+'년 누적':per.replace('-','년 ')+'월'} · ${hd.join(' · ')}</p></div>
   <select class="chip v41-per" data-v41-per>${[['ytd',v41Year+'년 누적'],...ms.slice().reverse().map(m=>[m,m.slice(2,4)+'.'+m.slice(5)])].map(([v,l])=>`<option value="${v}" ${v===per?'selected':''}>${l}</option>`).join('')}</select></div>
@@ -146,8 +145,8 @@ if(v41FromHash()&&typeof listing!=='undefined'&&listing){render()}
 var v41DnLast=null,v41DnEtc=null;const V41_BL=['#2a4fa8','#4a6fcf','#8fb0f0'],V41_GR=['#56616c','#6d7883','#858f99','#9ca5ae','#b3bbc2','#c9cfd5'];
 function v41Eok(k){const e=(k||0)/1e5;return e>=10?Math.round(e).toLocaleString()+'억':e>=.1?e.toFixed(1)+'억':Math.round((k||0)/10)+'만'}
 function v41Shade(h,k){const n=parseInt(h.slice(1),16),f=c=>Math.max(0,Math.min(255,Math.round(c*k)));return `rgb(${f(n>>16&255)},${f(n>>8&255)},${f(n&255)})`}
-function v41DnData(adv,per){const rows=v41Pick(per).filter(r=>r.adv===adv);const by=(f)=>{const o={};rows.filter(f).forEach(r=>o[r.ch]=(o[r.ch]||0)+r.inv);return Object.entries(o).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])};
- const t=by(r=>r.media==='지상파');let c=by(r=>r.media!=='지상파');let etc=[];if(c.length>6){etc=c.slice(5);const rest=etc.reduce((s,[,v])=>s+v,0);c=c.slice(0,5).concat([['기타',rest]])}return {t,c,etc}}
+function v41DnData(adv,per){const rows=v41Pick(per).filter(r=>r.adv===adv);const by=(f,key)=>{const o={};rows.filter(f).forEach(r=>{const k=r[key]||'(미분류)';o[k]=(o[k]||0)+r.inv});return Object.entries(o).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1])};
+ const t=by(r=>r.media==='지상파','ch');let c=by(r=>r.media!=='지상파','mpp');let etc=[];if(c.length>6){etc=c.slice(5);const rest=etc.reduce((s,[,v])=>s+v,0);c=c.slice(0,5).concat([['기타',rest]])}return {t,c,etc}}
 function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[,v])=>s+v,0),tot=tT+tC;if(!tot)return '';
  const R=148,K=.56,r=R*.5,DEP=32,ROT=13,TAU=Math.PI*2,GAP=(tT&&tC)?10:0,BW=168,BH=42,PITCH=50,top0=34;
  const n=Math.max(D.t.length,D.c.length),cy=top0+18+R*.9,H=Math.max(top0+n*PITCH+4,cy+R*K+DEP+30),cx=W/2,rc=cy+DEP/2,cs=Math.cos(ROT*Math.PI/180),sn=Math.sin(ROT*Math.PI/180);
@@ -168,7 +167,7 @@ function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[
  const gT=S.filter(s=>s.g==='t'),gC=S.filter(s=>s.g==='c');if(GAP||T<1){if(gT.length)caps+=cap(gT[0],gT[0].a0,true)+cap(gT.at(-1),gT.at(-1).a1,false);if(gC.length)caps+=cap(gC[0],gC[0].a0,true)+cap(gC.at(-1),gC.at(-1).a1,false)}
  // 카드 + 연결선 (다 펼쳐진 뒤에만)
  let lab='';if(T>=1){[[-1,gT,'지상파',tT,'#2a4fa8'],[1,gC,'케이블&종편',tC,'#56616c']].forEach(([side,grp,tl,tv,tc])=>{if(!grp.length)return;
-  const L=[...grp].sort((p,q)=>q.v-p.v).map(s=>{const m=(s.a0+s.a1)/2,fr=Math.sin(m)>0,[ax,ay]=rot(P(m,R,s.ox,fr?DEP*.5:0)),[bx,by]=rot(P(m,R+22,s.ox,fr?DEP*.5+Math.sin(m)*14:0));return {s,ax,ay,bx,by}});  // 카드는 광고비 많은 순(위→아래)
+  const L=[...grp].sort((p,q)=>(p.n==='기타')-(q.n==='기타')||q.v-p.v).map(s=>{const m=(s.a0+s.a1)/2,fr=Math.sin(m)>0,[ax,ay]=rot(P(m,R,s.ox,fr?DEP*.5:0)),[bx,by]=rot(P(m,R+22,s.ox,fr?DEP*.5+Math.sin(m)*14:0));return {s,ax,ay,bx,by}});  // 카드는 광고비 많은 순(위→아래)
   const colx=side<0?BW:W-BW,bx0=side<0?0:W-BW;
   lab+=`<text x="${bx0}" y="${top0-12}" font-size="14.5" font-weight="900" fill="${tc}">${tl} <tspan fill="#102b45">${v41Eok(tv)}</tspan> <tspan font-size="12" font-weight="700" fill="#8a96a3">${Math.round(tv/tot*100)}%</tspan></text>`;
   L.forEach((q,i)=>{const s=q.s,y=top0+i*PITCH+BH/2,mx=cx+side*Math.max(Math.abs(q.bx-cx)+8,R+GAP+50),st=s.g==='t'?'#8fa0d4':'#b3bcc4';
@@ -179,7 +178,7 @@ function v41DnSvg(D,T,W){const tT=D.t.reduce((s,[,v])=>s+v,0),tC=D.c.reduce((s,[
  const defs=`<defs><linearGradient id="v41hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".55" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="v41wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#0c2236" stop-opacity=".18"/></linearGradient><filter id="v41gl" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#0c2236" flood-opacity=".22"/></filter><radialGradient id="v41sh"><stop offset="0" stop-color="#0c2236" stop-opacity=".14"/><stop offset="1" stop-color="#0c2236" stop-opacity="0"/></radialGradient></defs>`;
  return `<svg class="v41-dn${T>=1?' done':''}" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" data-cx="${cx}" data-rc="${rc}">${defs}<g class="dn" transform="rotate(${ROT} ${cx} ${rc})"><ellipse cx="${cx}" cy="${cy+DEP+14}" rx="${R*1.2}" ry="${R*K*.8}" fill="url(#v41sh)" opacity="${Math.min(1,T*1.5).toFixed(2)}"/><g class="bk">${back}${caps}</g>${walls}${tops}<g class="hlov"></g></g>${lab}${hov}</svg>`}
 function v41DnMount(adv,per){const box=document.getElementById('v41-donut-slot');if(!box)return;const D=v41DnData(adv,per);if(!D.t.length&&!D.c.length){box.innerHTML='';return}
- const W=Math.max(760,Math.min(1040,(box.clientWidth||1000)));box.innerHTML=`<h3>채널별 광고비 구성</h3><div class="v41-dnw"></div><p class="v41-sub">아리아나(닐슨) 모니터링 광고비 기준 · 케이블은 상위 5개 채널과 기타 · 카드나 조각에 마우스를 올리면 강조돼요</p>`;
+ const W=Math.max(760,Math.min(1040,(box.clientWidth||1000)));box.innerHTML=`<h3>채널별 광고비 구성</h3><div class="v41-dnw"></div><p class="v41-sub">아리아나(닐슨) 모니터링 광고비 기준 · 케이블&종편은 MPP 기준, 상위 5개와 기타 · 카드나 조각에 마우스를 올리면 강조돼요</p>`;
  const host=box.querySelector('.v41-dnw'),id=(box._a=(box._a||0)+1),t0=performance.now(),DUR=1000,ease=x=>1-Math.pow(1-x,3);
  if(matchMedia('(prefers-reduced-motion: reduce)').matches){host.innerHTML=v41DnSvg(D,1,W);return}
  const fr=now=>{if(box._a!==id)return;const x=Math.min(1,(now-t0)/DUR);host.innerHTML=v41DnSvg(D,x<1?ease(x):1,W);if(x<1)requestAnimationFrame(fr)};requestAnimationFrame(fr)}

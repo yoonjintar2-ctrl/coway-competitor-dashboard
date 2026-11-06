@@ -286,4 +286,5 @@ document.addEventListener('click',e=>{if(route!=='reach')return;
 
 // 11-06 19:17 품목별 분포 영역은 사용자 요청으로 뺌
 // 11-06 19:21 코웨이 점: 레이더에 잡힌 불빛처럼 — 투명한 링이 가운데서 바깥으로 퍼지며 희미해지는 것을 반복(링 2개가 엇갈려 끊김 없이)
-function v41Ping(x,y,col,R){R=R||34;const r0=R>20?9:4;return [0,-1.2].map(b=>`<circle class="v41-ping" cx="${x}" cy="${y}" r="${(r0+R)/2}" fill="${col}" fill-opacity=".1" stroke="${col}" stroke-width="1.6" opacity=".3" pointer-events="none"><animate attributeName="r" values="${r0};${R}" dur="2.4s" begin="${b}s" repeatCount="indefinite" calcMode="spline" keySplines=".2 .6 .4 1"/><animate attributeName="opacity" values=".6;0" dur="2.4s" begin="${b}s" repeatCount="indefinite"/></circle>`).join('')}
+function v41Ping(x,y,col,R){R=R||32;const r0=R>20?9:4,h=R>20?17:7;  // 19:26 테두리 없이: 옅은 큰 원(배경)은 그대로 두고, 같은 색 면이 가운데서 바깥으로 퍼지며 희미해짐
+ return `<circle class="v41-halo" cx="${x}" cy="${y}" r="${h}" fill="${col}" fill-opacity=".2" pointer-events="none"/><circle class="v41-ping" cx="${x}" cy="${y}" r="${h}" fill="${col}" fill-opacity=".22" pointer-events="none"><animate attributeName="r" values="${r0};${R}" dur="2.6s" repeatCount="indefinite" calcMode="spline" keySplines=".25 .6 .45 1"/><animate attributeName="fill-opacity" values=".5;0" dur="2.6s" repeatCount="indefinite"/></circle>`}

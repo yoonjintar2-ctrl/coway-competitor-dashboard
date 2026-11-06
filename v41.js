@@ -24,8 +24,7 @@ function v41Controls(show){let box=document.querySelector('main>header .v41-ctrl
 // 먼슬리 리포트 기준 자료(2026년) — 카드·팝업 맨 위 표 (11-06 14:04)
 function v41Rep(){const r=v41D&&v41D.report;return r&&r.year===v41Year&&Object.keys(r.bubbles||{}).length?r:null}
 function v41RepPts(rep){const by={};Object.entries(rep.bubbles).forEach(([k,v])=>{const [sec,a]=k.split('|');const o=by[a]||(by[a]={a,secs:[],won:0,eq:0,r3:null});o.secs.push(sec);o.won+=v.won/1000;o.eq+=v.eq;o.r3=v.r3});
- // 코웨이 광고비는 월별 표의 실집행 합계(버블은 억 단위 반올림)
- const act=rep.rows.filter(x=>x.brand==='코웨이'&&x.media==='Total').reduce((t,x)=>t+(x.act||0),0);if(by['코웨이']&&act)by['코웨이'].won=act;
+ 
  return Object.values(by).map(o=>{let r=o.secs.length>1?v41Reach(o.a,'ytd'):{r3:o.r3};return {a:o.a,eq:o.eq,won:o.won,inv:0,ins:0,r,secs:o.secs}})}
 function v41RepRows(adv,per){const r=v41Rep();if(!r)return null;const rows=r.rows.filter(x=>x.brand===adv&&(per==='ytd'||v41M(v41Year,x.m)===per));return rows.length?rows:null}
 function v41View(){const d=v41D,rows=v41Pick('ytd'),by=v41Sum(rows,'adv'),ms=v41Months();

@@ -124,3 +124,16 @@ dialog.v41-dialog .v41-ph{align-items:stretch}
 /* 2026-11-06 23:20 1~6월 보너스율 기준 안내 */
 .v41-bonus-note{margin:14px 0 6px;padding:8px 12px;border-left:3px solid #1f6feb;background:#f2f6fc;border-radius:6px;color:#334;font-size:12px;line-height:1.5}
 .v41-bonus-note b{font-weight:800;color:#123}
+
+/* 2026-11-09 18:10 배경: 물방울 사진 제거 → 아주 은은한 앰비언트(옅은 회색·흰색 큰 방사형 번짐 몇 개, 먹물이 퍼지듯) */
+html.nd body{
+  background:
+    radial-gradient(760px 620px at 80% 20%,rgba(168,176,189,.20) 0%,rgba(178,186,198,.12) 30%,rgba(190,197,208,.05) 55%,transparent 72%),
+    radial-gradient(1150px 900px at 76% 26%,rgba(186,193,204,.12) 0%,rgba(196,202,212,.05) 50%,transparent 74%),
+    radial-gradient(820px 660px at 26% 80%,rgba(170,178,190,.17) 0%,rgba(182,189,200,.09) 34%,rgba(194,200,210,.035) 58%,transparent 74%),
+    radial-gradient(1250px 950px at 30% 84%,rgba(190,197,208,.10) 0%,transparent 72%),
+    radial-gradient(1100px 860px at 8% 6%,rgba(255,255,255,.95) 0%,rgba(255,255,255,.55) 36%,transparent 70%),
+    radial-gradient(1000px 820px at 60% 62%,rgba(255,255,255,.80) 0%,rgba(255,255,255,.35) 40%,transparent 72%),
+    #f1f2f5!important;
+  background-attachment:fixed!important;
+}

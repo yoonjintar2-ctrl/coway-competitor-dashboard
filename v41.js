@@ -315,3 +315,20 @@ document.addEventListener('click',e=>{if(route!=='reach')return;
 // 11-06 19:21 코웨이 점: 레이더에 잡힌 불빛처럼 — 투명한 링이 가운데서 바깥으로 퍼지며 희미해지는 것을 반복(링 2개가 엇갈려 끊김 없이)
 function v41Ping(x,y,col,R){R=R||32;const r0=R>20?9:4,h=R>20?17:7;  // 19:26 테두리 없이: 옅은 큰 원(배경)은 그대로 두고, 같은 색 면이 가운데서 바깥으로 퍼지며 희미해짐
  return `<circle class="v41-halo" cx="${x}" cy="${y}" r="${h}" fill="${col}" fill-opacity=".2" pointer-events="none"/><circle class="v41-ping" cx="${x}" cy="${y}" r="${h}" fill="${col}" fill-opacity=".22" pointer-events="none"><animate attributeName="r" values="${r0};${R}" dur="2.6s" repeatCount="indefinite" calcMode="spline" keySplines=".25 .6 .45 1"/><animate attributeName="fill-opacity" values=".5;0" dur="2.6s" repeatCount="indefinite"/></circle>`}
+
+// 2026-11-10 06:55 모든 페이지 상단에 데이터 출처 + 요율 안내 (사용자 요청: 닐슨 아덱스·디지털 자료 표기, 요율 언급)
+const V41_TVRATE='TV 광고비는 SM C&C 실집행 추정 요율 적용 — 지상파 15%·케이블&종편 39%(2025·2026년), 21%·36%(2024년), 23%·40%(2023년) · 라디오·인쇄·디지털은 모니터링 금액 그대로 · 닐슨 아덱스 금액은 2026년 보너스율 표 기준';
+const V41_SRC={
+ timeline:{s:[['닐슨 아덱스','TV·라디오·신문·잡지·디지털 집행 금액과 소재'],['AdCreative','소재 이미지·카피'],['YouTube','공식 채널 영상 — 예상 광고비 = 조회수 × CPV 30원']],r:V41_TVRATE},
+ analysis:{s:[['닐슨 아덱스','캠페인 집행 금액·매체·일별 집행'],['디지털 자료','광고주 월별 광고비·경쟁사 비교의 디지털(동영상·PC·MO 배너)'],['AdCreative','소재 이미지·카피'],['YouTube','공식 채널 영상'],['네이버','추정 검색수·뉴스']],r:V41_TVRATE},
+ daily:{s:[['AdCreative','새로 등록된 TV·라디오·인쇄·온라인 영상 소재(방송일 기준)'],['YouTube','경쟁사 공식 채널 신규 영상']],r:'광고비를 다루지 않는 화면이라 요율 해당 없음(소재 등록 현황만)'},
+ monthly:{s:[['닐슨 아덱스','TV(지상파·케이블&종편)·라디오·신문·잡지'],['디지털 자료','디지털(동영상·PC 배너·MO 배너)'],['네이버','추정 검색수·뉴스'],['YouTube·인스타그램','브랜드 게시물']],r:V41_TVRATE.replace('라디오·인쇄·디지털은','라디오·인쇄와 디지털 자료 디지털은')},
+ reach:{s:[['닐슨 아리아나','GRP·Eq GRP·도달률(R1+·R3+)·횟수, 지상파 채널 비중'],['SM C&C 먼슬리 리포트','TV 집행 요약·케이블 MPP 광고비(PDF 기준)'],['닐슨 아덱스','리포트에 없는 광고주·월의 케이블 MPP 광고비']],r:'코웨이는 실집행금액, 경쟁사는 보너스율 반영 추정 · 2026년 1~6월: 닐슨 보너스율 2025년·SM C&C 보정률 2026년 기준 / 7월~: 모두 2026년 기준'},
+ heatmap:{s:[['네이버','일별 추정 검색수(키워드 계획 기준)'],['닐슨 아덱스','일별 광고비(TV·라디오·인쇄·디지털)']],r:V41_TVRATE+' · 디지털은 디지털 자료가 월 단위라 일별은 닐슨 아덱스 디지털 사용'},
+ news:{s:[['네이버 뉴스 검색 API','기사 목록(제목에 브랜드가 들어간 기사)'],['기사 원문','요약·대표 이미지']],r:'광고비를 다루지 않는 화면이라 요율 해당 없음'}
+};
+function v41SrcRender(){try{const v=((location.hash.match(/^#\/(\w+)/)||[])[1])||'timeline',d=V41_SRC[v];const host=document.querySelector('main>header>div');if(!host)return;let el=document.getElementById('v41-src');
+ if(!d){if(el)el.remove();return}
+ if(!el){el=document.createElement('div');el.id='v41-src';el.className='v41-src';host.appendChild(el)}
+ el.innerHTML=`<p class="v41-src-s"><span class="v41-src-k">데이터 출처</span>${d.s.map(([a,b])=>`<span class="v41-src-i"><b>${a}</b> ${b}</span>`).join('')}</p>${d.r?`<p class="v41-src-r"><span class="v41-src-k">요율</span>${d.r}</p>`:''}`}catch(e){}}
+window.addEventListener('hashchange',v41SrcRender);window.addEventListener('load',()=>{v41SrcRender();setTimeout(v41SrcRender,800)});v41SrcRender();

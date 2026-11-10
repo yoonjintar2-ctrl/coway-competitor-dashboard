@@ -36,7 +36,7 @@ function v42MonthlyXls(){const d=v38D;if(!d||typeof v38Xlsx!=='function'){toast(
  const K=[['tv_terr','TV 지상파'],['tv_cable','TV 종편·케이블'],['dg_video','디지털 동영상'],['dg_pc','디지털 PC'],['dg_mo','디지털 MO'],['radio','라디오'],['news','신문'],['mag','잡지']];
  const rows=[[`${adv} · ${cat} · 월별 광고비(원, 실집행 추정 요율 반영)·네이버 쿼리 — 내려받은 날 ${v42Day()}`],[],['월',...K.map(k=>k[1]),'광고비 합계','전년 같은 달 합계',`경쟁사 평균(${d.avg_basis||'경쟁사'})`,'네이버 쿼리(월 합계)','쿼리 집계 일수','비고']];
  const tot=m=>K.reduce((s,[k])=>s+((d.spend[m]||{})[k]||0),0);
- d.months.forEach((m,i)=>{const sp=d.spend[m]||{},py=i>=12?tot(d.months[i-12]):'';rows.push([m,...K.map(([k])=>Math.round(sp[k]||0)),Math.round(tot(m)),py===''?'':Math.round(py),Math.round(d.avg[m]||0),d.query[m]==null?'':Math.round(d.query[m]),d.query_days[m]||0,m===d.current?`수집 중(${d.current_day||''}일까지)`:''])});
+ d.months.forEach((m,i)=>{const sp=d.spend[m]||{},py=i>=12?tot(d.months[i-12]):'';rows.push([m,...K.map(([k])=>Math.round(sp[k]||0)),Math.round(tot(m)),py===''?'':Math.round(py),Math.round(d.avg[m]||0),d.query[m]==null?'':Math.round(d.query[m]),d.query_days[m]||0,(d.est||{})[m]?`월 환산(TV ${d.est[m].tv||'-'}일·디지털 ${d.est[m].digital||'-'}일 기준)`:m===d.current?`수집 중(${d.current_day||''}일까지)`:''])});
  if((d.camps||[]).length){rows.push([],['캠페인','품목','시작','끝','광고비(원)']);[...d.camps].sort((a,b)=>(a.s||'').localeCompare(b.s||'')).forEach(c=>rows.push([c.name,c.category||'',c.s||'',c.e||'',Math.round(c.amount||0)]))}
  v42Down(v38Xlsx(rows,'광고비 통합 분석'),`${adv}_${cat}_광고비통합분석_${v42Day()}.xlsx`)}
 

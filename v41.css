@@ -145,3 +145,6 @@ html.nd body{
 .v41-src-r .v41-src-k{color:#7a5a12;background:rgba(214,160,40,.12)}
 .v41-src-i b{color:#26313f;font-weight:700}
 .v41-src-i{white-space:nowrap}.v41-src-i:not(:last-child)::after{content:'·';margin:0 9px;color:#b3bcc8}
+
+/* 2026-11-10 09:10 '캠페인 분석' 메뉴 제거 — 타임라인에서 캠페인을 누르면 그 화면으로 이동 */
+.nav[data-route="analysis"]{display:none!important}

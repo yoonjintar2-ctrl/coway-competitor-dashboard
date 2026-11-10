@@ -332,3 +332,9 @@ function v41SrcRender(){try{const v=((location.hash.match(/^#\/(\w+)/)||[])[1])|
  if(!el){el=document.createElement('div');el.id='v41-src';el.className='v41-src';host.appendChild(el)}
  el.innerHTML=`<p class="v41-src-s"><span class="v41-src-k">데이터 출처</span>${d.s.map(([a,b])=>`<span class="v41-src-i"><b>${a}</b> ${b}</span>`).join('')}</p>${d.r?`<p class="v41-src-r"><span class="v41-src-k">요율</span>${d.r}</p>`:''}`}catch(e){}}
 window.addEventListener('hashchange',v41SrcRender);window.addEventListener('load',()=>{v41SrcRender();setTimeout(v41SrcRender,800)});v41SrcRender();
+
+// 2026-11-10 09:10 '캠페인 분석' 메뉴를 없앴으므로, 캠페인 분석 화면에서는 '캠페인 타임라인' 메뉴를 켜 둠
+function v41NavAnalysis(){try{const a=document.querySelector('.nav[data-route="analysis"]'),t=document.querySelector('.nav[data-route="timeline"]');if(!a||!t)return;
+ if(a.classList.contains('active')){a.classList.remove('active');t.classList.add('active')}
+ if(!a.__v41o){a.__v41o=new MutationObserver(()=>{if(a.classList.contains('active')){a.classList.remove('active');t.classList.add('active')}});a.__v41o.observe(a,{attributes:true,attributeFilter:['class']})}}catch(e){}}
+window.addEventListener('load',()=>setTimeout(v41NavAnalysis,300));v41NavAnalysis();

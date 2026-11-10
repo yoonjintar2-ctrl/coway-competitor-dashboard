@@ -1,0 +1,55 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>뉴스 클리핑 예시</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+:root{--ink:#1f2328;--sub:#5f7484;--blue:#25a4dc}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;color:var(--ink);background:#eef2f6 url(/assets/nd-drops.jpg) center/cover fixed}
+.wrap{max-width:1180px;margin:28px auto;padding:0 20px}
+.glass{background:linear-gradient(160deg,rgba(255,255,255,.82),rgba(255,255,255,.58));border:1px solid rgba(255,255,255,.95);border-radius:22px;box-shadow:inset 0 1px 0 #fff,0 10px 30px rgba(20,40,80,.08);backdrop-filter:blur(14px) saturate(150%)}
+header.glass{padding:22px 28px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}
+.eyebrow{font-size:10.5px;letter-spacing:.12em;color:#2a8fc7;font-weight:700}
+h1{margin:6px 0 0;font-size:28px;letter-spacing:-.02em}
+.ctrl{display:flex;gap:10px}
+.ctrl label{display:grid;gap:5px;font-size:12px;font-weight:600;color:#5f6368}
+.ctrl select{min-width:150px;padding:9px 12px;border-radius:12px;border:1px solid #d6e3ea;background:#fff;font:600 13.5px inherit;font-family:inherit}
+.note{font-size:12px;color:var(--sub);margin:0 4px 12px}
+.list{padding:6px 22px}
+.day{font-size:13px;font-weight:700;color:#102b45;padding:16px 2px 6px;border-top:1px solid rgba(16,43,69,.12)}
+.day:first-child{border-top:0}
+.row{display:grid;grid-template-columns:62px minmax(0,1fr) 132px;gap:16px;align-items:center;padding:12px 2px;border-bottom:1px solid rgba(16,43,69,.06)}
+.row:last-child{border-bottom:0}
+.time{font-size:12.5px;font-weight:700;color:#3c4f5c;font-variant-numeric:tabular-nums;text-align:left;line-height:1.3}
+.time small{display:block;font-size:10.5px;font-weight:500;color:#9aa8b3}
+.main{min-width:0}
+.line1{display:flex;align-items:center;gap:7px;min-width:0}
+.chip{flex:none;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:#eef4f8;color:#3c5566;border:1px solid #dbe6ee}
+.chip.adv{background:var(--c);color:#fff;border-color:transparent}
+.title{font-size:15px;font-weight:700;color:#102b45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.line2{margin-top:5px;font-size:12px;font-weight:400;color:#6b7f8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.line2 b{font-weight:600;color:#8a99a6;margin-right:6px}
+.thumb{width:132px;height:74px;border-radius:10px;overflow:hidden;background:#e7eef3;border:1px solid rgba(255,255,255,.9)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.row:hover .title{color:#1a8cc2}
+.foot{font-size:11px;color:var(--sub);margin:14px 6px}
+.sample{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;color:#c26a00;background:#fff3e0;border-radius:999px;padding:3px 9px;vertical-align:middle}
+</style></head><body><div class="wrap">
+<header class="glass"><div><div class="eyebrow">COWAY COMPETITIVE INTELLIGENCE</div><h1>뉴스 클리핑 <span class="sample">예시 화면 · 실제 기사 6건</span></h1></div>
+<div class="ctrl"><label>품목<select><option>전체 품목</option></select></label><label>광고주<select><option>코웨이 + 경쟁사</option></select></label></div></header>
+<p class="note">코웨이와 경쟁 광고주 뉴스를 발행 시각 순으로 보여 줘요. 제목을 누르면 원문 기사로 이동해요.</p>
+<section class="glass list">
+ <div class="day">11.01 (일)</div>
+ <div class="row"><div class="time">13:51</div><div class="main"><div class="line1"><span class="chip">매트리스</span><span class="chip adv" style="--c:#f08a24">에이스침대</span><span class="title">에이스침대, ‘Fall in Sleep’ 프로모션 진행</span></div><div class="line2"><b>대한경제</b>에이스침대는 가을 시즌을 맞아 포근한 침실 연출을 돕는 ‘Fall in Sleep’ 프로모션을 진행한다고 1일 밝혔다. 12월6일까지 전국 에이스침대 대리점과 백화점 매장, 온라인몰에서 동시에 진행되는 이 행사 기간 동안에는…</div></div><div class="thumb"><img referrerpolicy="no-referrer" src="https://image.dnews.co.kr/photo/photo/2026/10/30/202610301347406060918-2-701642.jpg" alt=""></div></div>
+ <div class="day">10.30 (금)</div>
+ <div class="row"><div class="time">12:30</div><div class="main"><div class="line1"><span class="chip">정수기</span><span class="chip adv" style="--c:#1f8fd6">코웨이</span><span class="title">코웨이 정수기, AI 품질 경쟁력 입증…2026 AX 품질만족지수 첫 정상</span></div><div class="line2"><b>뉴스프리존</b>코웨이가 인공지능(AI)을 접목한 정수기 기술과 스마트 관리 서비스의 경쟁력을 인정받았다. 제품 성능뿐 아니라 사용 과정에서 고객이 경험하는 편의성과 신뢰성까지 평가하는 새로운 품질 조사에서…</div></div><div class="thumb"><img referrerpolicy="no-referrer" src="https://cdn.newsfreezone.co.kr/news/thumbnail/202610/716849_765794_385_v150.jpg" alt=""></div></div>
+ <div class="day">10.29 (목)</div>
+ <div class="row"><div class="time">11:32</div><div class="main"><div class="line1"><span class="chip">매트리스</span><span class="chip adv" style="--c:#1f8fd6">코웨이</span><span class="title">"스프링 매트리스부터 슬립테크까지" 코웨이 비렉스 주목</span></div><div class="line2"><b>SBS Biz</b>최근 침대 구매를 고려하는 소비자들 사이에서 코웨이의 ‘비렉스(BEREX)’가 크게 주목받고 있습니다. 코웨이가 선보인 슬립 및 힐링케어 브랜드 비렉스는 론칭 3년 만에 침대와 힐링 가전 시장의…</div></div><div class="thumb"><img referrerpolicy="no-referrer" src="https://img.biz.sbs.co.kr/upload/2026/10/29/kxo1793240987761-850.jpg" alt=""></div></div>
+ <div class="day">10.26 (월)</div>
+ <div class="row"><div class="time">09:27</div><div class="main"><div class="line1"><span class="chip">안마의자</span><span class="chip adv" style="--c:#2fa36b">바디프랜드</span><span class="title">"이웃 찾아왔어요"…바디프랜드, 사옥 문 '활짝'</span></div><div class="line2"><b>뉴시스</b>서울 양재천 인근에 본사를 둔 바디프랜드가 지난 주말 지역 주민들을 위해 사옥을 문을 열었다. 바디프랜드는 지난 24일 서울 강남구 양재천로에서 열린 '도곡 메타세쿼이아 로드 페스타'에 참여해…</div></div><div class="thumb"><img referrerpolicy="no-referrer" src="https://img1.newsis.com/2026/10/26/NISI20261026_0002273451_web.jpg" alt=""></div></div>
+ <div class="day">10.23 (금)</div>
+ <div class="row"><div class="time">13:24</div><div class="main"><div class="line1"><span class="chip">정수기</span><span class="chip adv" style="--c:#c5225f">LG전자</span><span class="title">얼음 씹는 소리로 정수기 알린 LG전자, 2026 한국PR대상 최우수상</span></div><div class="line2"><b>컨슈머타임스</b>LG전자가 얼음 씹는 소리, 식기세척기 스팀 장면 같은 감각 자극으로 가전 특징을 알린 '팅글' 마케팅으로 '2026년 한국PR대상' 디지털 기반 통합 마케팅 부문 최우수상을 받았다…</div></div><div class="thumb"><img referrerpolicy="no-referrer" src="https://www.cstimes.com/news/photo/202610/725107_646452_2441.jpg" alt=""></div></div>
+ <div class="day">10.20 (화)</div>
+ <div class="row"><div class="time">15:54</div><div class="main"><div class="line1"><span class="chip">안마의자</span><span class="chip adv" style="--c:#2fa36b">바디프랜드</span><span class="title">바디프랜드, 말 한마디면 알아서 전신 마사지…헬스케어 로봇이 내 몸 돌본다</span></div><div class="line2"><b>한국경제</b>생성형 AI 입힌 지능형 체어 기기가 스스로 탑승까지 도와</div></div><div class="thumb"><img referrerpolicy="no-referrer" src="https://img.hankyung.com/photo/202610/AA.46118709.1.jpg" alt=""></div></div>
+</section>
+<p class="foot">출처: 네이버 뉴스 검색에서 찾은 기사 원문(제목·첫 문단·대표 이미지) · 요약은 기사 첫 문단을 한 줄로 자른 것(AI 요약 아님)</p>
+</div></body></html>

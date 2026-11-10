@@ -148,3 +148,6 @@ html.nd body{
 
 /* 2026-11-10 09:10 '캠페인 분석' 메뉴 제거 — 타임라인에서 캠페인을 누르면 그 화면으로 이동 */
 .nav[data-route="analysis"]{display:none!important}
+
+/* 2026-11-10 17:50 'TV 통합 분석' 메뉴 잠시 숨김 — 캠페인3팀 기준에 맞춘 메뉴(타임라인·광고비 통합 분석)부터 정리 (사용자 요청, PC·GitHub 공통) */
+.nav[data-route="reach"]{display:none!important}

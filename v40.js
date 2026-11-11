@@ -84,7 +84,7 @@ function v40After(){const d=v38D,card=document.querySelector('#content .v38-card
  const unit=`${esc(d.category)} 품목에 쓴 광고비만 · 경쟁사 전체와 코웨이 · TV는 SM C&C 실집행 추정, 디지털은 광고비 통합 분석과 같은 기준`;
  const sec=(title,body,note,ctrl)=>`<section class="glass section v40-sec"><div class="v40-h"><h2>${title}</h2>${d.category&&ctrl?ctrl:''}</div>${d.category?body:need}${d.category&&note?`<p class="footnote v40-foot">${note}</p>`:''}</section>`;
  card.insertAdjacentHTML('afterend',
-  sec('품목 내 광고주별 월별 광고비',`<div class="v38-glass">${d.category?v40PeerTable(d):''}</div>`,`${unit} · 광고주 이름을 누르면 그 광고주 화면으로 넘어가요`)+
+  sec('품목 내 광고주별 월별 광고비',`${d.category?v40PeerTable(d):''}`,`${unit} · 광고주 이름을 누르면 그 광고주 화면으로 넘어가요`)+
   sec('품목 내 Share of Spending',`<div class="v38-glass v40-pane"><div id="v40-sos">${d.category?v40Donut(d):''}</div></div>`,`${unit} · 3% 미만 광고주는 기타로 묶었어요(마우스를 올리면 세부) · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):'')+
   sec('품목 내 매체 믹스',`<div class="v38-glass v40-pane"><div class="v40-mixwrap"><div id="v40-mix">${d.category?v40MixChart(d):''}</div><button type="button" class="v38-fbtn v40-mbtn l" data-v40-mscroll="-1" aria-label="왼쪽으로" hidden>${V40_CHEV(-1)}</button><button type="button" class="v38-fbtn v40-mbtn r" data-v40-mscroll="1" aria-label="오른쪽으로" hidden>${V40_CHEV(1)}</button></div></div>`,`${unit} · 기본은 올해 누적, 오른쪽 위에서 월을 고를 수 있어요`,d.category?v40Sel(d):''));
  const sc=document.getElementById('v40-pscroll');if(sc)sc.scrollLeft=sc.scrollWidth;const mx=document.getElementById('v40-mix');if(mx&&d.category)mx.innerHTML=v40MixChart(d,mx.clientWidth);v40MixBtns();v40SosArm(d)}

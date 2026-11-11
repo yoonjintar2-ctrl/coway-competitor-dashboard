@@ -4,31 +4,21 @@ var V43_META={"2026-11": "11/9 보고 · 11/1~7 기준", "2026-10": "10/13 보�
 var v43Month=Object.keys(V43_DATA).sort().pop();
 (function(){const s=document.createElement('style');s.textContent=`
 #v43-box{margin-top:18px}
-#v43-box .v43-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}
+#v43-box .v43-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 12px}
 #v43-box .v43-head>div:first-child{flex:1;min-width:0}
+#v43-box h2{margin:0;font-size:16px;font-weight:900;color:#102b45}
+#v43-box h2 small{font-size:11.5px;font-weight:600;color:#8a96a3;margin-left:8px}
 #v43-box .v43-head>.v43-ctl{flex:none;margin-left:auto;display:flex;justify-content:flex-end;gap:10px;align-items:center;white-space:nowrap}
 #v43-box .v43-ctl label{font-size:12px;color:#6b7785}
-#v43-box h2{margin:0;font-size:19px;font-weight:800;letter-spacing:-.02em}
-#v43-box .v43-sub{margin:5px 0 0;font-size:12px;color:#6b7785;line-height:1.5}
-#v43-box .v43-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
-@media(max-width:1100px){#v43-box .v43-grid{grid-template-columns:1fr}}
-#v43-box .v43-card{background:rgba(255,255,255,.72);border:1px solid rgba(20,40,70,.08);border-radius:16px;padding:12px 14px 10px;min-width:0}
-#v43-box .v43-card h3{margin:0 0 8px;font-size:14px;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:8px}
-#v43-box .v43-card h3 b{font-weight:800}
-#v43-box .v43-card h3 span{font-size:11.5px;font-weight:600;color:#6b7785}
-#v43-box table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
-#v43-box th{font-weight:600;color:#7b8794;font-size:11px;text-align:right;padding:4px 6px;border-bottom:1px solid rgba(20,40,70,.1)}
-#v43-box th:first-child,#v43-box td:first-child{text-align:left;width:24%}
-#v43-box th:last-child,#v43-box td:last-child{text-align:left;width:36%;color:#6b7785;padding-left:18px}
-#v43-box td{padding:5px 6px;border-bottom:1px solid rgba(20,40,70,.05);text-align:right;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#v43-box td:first-child{font-weight:600}
-#v43-box tr.off td{color:#aab3bd;font-weight:400}
-#v43-box tr.cw td:first-child{color:#1a8cc2}
-#v43-box th,#v43-box td,#v43-box th:first-child,#v43-box td:first-child,#v43-box th:last-child,#v43-box td:last-child{text-align:center;padding-left:6px}
-#v43-box td.v{overflow:visible;text-overflow:clip}
-#v43-box tr.on td.v{font-weight:700;color:#1d2733}
-#v43-box .v43-more{margin-top:6px;font-size:11.5px;color:#1a8cc2;background:none;border:0;padding:2px 0;cursor:pointer}
-#v43-box .v43-none{font-size:12px;color:#aab3bd;padding:6px 0}
+#v43-box table.v43-pt{width:100%;table-layout:fixed}
+#v43-box .v43-pt th,#v43-box .v43-pt td{text-align:center;overflow:hidden;text-overflow:ellipsis}
+#v43-box .v43-pt th[scope=row]{position:static;max-width:none;min-width:0;box-shadow:none;font-weight:700;color:#34414d}
+#v43-box .v43-pt thead th:first-child{position:static;max-width:none;box-shadow:none;text-align:center}
+#v43-box .v43-pt col.n{width:22%}#v43-box .v43-pt col.v{width:11%}
+#v43-box .v43-pt tr.cw th[scope=row]{color:#1d4f91}
+#v43-box .v43-pt tr.on td.v{font-weight:800;color:#34414d}
+#v43-box .v43-pt tr.off th[scope=row],#v43-box .v43-pt tr.off td{color:#b3bfc8;font-weight:500}
+#v43-box .v43-pt td.z{color:#cdd8df;font-weight:400!important}
 `;document.head.appendChild(s)})();
 var v43Cat='';
 function v43Secs(){return V43_DATA[v43Month]||[]}
@@ -36,9 +26,11 @@ function v43Html(){const secs=v43Secs(),ms=Object.keys(V43_DATA).sort().reverse(
  if(!secs.some(s=>s.cat===v43Cat))v43Cat=secs.length?secs[0].cat:'';
  const s=secs.find(x=>x.cat===v43Cat)||{rows:[]};const has=r=>['tv','radio','mag','news'].some(k=>r[k]!=='-');
  const rows=[...s.rows.filter(has),...s.rows.filter(r=>!has(r))],n=s.rows.filter(has).length;
- const tr=r=>`<tr class="${has(r)?'on':'off'}${/^코웨이/.test(r.name)?' cw':''}"><td title="${e(r.name)}">${e(r.name)}</td><td class="v">${e(r.tv)}</td><td class="v">${e(r.radio)}</td><td class="v">${e(r.mag)}</td><td class="v">${e(r.news)}</td><td title="${e(r.note)}">${e(r.note)}</td></tr>`;
- return `<div class="v43-head"><div><h2>품목별 광고주별 광고비</h2><p class="v43-sub">캠페인3팀 월간 경쟁사 동향 리포트 표 · ${e(V43_META[v43Month]||'')} · TV는 지상파 15%·케이블 39% 요율 적용, 1~7일 금액 × 당월 일수 ÷ 7 · 코웨이는 자사 집행 금액 · 실제 집행 내역과 다를 수 있음</p></div><div class="v43-ctl"><label>품목 <select id="v43-cat" class="chip">${secs.map(x=>`<option value="${e(x.cat)}" ${x.cat===v43Cat?'selected':''}>${e(x.cat)}</option>`).join('')}</select></label><label>월 <select id="v43-month" class="chip">${ms.map(m=>`<option value="${m}" ${m===v43Month?'selected':''}>${m.slice(2,4)}.${m.slice(5)}</option>`).join('')}</select></label></div></div>
- <div class="v43-card"><h3><b>${e(v43Cat)} <span>집행 ${n} · 전체 ${s.rows.length}</span></b><button type="button" class="v39-ic" id="v43-xls" title="이 달 전체 품목을 엑셀로 내려받기" aria-label="엑셀 내려받기">${typeof V39_XLS==='string'?V39_XLS:'엑셀'}</button></h3><table><thead><tr><th>광고주</th><th>TV</th><th>라디오</th><th>잡지</th><th>신문</th><th>TVC 소재</th></tr></thead><tbody>${rows.map(tr).join('')}</tbody></table></div>`}
+ const c=v=>`<td class="v${v==='-'?' z':''}">${v==='-'?'–':e(v)}</td>`;
+ const tr=r=>`<tr class="${has(r)?'on':'off'}${/^코웨이/.test(r.name)?' cw':''}"><th scope="row" title="${e(r.name)}">${e(r.name)}</th>${c(r.tv)}${c(r.radio)}${c(r.mag)}${c(r.news)}<td title="${e(r.note)}">${e(r.note)}</td></tr>`;
+ return `<div class="v43-head"><div><h2>품목별 광고주별 광고비<small>${e(v43Cat)} · 집행 ${n} · 전체 ${s.rows.length}</small></h2></div><div class="v43-ctl"><label>품목 <select id="v43-cat" class="chip">${secs.map(x=>`<option value="${e(x.cat)}" ${x.cat===v43Cat?'selected':''}>${e(x.cat)}</option>`).join('')}</select></label><label>월 <select id="v43-month" class="chip">${ms.map(m=>`<option value="${m}" ${m===v43Month?'selected':''}>${m.slice(2,4)}.${m.slice(5)}</option>`).join('')}</select></label><button type="button" class="v39-ic" id="v43-xls" title="이 달 전체 품목을 엑셀로 내려받기" aria-label="엑셀 내려받기">${typeof V39_XLS==='string'?V39_XLS:'엑셀'}</button></div></div>
+ <div class="v40-tbl"><table class="v40-pt v43-pt"><colgroup><col class="n"><col class="v"><col class="v"><col class="v"><col class="v"><col></colgroup><thead><tr><th scope="col">광고주</th><th scope="col">TV</th><th scope="col">라디오</th><th scope="col">잡지</th><th scope="col">신문</th><th scope="col">TVC 소재</th></tr></thead><tbody>${rows.map(tr).join('')}</tbody></table></div>
+ <p class="footnote v40-foot">캠페인3팀 월간 경쟁사 동향 리포트 표 · ${e(V43_META[v43Month]||'')} · TV는 지상파 15%·케이블 39% 요율 적용, 1~7일 금액 × 당월 일수 ÷ 7 · 코웨이는 자사 집행 금액 · 실제 집행 내역과 다를 수 있음 · 엑셀은 이 달 전체 품목</p>`}
 function v43Redraw(){const b=document.getElementById('v43-box');if(b)b.innerHTML=v43Html()}
 function v43Mount(){if(typeof route==='undefined'||route!=='monthly')return;const c=document.getElementById('content');if(!c||!c.querySelector('.v38-card')||document.getElementById('v43-box'))return;const b=document.createElement('section');b.id='v43-box';b.className='glass section';b.innerHTML=v43Html();c.appendChild(b)}
 function v43Excel(){const num=v=>v==='-'?'':/^[\d.]+억$/.test(v)?parseFloat(v):v;const rows=[['월','품목','광고주','TV(억)','라디오(억)','잡지(억)','신문(억)','TVC 소재']];v43Secs().forEach(s=>s.rows.forEach(r=>rows.push([v43Month,s.cat,r.name,num(r.tv),num(r.radio),num(r.mag),num(r.news),r.note])));

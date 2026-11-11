@@ -24,6 +24,7 @@ var v43Month=Object.keys(V43_DATA).sort().pop();
 #v43-box td:first-child{font-weight:600}
 #v43-box tr.off td{color:#aab3bd;font-weight:400}
 #v43-box tr.cw td:first-child{color:#1a8cc2}
+#v43-box th,#v43-box td,#v43-box th:first-child,#v43-box td:first-child,#v43-box th:last-child,#v43-box td:last-child{text-align:center;padding-left:6px}
 #v43-box td.v{overflow:visible;text-overflow:clip}
 #v43-box tr.on td.v{font-weight:700;color:#1d2733}
 #v43-box .v43-more{margin-top:6px;font-size:11.5px;color:#1a8cc2;background:none;border:0;padding:2px 0;cursor:pointer}

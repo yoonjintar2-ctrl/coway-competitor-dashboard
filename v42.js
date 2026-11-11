@@ -33,7 +33,7 @@ function v42MonthlyPng(){const ch=document.querySelector('#content .v38-chart'),
  body+=`<rect x="${lx}" y="${ly-5}" width="16" height="3" rx="1.5" fill="${V38_G}"/><text x="${lx+22}" y="${ly}" font-size="11.5" font-weight="700" fill="#55697a">네이버 쿼리</text>`;
  v42Save(body,W,H,`${adv}_${cat}_광고비통합분석_${v42Day()}.png`)}
 function v42MonthlyXls(){const d=v38D;if(!d||typeof v38Xlsx!=='function'){toast('자료가 아직 없어요.');return}const {adv,cat}=v42MonthlyName();
- const K=[['tv_terr','TV 지상파'],['tv_cable','TV 종편·케이블'],['dg_video','디지털 동영상'],['dg_pc','디지털 PC'],['dg_mo','디지털 MO'],['radio','라디오'],['news','신문'],['mag','잡지']];
+ const K=[['tv_plan','TV 구분 없음(수기)'],['tv_terr','TV 지상파'],['tv_cable','TV 종편·케이블'],['dg_video','디지털 동영상'],['dg_pc','디지털 PC'],['dg_mo','디지털 MO'],['radio','라디오'],['news','신문'],['mag','잡지']];
  const rows=[[`${adv} · ${cat} · 월별 광고비(원, 실집행 추정 요율 반영)·네이버 쿼리 — 내려받은 날 ${v42Day()}`],[],['월',...K.map(k=>k[1]),'광고비 합계','전년 같은 달 합계',`경쟁사 평균(${d.avg_basis||'경쟁사'})`,'네이버 쿼리(월 합계)','쿼리 집계 일수','비고']];
  const tot=m=>K.reduce((s,[k])=>s+((d.spend[m]||{})[k]||0),0);
  d.months.forEach((m,i)=>{const sp=d.spend[m]||{},py=i>=12?tot(d.months[i-12]):'';rows.push([m,...K.map(([k])=>Math.round(sp[k]||0)),Math.round(tot(m)),py===''?'':Math.round(py),Math.round(d.avg[m]||0),d.query[m]==null?'':Math.round(d.query[m]),d.query_days[m]||0,(d.est||{})[m]?(typeof v38Est==='function'?v38Est(d.est[m]):'월 환산'):m===d.current?`수집 중(${d.current_day||''}일까지)`:''])});

@@ -2,7 +2,7 @@
    광고주(또는 세부 품목)를 고르면 최근 25개월(화면엔 12개월, 좌우 버튼으로 이동)을 월 단위로:
    캠페인 캡슐·관련 기사(같은 띠, 높이 고정) → 네이버 쿼리(올해·전년) → 매체별 광고비 막대(전년 막대·경쟁사 평균 영역) → 표 → 유튜브·인스타그램 게시물. */
 var v38First=true,V38_TITLE='광고비 통합 분석',v38Opt=null,v38Adv='',v38Cat='',v38D=null,v38Req=0;
-var V38_CATS=[['tv','TV','#1b84bd',[['tv_terr','지상파'],['tv_cable','종편·케이블']]],['dg','디지털','#4aa9da',[['dg_video','동영상'],['dg_pc','PC'],['dg_mo','MO']]],['radio','라디오','#8cc7e5',[['radio','라디오']]],['print','인쇄','#bfdfef',[['news','신문'],['mag','잡지']]]];
+var V38_CATS=[['tv','TV','#1b84bd',[['tv_terr','지상파'],['tv_cable','종편·케이블'],['tv_plan','구분 없음(수기)']]],['dg','디지털','#4aa9da',[['dg_video','동영상'],['dg_pc','PC'],['dg_mo','MO']]],['radio','라디오','#8cc7e5',[['radio','라디오']]],['print','인쇄','#bfdfef',[['news','신문'],['mag','잡지']]]];
 var V38_G='#858f99';  // 네이버 쿼리: 무채색(광고비 막대가 주인공, 11-05 14:58)
 function v38Nav(){const nav=document.querySelector('.sidebar nav');if(!nav||nav.querySelector('[data-route="monthly"]'))return;
  const b=document.createElement('button');b.className='nav';b.dataset.route='monthly';b.textContent=V38_TITLE;

@@ -1,6 +1,6 @@
 /* v40 — 2026-11-06 광고비 통합 분석 하단: 품목 내 광고주별 월별 광고비 + 매체 믹스·쉐어 오브 스펜딩
    품목(세부 품목)을 골랐을 때만 — 그 품목에 쓴 광고비만(경쟁사 모두 + 코웨이). */
-var V40_MIX=[['tv_terr','지상파','#4c66b2'],['tv_cable','종편·케이블','#7fc4e4'],['dg','디지털','#9fd6c8'],['radio','라디오','#6ea7a3'],['news','신문','#8a97ab'],['mag','잡지','#c3c8cd']];
+var V40_MIX=[['tv_plan','TV(구분 없음·수기)','#2f4a8f'],['tv_terr','지상파','#4c66b2'],['tv_cable','종편·케이블','#7fc4e4'],['dg','디지털','#9fd6c8'],['radio','라디오','#6ea7a3'],['news','신문','#8a97ab'],['mag','잡지','#c3c8cd']];
 var v40Per='ytd';  // 'ytd' 또는 'YYYY-MM'
 function v40Mix(x){const o={};V40_MIX.forEach(([k])=>o[k]=0);for(const [k,v] of Object.entries(x||{})){const kk=k.startsWith('dg_')?'dg':k;if(kk in o)o[kk]+=v||0}return o}
 function v40Months(d){const y=d.current.slice(0,4);return d.months.filter(m=>m.startsWith(y))}

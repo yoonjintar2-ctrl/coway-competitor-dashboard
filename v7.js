@@ -1,6 +1,6 @@
 /* v7 — 2026-11-03 Claude: 설정 > 인덱스 (엑셀로 관리하는 기준표를 붙여넣기·편집). v6 다음 로드. */
 var v7Tab='media',v7Idx=null,v7Filter='',v7Paste=false;
-const v7Tabs=[['media','매체 구분'],['competitor','경쟁사 판단'],['category_map','업종 → 품목'],['product_name','상품명 통합'],['pp','채널 → PP'],['magazine','인쇄 매체 카테고리'],['ad_type','광고 유형']];
+const v7Tabs=[['media','매체 구분'],['competitor','경쟁사 판단'],['category_map','업종 → 품목'],['product_name','상품명 통합'],['pp','채널 → PP'],['magazine','인쇄 매체 카테고리'],['ad_type','광고 유형'],['report_adv','통합분석 제외 광고주'],['manual_spend','수기 수정']];
 var v7BaseRender=render;
 render=async function(){
  if(route!=='settings')return v7BaseRender();

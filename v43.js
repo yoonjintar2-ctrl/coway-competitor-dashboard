@@ -6,7 +6,8 @@ var v43Month=Object.keys(V43_DATA).sort().pop();
 #v43-box{margin-top:18px}
 #v43-box .v43-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}
 #v43-box .v43-head>div{flex:1;min-width:0}
-#v43-box .v43-head label{flex:none;white-space:nowrap}
+#v43-box .v43-ctl{flex:none;display:flex;gap:10px;align-items:center;white-space:nowrap}
+#v43-box .v43-ctl label{font-size:12px;color:#6b7785}
 #v43-box h2{margin:0;font-size:19px;font-weight:800;letter-spacing:-.02em}
 #v43-box .v43-sub{margin:5px 0 0;font-size:12px;color:#6b7785;line-height:1.5}
 #v43-box .v43-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
@@ -14,10 +15,10 @@ var v43Month=Object.keys(V43_DATA).sort().pop();
 #v43-box .v43-card{background:rgba(255,255,255,.72);border:1px solid rgba(20,40,70,.08);border-radius:16px;padding:12px 14px 10px;min-width:0}
 #v43-box .v43-card h3{margin:0 0 8px;font-size:14px;font-weight:800;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 #v43-box .v43-card h3 span{font-size:11.5px;font-weight:600;color:#6b7785}
-#v43-box table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+#v43-box table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
 #v43-box th{font-weight:600;color:#7b8794;font-size:11px;text-align:right;padding:4px 6px;border-bottom:1px solid rgba(20,40,70,.1)}
-#v43-box th:first-child,#v43-box td:first-child{text-align:left;width:27%}
-#v43-box th:last-child,#v43-box td:last-child{text-align:left;width:25%;color:#6b7785}
+#v43-box th:first-child,#v43-box td:first-child{text-align:left;width:24%}
+#v43-box th:last-child,#v43-box td:last-child{text-align:left;width:36%;color:#6b7785;padding-left:18px}
 #v43-box td{padding:5px 6px;border-bottom:1px solid rgba(20,40,70,.05);text-align:right;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #v43-box td:first-child{font-weight:600}
 #v43-box tr.off td{color:#aab3bd;font-weight:400}
@@ -27,14 +28,22 @@ var v43Month=Object.keys(V43_DATA).sort().pop();
 #v43-box .v43-more{margin-top:6px;font-size:11.5px;color:#1a8cc2;background:none;border:0;padding:2px 0;cursor:pointer}
 #v43-box .v43-none{font-size:12px;color:#aab3bd;padding:6px 0}
 `;document.head.appendChild(s)})();
-var v43Open=new Set();
-function v43Html(){const secs=V43_DATA[v43Month]||[],ms=Object.keys(V43_DATA).sort().reverse();const e=typeof esc==='function'?esc:(x=>String(x));
- const cell=v=>v==='-'?'-':e(v);
- const card=s=>{const on=s.rows.filter(r=>['tv','radio','mag','news'].some(k=>r[k]!=='-')),off=s.rows.filter(r=>!on.includes(r)),open=v43Open.has(s.cat);
-  const tr=(r,c)=>`<tr class="${c}${/^코웨이/.test(r.name)?' cw':''}"><td title="${e(r.name)}">${e(r.name)}</td><td class="v">${cell(r.tv)}</td><td class="v">${cell(r.radio)}</td><td class="v">${cell(r.mag)}</td><td class="v">${cell(r.news)}</td><td title="${e(r.note)}">${e(r.note)}</td></tr>`;
-  return `<div class="v43-card"><h3>${e(s.cat)}<span>집행 ${on.length} · 전체 ${s.rows.length}</span></h3>${on.length||open?`<table><thead><tr><th>광고주</th><th>TV</th><th>라디오</th><th>잡지</th><th>신문</th><th>TVC 소재</th></tr></thead><tbody>${on.map(r=>tr(r,'on')).join('')}${open?off.map(r=>tr(r,'off')).join(''):''}</tbody></table>`:'<div class="v43-none">집행 없음</div>'}${off.length?`<button class="v43-more" data-v43-more="${e(s.cat)}">${open?'집행 없는 광고주 접기':`집행 없는 광고주 ${off.length}곳 보기`}</button>`:''}</div>`};
- return `<div class="v43-head"><div><h2>품목별 광고주별 광고비</h2><p class="v43-sub">캠페인3팀 월간 경쟁사 동향 리포트 표 · ${e(V43_META[v43Month]||'')} · TV는 지상파 15%·케이블 39% 요율 적용, 1~7일 금액 × 당월 일수 ÷ 7 · 코웨이는 자사 집행 금액 · 실제 집행 내역과 다를 수 있음</p></div><label style="font-size:12px;color:#6b7785">월 <select id="v43-month" class="chip">${ms.map(m=>`<option value="${m}" ${m===v43Month?'selected':''}>${m.slice(2,4)}.${m.slice(5)}</option>`).join('')}</select></label></div><div class="v43-grid">${secs.map(card).join('')}</div>`}
+var v43Cat='';
+function v43Secs(){return V43_DATA[v43Month]||[]}
+function v43Html(){const secs=v43Secs(),ms=Object.keys(V43_DATA).sort().reverse();const e=typeof esc==='function'?esc:(x=>String(x));
+ if(!secs.some(s=>s.cat===v43Cat))v43Cat=secs.length?secs[0].cat:'';
+ const s=secs.find(x=>x.cat===v43Cat)||{rows:[]};const has=r=>['tv','radio','mag','news'].some(k=>r[k]!=='-');
+ const rows=[...s.rows.filter(has),...s.rows.filter(r=>!has(r))],n=s.rows.filter(has).length;
+ const tr=r=>`<tr class="${has(r)?'on':'off'}${/^코웨이/.test(r.name)?' cw':''}"><td title="${e(r.name)}">${e(r.name)}</td><td class="v">${e(r.tv)}</td><td class="v">${e(r.radio)}</td><td class="v">${e(r.mag)}</td><td class="v">${e(r.news)}</td><td title="${e(r.note)}">${e(r.note)}</td></tr>`;
+ return `<div class="v43-head"><div><h2>품목별 광고주별 광고비</h2><p class="v43-sub">캠페인3팀 월간 경쟁사 동향 리포트 표 · ${e(V43_META[v43Month]||'')} · TV는 지상파 15%·케이블 39% 요율 적용, 1~7일 금액 × 당월 일수 ÷ 7 · 코웨이는 자사 집행 금액 · 실제 집행 내역과 다를 수 있음</p></div><div class="v43-ctl"><label>품목 <select id="v43-cat" class="chip">${secs.map(x=>`<option value="${e(x.cat)}" ${x.cat===v43Cat?'selected':''}>${e(x.cat)}</option>`).join('')}</select></label><label>월 <select id="v43-month" class="chip">${ms.map(m=>`<option value="${m}" ${m===v43Month?'selected':''}>${m.slice(2,4)}.${m.slice(5)}</option>`).join('')}</select></label><button class="secondary" id="v43-xls" title="이 달 전체 품목을 엑셀로 내려받기">엑셀</button></div></div>
+ <div class="v43-card"><h3>${e(v43Cat)}<span>집행 ${n} · 전체 ${s.rows.length}</span></h3><table><thead><tr><th>광고주</th><th>TV</th><th>라디오</th><th>잡지</th><th>신문</th><th>TVC 소재</th></tr></thead><tbody>${rows.map(tr).join('')}</tbody></table></div>`}
+function v43Redraw(){const b=document.getElementById('v43-box');if(b)b.innerHTML=v43Html()}
 function v43Mount(){if(typeof route==='undefined'||route!=='monthly')return;const c=document.getElementById('content');if(!c||!c.querySelector('.v38-card')||document.getElementById('v43-box'))return;const b=document.createElement('section');b.id='v43-box';b.className='glass section';b.innerHTML=v43Html();c.appendChild(b)}
-document.addEventListener('change',ev=>{if(ev.target&&ev.target.id==='v43-month'){v43Month=ev.target.value;const b=document.getElementById('v43-box');if(b)b.innerHTML=v43Html()}});
-document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.closest('[data-v43-more]');if(!t)return;const k=t.dataset.v43More;v43Open.has(k)?v43Open.delete(k):v43Open.add(k);const b=document.getElementById('v43-box');if(b)b.innerHTML=v43Html()});
+function v43Excel(){const num=v=>v==='-'?'':/^[\d.]+억$/.test(v)?parseFloat(v):v;const rows=[['월','품목','광고주','TV(억)','라디오(억)','잡지(억)','신문(억)','TVC 소재']];v43Secs().forEach(s=>s.rows.forEach(r=>rows.push([v43Month,s.cat,r.name,num(r.tv),num(r.radio),num(r.mag),num(r.news),r.note])));
+ const name=`품목별_광고주별_광고비_${v43Month}.xlsx`;let blob;
+ if(typeof v38Xlsx==='function')blob=v38Xlsx(rows,'품목별 광고주별 광고비');
+ else{blob=new Blob(['\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n')],{type:'text/csv'})}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=typeof v38Xlsx==='function'?name:name.replace('.xlsx','.csv');document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+document.addEventListener('change',ev=>{const t=ev.target;if(!t)return;if(t.id==='v43-month'){v43Month=t.value;v43Redraw()}else if(t.id==='v43-cat'){v43Cat=t.value;v43Redraw()}});
+document.addEventListener('click',ev=>{if(ev.target.closest&&ev.target.closest('#v43-xls'))v43Excel()});
 (function(){const go=()=>{const c=document.getElementById('content');if(!c)return setTimeout(go,300);new MutationObserver(()=>v43Mount()).observe(c,{childList:true});v43Mount()};go()})();
